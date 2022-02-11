@@ -10,10 +10,11 @@ verify if it contains a comment.
 import os
 import glob
 import click
+import tempfile
 
 import kgx.cli
 
-OUTDIR = "transformed"
+TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 
@@ -25,7 +26,6 @@ TARGET_TYPE = "ontologies"
 def run(input: str):
 
     data_filepaths = examine_data_directory(input)
-    set_up_outdirs(data_filepaths)
     do_transforms(data_filepaths)
 
 def examine_data_directory(input: str):
@@ -49,25 +49,6 @@ def examine_data_directory(input: str):
     
     return data_filepaths
 
-def set_up_outdirs(paths: list) -> None:
-    """
-    Given a list of file paths,
-    sets up output directories.
-    :param paths: list of file paths as strings
-    """
-
-    print("Setting up output directories...")
-
-    if not os.path.exists(OUTDIR):
-        os.mkdir(OUTDIR)
-
-    for filepath in paths:
-        newpath = "/".join((filepath.split("/"))[-3:-1])
-        newpath = os.path.join(OUTDIR,newpath)
-        print(newpath)
-        if not os.path.exists(newpath):
-            os.makedirs(newpath)
-
 def do_transforms(paths: list) -> None:
     """
     Given a list of file paths,
@@ -78,9 +59,13 @@ def do_transforms(paths: list) -> None:
     :param paths: list of file paths as strings
     """
 
-    print("Transforming...")
+    if not os.path.exists(TXDIR):
+        os.mkdir(TXDIR)
+
+    print("Transforming all...")
 
     for filepath in paths:
+        print(f"Starting on {filepath}")
         with open(filepath) as infile:
             header = (infile.readline()).rstrip()
             metadata = (header.split(NAMESPACE))[1]
@@ -89,18 +74,36 @@ def do_transforms(paths: list) -> None:
             if metadata_split[0] == TARGET_TYPE:
                 dataname = metadata_split[1]
                 version = metadata_split[3]
-                outname = f"{dataname}_{version}" 
-                outpath = os.path.join(OUTDIR,metadata[0:2],outname)
+                outname = f"{dataname}_{version}"
+                outdir = os.path.join(TXDIR,"/".join(metadata_split[0:2]))
+                outpath = os.path.join(outdir,outname)
+                if not os.path.exists(outdir):
+                    os.makedirs(outdir)
             else:
                 continue
-        
-        # Still need to remove first line or KGX will choke
-
-        kgx.cli.transform(inputs=filepath,
-                          input_format='nt',
-                          output=outpath,
-                          output_format='tsv')
             
+            # Need version of file w/o first line or KGX will choke
+            # The file may be empty!
+            with tempfile.NamedTemporaryFile(mode = "w", delete=False) as tempout:
+                linecount = 0
+                for line in infile:
+                    tempout.write(line)
+                    linecount = linecount +1
+                tempname = tempout.name
+                print(tempname)
 
+            if linecount > 0:
+                print(f"Transforming {outname}")
+                kgx.cli.transform(inputs=[tempname],
+                        input_format='nt',
+                        output=outpath,
+                        output_format='tsv')
+            else:
+                print(f"File for {outname} is empty! Writing placeholder.")
+                with open(outpath, 'w') as outfile:
+                    pass
+            
+            os.remove(tempout.name)
+            
 if __name__ == '__main__':
   run()
