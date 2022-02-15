@@ -20,13 +20,19 @@ TARGET_TYPE = "ontologies"
 
 @click.command()
 @click.option("--input",
-               required=True,
-               nargs=1,
-               help="""Path to the 4store data dump - usually named data""")
-def run(input: str):
+                required=True,
+                nargs=1,
+                help="""Path to the 4store data dump - usually named data""")
+@click.option("--kgx_validate",
+                is_flag=True,
+                help="""If used, will run the KGX validator after completing all transformations. 
+                        Validation logs will be written to each output directory.""")
+def run(input: str, kgx_validate: bool):
 
-    data_filepaths = examine_data_directory(input)
-    do_transforms(data_filepaths)
+    #data_filepaths = examine_data_directory(input)
+    #do_transforms(data_filepaths)
+    if kgx_validate:
+        validate_transforms()
 
 def examine_data_directory(input: str):
     """
@@ -83,7 +89,9 @@ def do_transforms(paths: list) -> None:
                 continue
             
             # Need version of file w/o first line or KGX will choke
-            # The file may be empty!
+            # The file may be empty, but that doesn't mean the
+            # relevant contents aren't somewhere in the data dump
+            # So we write a placeholder if needed
             with tempfile.NamedTemporaryFile(mode = "w", delete=False) as tempout:
                 linecount = 0
                 for line in infile:
@@ -98,12 +106,48 @@ def do_transforms(paths: list) -> None:
                         input_format='nt',
                         output=outpath,
                         output_format='tsv')
+
             else:
                 print(f"File for {outname} is empty! Writing placeholder.")
                 with open(outpath, 'w') as outfile:
                     pass
             
+            # Remove the tempfile
             os.remove(tempout.name)
+
+def validate_transforms() -> None:
+    """
+    Runs KGX validation on all
+    node/edge files in the transformed
+    output. Writes logs to each directory.
+    """
+
+    tx_filepaths = []
+
+    # Get a list of all node/edgefiles
+    for filepath in glob.iglob(TXDIR + '**/**', recursive=True):
+        if filepath[-3:] == 'tsv':
+            tx_filepaths.append(filepath)
+    
+    for filepath in tx_filepaths:
+        # Just get the edges - KGX will find nodes
+        if filepath[-10:] == '_nodes.tsv':
+            pass
+        tx_name = ((os.path.basename(filepath)).split(".tsv"))[0]
+        parent_dir = os.path.dirname(filepath)
+        log_path = os.path.join(parent_dir,f'kgx_validate_{tx_name}.log')
+        try:
+            errors = kgx.cli.validate(inputs=[filepath],
+                        input_format="tsv",
+                        output=log_path,
+                        input_compression=None,
+                        stream=False)
+            if len(errors) > 0: # i.e. there are any real errors
+                print(f"KGX found errors in graph files. See {log_path}")
+            else:
+                print(f"KGX found no errors in {tx_name}.")
+        except TypeError as e:
+            print(f"Error while validating {tx_name}: {e}")
             
 if __name__ == '__main__':
   run()
