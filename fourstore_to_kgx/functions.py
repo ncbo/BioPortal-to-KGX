@@ -81,7 +81,9 @@ def do_transforms(paths: list) -> None:
                 kgx.cli.transform(inputs=[tempname],
                         input_format='nt',
                         output=outpath,
-                        output_format='tsv')
+                        output_format='tsv',
+                        knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
+                                           ("primary_knowledge_source", "False")])
 
             else:
                 print(f"File for {outname} is empty! Writing placeholder.")
