@@ -101,7 +101,7 @@ def validate_transforms() -> None:
     tx_filepaths = []
 
     # Get a list of all node/edgefiles
-    for filepath in glob.iglob(TXDIR + '**/**', recursive=True):
+    for filepath in glob.iglob(TXDIR + '/**', recursive=True):
         if filepath[-3:] == 'tsv':
             tx_filepaths.append(filepath)
     
