@@ -14,6 +14,7 @@ Prepare a dump of the Bioportal 4store data with the `4s-dump` script.
 The dump will be in the form of n-triples, with individual sets of records in nested directories and one line of metadata at the top of each file.
 
 Run BioPortal-to-KGX as:
+
 ```
 python run.py --input ../path/to/your/data/ --kgx_validate
 ```
