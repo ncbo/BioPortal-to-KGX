@@ -24,7 +24,8 @@ def examine_data_directory(input: str):
 
     # Find all files, not including lone directory names
     for filepath in glob.iglob(input + '**/**', recursive=True):
-        if len(os.path.basename(filepath)) == 28:
+        if len(os.path.basename(filepath)) == 28 and \
+            filepath not in data_filepaths:
             data_filepaths.append(filepath)
     
     print(f"{len(data_filepaths)} files found.")
@@ -61,6 +62,7 @@ def do_transforms(paths: list) -> None:
                 outpath = os.path.join(outdir,outname)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
+                ok_to_transform = True
             else:
                 continue
             
@@ -68,7 +70,9 @@ def do_transforms(paths: list) -> None:
             for filename in os.listdir(outdir):
                 if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
                     print(f"Transform already present for {outname}")
-
+                    ok_to_transform = False
+                    break
+                    
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
@@ -79,9 +83,14 @@ def do_transforms(paths: list) -> None:
                     tempout.write(line)
                     linecount = linecount +1
                 tempname = tempout.name
-                print(tempname)
 
-            if linecount > 0:
+            if linecount == 0:
+                print(f"File for {outname} is empty! Writing placeholder.")
+                with open(outpath, 'w') as outfile:
+                    pass
+                continue
+
+            if ok_to_transform:
                 print(f"Transforming {outname}")
                 kgx.cli.transform(inputs=[tempname],
                         input_format='nt',
@@ -90,11 +99,6 @@ def do_transforms(paths: list) -> None:
                         knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
                                            ("primary_knowledge_source", "False")])
 
-            else:
-                print(f"File for {outname} is empty! Writing placeholder.")
-                with open(outpath, 'w') as outfile:
-                    pass
-            
             # Remove the tempfile
             os.remove(tempout.name)
 
