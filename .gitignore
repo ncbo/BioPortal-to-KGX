@@ -1,4 +1,5 @@
-robot*
+robot
+robot.jar
 transformed*/*
 
 # Byte-compiled / optimized / DLL files
