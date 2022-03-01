@@ -9,7 +9,7 @@ verify if it contains a comment.
 
 import click
 
-from fourstore_to_kgx.functions import examine_data_directory, \
+from bioportal_to_kgx.functions import examine_data_directory, \
                                         do_transforms, \
                                         validate_transforms
 
