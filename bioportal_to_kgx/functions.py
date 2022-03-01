@@ -6,6 +6,8 @@ import tempfile
 
 import kgx.cli
 
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology
+
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
@@ -35,6 +37,8 @@ def examine_data_directory(input: str):
 def do_transforms(paths: list) -> None:
     """
     Given a list of file paths,
+    first does pre-processing with ROBOT
+    (relax only and convert to JSON), then
     uses KGX to transform each file
     to tsv node/edgelists.
     Parses header for each to get
@@ -44,6 +48,13 @@ def do_transforms(paths: list) -> None:
 
     if not os.path.exists(TXDIR):
         os.mkdir(TXDIR)
+
+    print("Setting up ROBOT...")
+    robot_path = os.path.join(os.getcwd(),"robot")
+    robot_params = initialize_robot(robot_path)
+    print(f"ROBOT path: {robot_path}")
+    robot_env = robot_params[1]
+    print(f"ROBOT evironment variables: {robot_env['ROBOT_JAVA_ARGS']}")
 
     print("Transforming all...")
 
@@ -91,9 +102,19 @@ def do_transforms(paths: list) -> None:
                 continue
 
             if ok_to_transform:
-                print(f"Transforming {outname}")
-                kgx.cli.transform(inputs=[tempname],
-                        input_format='nt',
+
+                print(f"ROBOT: relax {outname}")
+                relaxed_outpath = os.path.join(outdir,outname+"_relaxed.json")
+                if not relax_ontology(robot_path, 
+                                        tempname,
+                                        relaxed_outpath,
+                                        robot_env):
+                    print(f"ROBOT relax of {outname} failed - skipping.")
+                    continue
+
+                print(f"KGX transform {outname}")
+                kgx.cli.transform(inputs=[relaxed_outpath],
+                        input_format='obojson',
                         output=outpath,
                         output_format='tsv',
                         knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
