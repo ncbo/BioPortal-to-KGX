@@ -64,6 +64,11 @@ def do_transforms(paths: list) -> None:
             else:
                 continue
             
+            # Check if the outdir already contains transforms
+            for filename in os.listdir(outdir):
+                if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
+                    print(f"Transform already present for {outname}")
+
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
