@@ -137,22 +137,18 @@ def validate_transforms() -> None:
         if filepath[-3:] == 'tsv':
             tx_filepaths.append(filepath)
     
-    for filepath in tx_filepaths:
-        # Just get the edges - KGX will find nodes
-        if filepath[-10:] == '_nodes.tsv':
-            pass
-        tx_name = ((os.path.basename(filepath)).split(".tsv"))[0]
-        parent_dir = os.path.dirname(filepath)
-        log_path = os.path.join(parent_dir,f'kgx_validate_{tx_name}.log')
-        try:
-            errors = kgx.cli.validate(inputs=[filepath],
-                        input_format="tsv",
-                        output=log_path,
-                        input_compression=None,
-                        stream=False)
-            if len(errors) > 0: # i.e. there are any real errors
-                print(f"KGX found errors in graph files. See {log_path}")
-            else:
-                print(f"KGX found no errors in {tx_name}.")
-        except TypeError as e:
-            print(f"Error while validating {tx_name}: {e}")
+    tx_name = ((os.path.basename(tx_filepaths[0])).split(".tsv"))[0]
+    parent_dir = os.path.dirname(tx_filepaths[0])
+    log_path = os.path.join(parent_dir,f'kgx_validate_{tx_name}.log')
+    try:
+        errors = kgx.cli.validate(inputs=tx_filepaths,
+                    input_format="tsv",
+                    input_compression=None,
+                    output=log_path,
+                    stream=False)
+        if len(errors) > 0: # i.e. there are any real errors
+            print(f"KGX found errors in graph files. See {log_path}")
+        else:
+            print(f"KGX found no errors in {tx_name}.")
+    except TypeError as e:
+        print(f"Error while validating {tx_name}: {e}")
