@@ -3,6 +3,7 @@
 import os
 import glob
 import tempfile
+from json import dump as json_dump
 
 import kgx.cli
 
@@ -137,18 +138,22 @@ def validate_transforms() -> None:
         if filepath[-3:] == 'tsv':
             tx_filepaths.append(filepath)
     
-    tx_name = ((os.path.basename(tx_filepaths[0])).split(".tsv"))[0]
+    tx_filename = os.path.basename(tx_filepaths[0])
+    tx_name = "_".join(tx_filename.split("_", 2)[:2])
     parent_dir = os.path.dirname(tx_filepaths[0])
     log_path = os.path.join(parent_dir,f'kgx_validate_{tx_name}.log')
-    try:
-        errors = kgx.cli.validate(inputs=tx_filepaths,
-                    input_format="tsv",
-                    input_compression=None,
-                    output=log_path,
-                    stream=False)
-        if len(errors) > 0: # i.e. there are any real errors
-            print(f"KGX found errors in graph files. See {log_path}")
-        else:
-            print(f"KGX found no errors in {tx_name}.")
-    except TypeError as e:
-        print(f"Error while validating {tx_name}: {e}")
+
+    # kgx validate output isn't working for some reason
+    # so there are some workarounds here
+    with open(log_path, 'w') as log_file:
+        try:
+            json_dump((kgx.cli.validate(inputs=tx_filepaths,
+                        input_format="tsv",
+                        input_compression=None,
+                        stream=True,
+                        output=None)),
+                        log_file,
+                        indent=4)
+        except TypeError as e:
+            print(f"Error while validating {tx_name}: {e}")
+    print(f"Wrote validation errors to {log_path}")
