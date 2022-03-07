@@ -107,6 +107,7 @@ def do_transforms(paths: list) -> dict:
                 print(f"File for {outname} is empty! Writing placeholder.")
                 with open(outpath, 'w') as outfile:
                     pass
+                txs_complete[outname] = False
                 continue
 
             if ok_to_transform:

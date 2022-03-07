@@ -29,8 +29,10 @@ def run(input: str, kgx_validate: bool):
     if kgx_validate:
         validate_transforms()
 
-    print("Completed transforms:\n")
-    print(transform_status)
+    successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))
+    failures = ", ".join(list(dict(filter(lambda elem: not elem[1], transform_status.items()))))
+    print(f"Successful transforms: {successes}")
+    print(f"Failed transforms: {failures}")
 
 if __name__ == '__main__':
   run()
