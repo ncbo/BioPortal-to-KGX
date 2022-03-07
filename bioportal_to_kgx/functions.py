@@ -1,7 +1,9 @@
 # functions.py
 
+import contextlib
 import os
 import glob
+import sys
 import tempfile
 from json import dump as json_dump
 
@@ -35,7 +37,7 @@ def examine_data_directory(input: str):
     
     return data_filepaths
 
-def do_transforms(paths: list) -> None:
+def do_transforms(paths: list) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -45,6 +47,9 @@ def do_transforms(paths: list) -> None:
     Parses header for each to get
     metadata.
     :param paths: list of file paths as strings
+    :return: dict of transform success/failure,
+            with ontology names as keys,
+            bools for values with success as True
     """
 
     if not os.path.exists(TXDIR):
@@ -56,6 +61,8 @@ def do_transforms(paths: list) -> None:
     print(f"ROBOT path: {robot_path}")
     robot_env = robot_params[1]
     print(f"ROBOT evironment variables: {robot_env['ROBOT_JAVA_ARGS']}")
+
+    txs_complete = {}
 
     print("Transforming all...")
 
@@ -106,23 +113,34 @@ def do_transforms(paths: list) -> None:
 
                 print(f"ROBOT: relax {outname}")
                 relaxed_outpath = os.path.join(outdir,outname+"_relaxed.json")
-                if not relax_ontology(robot_path, 
+                if relax_ontology(robot_path, 
                                         tempname,
                                         relaxed_outpath,
                                         robot_env):
+                    txs_complete[outname] = True
+                else:
                     print(f"ROBOT relax of {outname} failed - skipping.")
+                    txs_complete[outname] = False
+                    os.remove(tempout.name)
                     continue
 
                 print(f"KGX transform {outname}")
-                kgx.cli.transform(inputs=[relaxed_outpath],
-                        input_format='obojson',
-                        output=outpath,
-                        output_format='tsv',
-                        knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                           ("primary_knowledge_source", "False")])
+                try:
+                    kgx.cli.transform(inputs=[relaxed_outpath],
+                            input_format='obojson',
+                            output=outpath,
+                            output_format='tsv',
+                            knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
+                                                ("primary_knowledge_source", "False")])
+                    txs_complete[outname] = True
+                except ValueError as e:
+                    print(f"Could not complete KGX transform of {outname} due to: {e}")
+                    txs_complete[outname] = False
 
             # Remove the tempfile
             os.remove(tempout.name)
+
+    return txs_complete
 
 def validate_transforms() -> None:
     """
@@ -154,6 +172,7 @@ def validate_transforms() -> None:
                         output=None)),
                         log_file,
                         indent=4)
+            print(f"Wrote validation errors to {log_path}")
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
-    print(f"Wrote validation errors to {log_path}")
+    

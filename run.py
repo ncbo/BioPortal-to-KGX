@@ -25,9 +25,12 @@ from bioportal_to_kgx.functions import examine_data_directory, \
 def run(input: str, kgx_validate: bool):
 
     data_filepaths = examine_data_directory(input)
-    do_transforms(data_filepaths)
+    transform_status = do_transforms(data_filepaths)
     if kgx_validate:
         validate_transforms()
+
+    print("Completed transforms:\n")
+    print(transform_status)
 
 if __name__ == '__main__':
   run()
