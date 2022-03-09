@@ -198,7 +198,7 @@ def validate_transform(in_path: str) -> None:
     # and check if they are empty
     for filepath in os.listdir(in_path):
         if filepath[-3:] == 'tsv':
-            if not is_file_too_short(filepath):
+            if not is_file_too_short(os.path.join(in_path,filepath)):
                 tx_filepaths.append(os.path.join(in_path,filepath))
     
     tx_filename = os.path.basename(tx_filepaths[0])
