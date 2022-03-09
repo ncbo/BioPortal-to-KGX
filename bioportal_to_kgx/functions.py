@@ -6,9 +6,9 @@ import glob
 import tempfile
 from json import dump as json_dump
 
-import kgx.cli
+import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
