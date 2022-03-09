@@ -1,6 +1,7 @@
 # functions.py
 
 import os
+import sys
 import glob
 import tempfile
 from json import dump as json_dump
@@ -23,6 +24,10 @@ def examine_data_directory(input: str):
 
     data_filepaths = []
 
+    # Check if this path exists first.
+    if not os.path.isdir(input):
+        raise FileNotFoundError(f"Cannot find {input}.")
+
     print(f"Looking for records in {input}")
 
     # Find all files, not including lone directory names
@@ -31,7 +36,10 @@ def examine_data_directory(input: str):
             filepath not in data_filepaths:
             data_filepaths.append(filepath)
     
-    print(f"{len(data_filepaths)} files found.")
+    if len(data_filepaths) > 0:
+        print(f"{len(data_filepaths)} files found.")
+    else:
+        sys.exit("No files found at this path!")
     
     return data_filepaths
 
