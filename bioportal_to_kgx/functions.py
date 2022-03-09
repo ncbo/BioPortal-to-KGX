@@ -179,9 +179,11 @@ def validate_transform(in_path: str) -> None:
     tx_filepaths = []
 
     # Find node/edgefiles
+    # and check if they are empty
     for filepath in os.listdir(in_path):
         if filepath[-3:] == 'tsv':
-            tx_filepaths.append(os.path.join(in_path,filepath))
+            if not is_file_too_short(filepath):
+                tx_filepaths.append(os.path.join(in_path,filepath))
     
     tx_filename = os.path.basename(tx_filepaths[0])
     tx_name = "_".join(tx_filename.split("_", 2)[:2])
@@ -201,4 +203,22 @@ def validate_transform(in_path: str) -> None:
             print(f"Wrote validation errors to {log_path}")
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
+
+def is_file_too_short(filepath: str) -> bool:
+    """
+    Checks if a file contains only an empty line
+    or is otherwise very short 
+    (i.e., it has a non-zero size but is still empty,
+    or is only a few lines).
+    :param filepath: str, path to file
+    :return" bool, True if file is blank or too short
+    """
+
+    with open(filepath, 'r') as infile:
+        for count, line in enumerate(infile):
+            pass
     
+    if count >= 10:
+        return False
+    else:
+        return True
