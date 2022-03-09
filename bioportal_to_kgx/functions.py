@@ -14,11 +14,13 @@ TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 
-def examine_data_directory(input: str):
+def examine_data_directory(input: str, include_only: list, exclude: list):
     """
     Given a path, generates paths for all data files
     within, recursively.
     :param input: str for root of data dump
+    :param include_only: if non-empty, only return these files
+    :param exclude: if non-empty, don't return these files
     :return: list of file paths as strings
     """
 
@@ -30,10 +32,24 @@ def examine_data_directory(input: str):
 
     print(f"Looking for records in {input}")
 
+    including = False
+    if len(include_only) > 0:
+        print(f"Will only include the specified {len(include_only)} file(s).")
+        including = True
+    
+    excluding = False
+    if len(exclude) > 0:
+        print(f"Will exclude the specified {len(exclude)} file(s).")
+        excluding = True
+
     # Find all files, not including lone directory names
     for filepath in glob.iglob(input + '**/**', recursive=True):
         if len(os.path.basename(filepath)) == 28 and \
             filepath not in data_filepaths:
+            if including and os.path.basename(filepath) not in include_only:
+                continue
+            if excluding and os.path.basename(filepath) in exclude:
+                continue
             data_filepaths.append(filepath)
     
     if len(data_filepaths) > 0:
