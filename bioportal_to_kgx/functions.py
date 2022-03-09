@@ -1,9 +1,7 @@
 # functions.py
 
-import contextlib
 import os
 import glob
-import sys
 import tempfile
 from json import dump as json_dump
 
@@ -37,7 +35,7 @@ def examine_data_directory(input: str):
     
     return data_filepaths
 
-def do_transforms(paths: list) -> dict:
+def do_transforms(paths: list, validate: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -47,6 +45,7 @@ def do_transforms(paths: list) -> dict:
     Parses header for each to get
     metadata.
     :param paths: list of file paths as strings
+    :param validate: bool, do validations if True
     :return: dict of transform success/failure,
             with ontology names as keys,
             bools for values with success as True
@@ -86,11 +85,24 @@ def do_transforms(paths: list) -> dict:
                 continue
             
             # Check if the outdir already contains transforms
-            for filename in os.listdir(outdir):
-                if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
-                    print(f"Transform already present for {outname}")
-                    ok_to_transform = False
-                    break
+            # or if it contains a logfile - if not,
+            # and the validate flag is True,
+            # then validation is still required
+            have_validation_log = False
+            tx_filecount = 0
+            filelist = os.listdir(outdir)
+            for filename in filelist:
+                if (filename.endswith("nodes.tsv") or filename.endswith("edges.tsv")):
+                    tx_filecount = tx_filecount + 1
+                    if ok_to_transform:
+                        print(f"Transform already present for {outname}")
+                        ok_to_transform = False
+                if filename.endswith(".log"):
+                    print(f"Validation log present: {filename}")
+                    have_validation_log = True
+            if validate and not have_validation_log and tx_filecount > 0:
+                print(f"Validation log not found for {outname} - will validate.")
+                validate_transform(outdir)
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -138,29 +150,34 @@ def do_transforms(paths: list) -> dict:
                     print(f"Could not complete KGX transform of {outname} due to: {e}")
                     txs_complete[outname] = False
 
+                if validate and txs_complete[outname]:
+                    print("Validating...")
+                    validate_transform(outdir)
+
             # Remove the tempfile
             os.remove(tempout.name)
 
     return txs_complete
 
-def validate_transforms() -> None:
+def validate_transform(in_path: str) -> None:
     """
-    Runs KGX validation on all
-    node/edge files in the transformed
-    output. Writes logs to each directory.
+    Runs KGX validation on a single set of
+    node/edge files, given a input directory
+    containing a transformed ontology. 
+    Writes log to that directory.
+    :param in_path: str, path to directory
     """
 
     tx_filepaths = []
 
-    # Get a list of all node/edgefiles
-    for filepath in glob.iglob(TXDIR + '/**', recursive=True):
+    # Find node/edgefiles
+    for filepath in os.listdir(in_path):
         if filepath[-3:] == 'tsv':
-            tx_filepaths.append(filepath)
+            tx_filepaths.append(os.path.join(in_path,filepath))
     
     tx_filename = os.path.basename(tx_filepaths[0])
     tx_name = "_".join(tx_filename.split("_", 2)[:2])
-    parent_dir = os.path.dirname(tx_filepaths[0])
-    log_path = os.path.join(parent_dir,f'kgx_validate_{tx_name}.log')
+    log_path = os.path.join(in_path,f'kgx_validate_{tx_name}.log')
 
     # kgx validate output isn't working for some reason
     # so there are some workarounds here
