@@ -9,7 +9,7 @@ verify if it contains a comment.
 
 import click
 
-from bioportal_to_kgx.functions import examine_data_directory, do_transforms # type: ignore \ 
+from bioportal_to_kgx.functions import examine_data_directory, do_transforms # type: ignore
 
 @click.command()
 @click.option("--input",
@@ -22,9 +22,17 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                         Validation logs will be written to each output directory.
                         If an existing transform is found without a validation log,
                         a new validation will be run.""")
-def run(input: str, kgx_validate: bool):
+@click.option("--include_only",
+                callback=lambda _,__,x: x.split(',') if x else [],
+                help="""One or more ontologies to retreive and transform, and only these,
+                     comma-delimited and named by their hashed file ID, e.g., dabd4d902360003975fb25ae56f8.""")
+@click.option("--exclude",
+                callback=lambda _,__,x: x.split(',') if x else [],
+                help="""One or more ontologies to exclude from transforms,
+                     comma-delimited and named by their hashed file ID, e.g., dabd4d902360003975fb25ae56f8.""")
+def run(input: str, kgx_validate: bool, include_only=[], exclude=[]):
 
-    data_filepaths = examine_data_directory(input)
+    data_filepaths = examine_data_directory(input, include_only, exclude)
     transform_status = do_transforms(data_filepaths, kgx_validate)
 
     successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))

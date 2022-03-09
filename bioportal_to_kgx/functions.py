@@ -14,11 +14,13 @@ TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 
-def examine_data_directory(input: str):
+def examine_data_directory(input: str, include_only: list, exclude: list):
     """
     Given a path, generates paths for all data files
     within, recursively.
     :param input: str for root of data dump
+    :param include_only: if non-empty, only return these files
+    :param exclude: if non-empty, don't return these files
     :return: list of file paths as strings
     """
 
@@ -30,10 +32,24 @@ def examine_data_directory(input: str):
 
     print(f"Looking for records in {input}")
 
+    including = False
+    if len(include_only) > 0:
+        print(f"Will only include the specified {len(include_only)} file(s).")
+        including = True
+    
+    excluding = False
+    if len(exclude) > 0:
+        print(f"Will exclude the specified {len(exclude)} file(s).")
+        excluding = True
+
     # Find all files, not including lone directory names
     for filepath in glob.iglob(input + '**/**', recursive=True):
         if len(os.path.basename(filepath)) == 28 and \
             filepath not in data_filepaths:
+            if including and os.path.basename(filepath) not in include_only:
+                continue
+            if excluding and os.path.basename(filepath) in exclude:
+                continue
             data_filepaths.append(filepath)
     
     if len(data_filepaths) > 0:
@@ -179,9 +195,11 @@ def validate_transform(in_path: str) -> None:
     tx_filepaths = []
 
     # Find node/edgefiles
+    # and check if they are empty
     for filepath in os.listdir(in_path):
         if filepath[-3:] == 'tsv':
-            tx_filepaths.append(os.path.join(in_path,filepath))
+            if not is_file_too_short(os.path.join(in_path,filepath)):
+                tx_filepaths.append(os.path.join(in_path,filepath))
     
     tx_filename = os.path.basename(tx_filepaths[0])
     tx_name = "_".join(tx_filename.split("_", 2)[:2])
@@ -201,4 +219,22 @@ def validate_transform(in_path: str) -> None:
             print(f"Wrote validation errors to {log_path}")
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
+
+def is_file_too_short(filepath: str) -> bool:
+    """
+    Checks if a file contains only an empty line
+    or is otherwise very short 
+    (i.e., it has a non-zero size but is still empty,
+    or is only a few lines).
+    :param filepath: str, path to file
+    :return" bool, True if file is blank or too short
+    """
+
+    with open(filepath, 'r') as infile:
+        for count, line in enumerate(infile):
+            pass
     
+    if count >= 10:
+        return False
+    else:
+        return True
