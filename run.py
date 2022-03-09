@@ -9,8 +9,7 @@ verify if it contains a comment.
 
 import click
 
-from bioportal_to_kgx.functions import examine_data_directory, \
-                                        do_transforms
+from bioportal_to_kgx.functions import examine_data_directory, do_transforms # type: ignore \ 
 
 @click.command()
 @click.option("--input",
