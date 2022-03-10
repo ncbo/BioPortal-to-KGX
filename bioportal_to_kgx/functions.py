@@ -234,7 +234,7 @@ def is_file_too_short(filepath: str) -> bool:
         for count, line in enumerate(infile):
             pass
     
-    if count >= 10:
+    if count >= 2:
         return False
     else:
         return True
