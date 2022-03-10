@@ -176,20 +176,22 @@ def do_transforms(paths: list, validate: bool) -> dict:
 
                 if validate and txs_complete[outname]:
                     print("Validating...")
-                    validate_transform(outdir)
+                    if not validate_transform(outdir):
+                        print(f"Validation did not complete for {outname}.")
 
             # Remove the tempfile
             os.remove(tempout.name)
 
     return txs_complete
 
-def validate_transform(in_path: str) -> None:
+def validate_transform(in_path: str) -> bool:
     """
     Runs KGX validation on a single set of
     node/edge files, given a input directory
     containing a transformed ontology. 
     Writes log to that directory.
     :param in_path: str, path to directory
+    :return: True if complete, False otherwise
     """
 
     tx_filepaths = []
@@ -200,6 +202,10 @@ def validate_transform(in_path: str) -> None:
         if filepath[-3:] == 'tsv':
             if not is_file_too_short(os.path.join(in_path,filepath)):
                 tx_filepaths.append(os.path.join(in_path,filepath))
+
+    if len(tx_filepaths) == 0:
+        print(f"All transforms in {in_path} are blank or very short.")
+        return False
     
     tx_filename = os.path.basename(tx_filepaths[0])
     tx_name = "_".join(tx_filename.split("_", 2)[:2])
@@ -217,8 +223,10 @@ def validate_transform(in_path: str) -> None:
                         log_file,
                         indent=4)
             print(f"Wrote validation errors to {log_path}")
+            return True
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
+            return False
 
 def is_file_too_short(filepath: str) -> bool:
     """
@@ -234,7 +242,7 @@ def is_file_too_short(filepath: str) -> bool:
         for count, line in enumerate(infile):
             pass
     
-    if count >= 10:
+    if count >= 2:
         return False
     else:
         return True
