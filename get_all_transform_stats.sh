@@ -27,13 +27,16 @@ all_errortypes=("MISSING_NODE_PROPERTY"
 
 # Run
 echo "All processed ontologies:"
-ls -d transformed/ontologies/* | wc -l
+ls -d $TX_PATH | wc -l
 
 echo "All successful JSON transforms:"
 find $TX_PATH -name "*.json" | wc -l
 
 echo "All successful KGX TSV transforms:"
 find $TX_PATH -name "*_edges.tsv" | wc -l
+
+echo "Ontologies with failed transforms:"
+find $TX_PATH -maxdepth 1 -type d -exec bash -c "echo -ne '{} '; ls '{}' | wc -l" \; | awk '$NF==1{print $1}'
 
 echo "Transforms with at least one of the following errors:"
 for ((i=0; i < ${#all_errortypes[@]}; i++))
