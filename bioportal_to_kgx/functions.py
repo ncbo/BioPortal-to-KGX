@@ -4,6 +4,7 @@ import os
 import sys
 import glob
 import tempfile
+import re
 from json import dump as json_dump
 
 import kgx.cli # type: ignore
@@ -171,8 +172,22 @@ def do_transforms(paths: list, validate: bool) -> dict:
                                                 ("primary_knowledge_source", "False")])
                     txs_complete[outname] = True
                 except ValueError as e:
-                    print(f"Could not complete KGX transform of {outname} due to: {e}")
-                    txs_complete[outname] = False
+                    print(f"Encountered error during KGX transform of {outname}: {e}")
+
+                    # We can try to fix it - this is usually a malformed CURIE
+                    # (or something that looks like a CURIE)
+                    print("Will attempt to repair file and try again.")
+                    repaired_outpath = remove_bad_curie(relaxed_outpath)
+                    try:
+                        kgx.cli.transform(inputs=[repaired_outpath],
+                            input_format='obojson',
+                            output=outpath,
+                            output_format='tsv',
+                            knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
+                                                ("primary_knowledge_source", "False")])
+                        txs_complete[outname] = True
+                    except ValueError as e:
+                        print(f"Encountered error during KGX transform of {outname}: {e}")
 
                 if validate and txs_complete[outname]:
                     print("Validating...")
@@ -235,7 +250,7 @@ def is_file_too_short(filepath: str) -> bool:
     (i.e., it has a non-zero size but is still empty,
     or is only a few lines).
     :param filepath: str, path to file
-    :return" bool, True if file is blank or too short
+    :return: bool, True if file is blank or too short
     """
 
     with open(filepath, 'r') as infile:
@@ -246,3 +261,23 @@ def is_file_too_short(filepath: str) -> bool:
         return False
     else:
         return True
+
+def remove_bad_curie(filepath: str) -> str:
+    """
+    Given the path to an obojson with a
+    CURIE causing KGX to fail transforms,
+    remove the offending prefix.
+    Save a new file and return.
+    :param filepath: str, path to file
+    :return: path to repaired file
+    """
+
+    repaired_filepath = filepath + ".repaired"
+
+    with open(filepath, 'r') as infile:
+        with open(repaired_filepath, 'w') as outfile:
+            for line in infile:
+                line = re.sub("file:", "", line)
+                outfile.write(line)
+
+    return repaired_filepath
