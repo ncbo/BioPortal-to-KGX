@@ -78,8 +78,8 @@ def merge_and_convert_ontology(robot_path: str, input_path: str, output_path: st
     This method runs a merge and convert ROBOT command on a single ontology.
     Has a three-hour timeout limit - process is killed if it takes this long.
     :param robot_path: Path to ROBOT files
-    :param input_owl: Ontology file to be relaxed
-    :param output_owl: Ontology file to be created (needs valid ROBOT suffix)
+    :param input_path: Ontology file to be relaxed
+    :param output_path: Ontology file to be created (needs valid ROBOT suffix)
     :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
     :return: True if completed without errors, False if errors
     """
@@ -135,6 +135,42 @@ def measure_ontology(robot_path: str, input_path: str, output_log: str, robot_en
             _env=robot_env,
         )
         print(f"Complete. See log in {output_log}")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
+
+def robot_remove(robot_path: str, input_path: str, output_path: str, 
+                term: str, robot_env: dict) -> bool:
+    """
+    This method runs the ROBOT remove command on a single ontology.
+
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file for input
+    :param output_path: Ontology file to be created (needs valid ROBOT suffix)
+    :param term: term to select for removal
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+    success = False
+
+    print(f"Removing selected elements from {input_path}: {term}...")
+
+    robot_command = sh.Command(robot_path)
+
+    profile = 'Full'
+
+    try:
+        robot_command('remove',
+            '-vvv',
+            '--input', input_path,
+            '--term', term,
+            '--output', output_path,
+            _env=robot_env,
+        )
+        print(f"Complete. See {output_path}")
         success = True
     except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
