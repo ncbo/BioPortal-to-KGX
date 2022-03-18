@@ -9,7 +9,9 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, \
+                                        relax_ontology, \
+                                        robot_remove # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -157,10 +159,23 @@ def do_transforms(paths: list, validate: bool) -> dict:
                                         robot_env):
                     txs_complete[outname] = True
                 else:
-                    print(f"ROBOT relax of {outname} failed - skipping.")
-                    txs_complete[outname] = False
-                    os.remove(tempout.name)
-                    continue
+                    print(f"Encountered error during robot relax of {outname}.")
+
+                    # We can try to fix it - 
+                    # this is usually a null value in a comment
+                    print("Will attempt to repair file and try again.")
+                    repaired_outpath = remove_comments(tempname, robot_path, robot_env)
+                    if relax_ontology(robot_path, 
+                                        repaired_outpath,
+                                        relaxed_outpath,
+                                        robot_env):
+                        txs_complete[outname] = True
+                    else:
+                        print(f"Encountered unresolvable error during robot relax of {outname}.")
+                        print("Will skip.")
+                        txs_complete[outname] = False
+                        os.remove(tempout.name)
+                        continue
 
                 print(f"KGX transform {outname}")
                 try:
@@ -279,5 +294,31 @@ def remove_bad_curie(filepath: str) -> str:
             for line in infile:
                 line = re.sub("file:", "", line)
                 outfile.write(line)
+
+    return repaired_filepath
+
+def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
+    """
+    Given the path to an obojson file,
+    remove all comment triples.
+    They usually have a predicate like
+    <http://www.w3.org/2000/01/rdf-schema#comment>
+    Save a new file and return.
+    The robot_remove function in robot_utils
+    does most of the work here.
+    :param filepath: str, path to file
+    :param robot_env: ROBOT environment parameters
+    :return: path to repaired file
+    """
+
+    repaired_filepath = (os.path.splitext(filepath)[0]) + "nocomments.json"
+
+    comment_term = "rdfs:comment"
+
+    robot_remove(robot_path=robot_path, 
+                input_path=filepath, 
+                output_path=repaired_filepath, 
+                term=comment_term, 
+                robot_env=robot_env)
 
     return repaired_filepath
