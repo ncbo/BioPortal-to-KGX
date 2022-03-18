@@ -9,9 +9,7 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, \
-                                        relax_ontology, \
-                                        robot_remove # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove  # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
