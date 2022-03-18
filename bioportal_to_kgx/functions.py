@@ -160,7 +160,7 @@ def do_transforms(paths: list, validate: bool) -> dict:
                     print(f"Encountered error during robot relax of {outname}.")
 
                     # We can try to fix it - 
-                    # this is usually a null value in a comment
+                    # this is usually a null value in a comment.
                     print("Will attempt to repair file and try again.")
                     repaired_outpath = remove_comments(tempname, robot_path, robot_env)
                     if relax_ontology(robot_path, 
@@ -303,13 +303,15 @@ def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
     <http://www.w3.org/2000/01/rdf-schema#comment>
     Save a new file and return.
     The robot_remove function in robot_utils
-    does most of the work here.
+    does most of the work here,
+    but it also needs the output format to be OWL
+    first to ensure the final JSON is as expected.
     :param filepath: str, path to file
     :param robot_env: ROBOT environment parameters
     :return: path to repaired file
     """
 
-    repaired_filepath = (os.path.splitext(filepath)[0]) + "nocomments.json"
+    repaired_filepath = (os.path.splitext(filepath)[0]) + "nocomments.owl"
 
     comment_term = "rdfs:comment"
 
