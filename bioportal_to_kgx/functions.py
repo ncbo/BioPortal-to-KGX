@@ -9,7 +9,7 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_convert, robot_report, robot_measure  # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -131,7 +131,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                     have_kgx_validation_log = True
             if robot_validate and not have_robot_report and tx_filecount > 0:
                 print(f"ROBOT reports not found for {outname} - will generate.")
-                get_robot_reports(outdir, robot_path, robot_env)
+                get_robot_reports(filepath, outdir, robot_path, robot_env)
             if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
                 print(f"KGX validation log not found for {outname} - will validate.")
                 kgx_validate_transform(outdir)
@@ -184,7 +184,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                 
                 if robot_validate and txs_complete[outname]:
                     print("Generating ROBOT reports...")
-                    if not get_robot_reports(outdir, robot_path, robot_env):
+                    if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
                 print(f"KGX transform {outname}")
@@ -224,16 +224,19 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
 
     return txs_complete
 
-def get_robot_reports(filepath_dir: str, robot_path: str, robot_env: dict) -> bool:
+def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
     """
     Given the path to an obojson file,
-    run both the 'report' and 'measure'
+    run both the ROBOT 'report' and 'measure'
     commands.
     Saves both to the same directory as 
     the input ontology.
+    Runs a convert command first to ensure
+    ROBOT can parse the input.
     Returns True if successful,
-    otherwise 
-    :param filepath_dir: directory where relaxed file should be
+    otherwise False.
+    :param filepath: path to the *original* ontology dump file
+    :param outpath_dir: directory where output
     :param robot_path: path to ROBOT itself
     :param robot_env: ROBOT environment parameters
     :return: True if success
@@ -241,12 +244,8 @@ def get_robot_reports(filepath_dir: str, robot_path: str, robot_env: dict) -> bo
 
     success = True
 
-    filelist = os.listdir(filepath_dir)
-    for filename in filelist:
-        if filename.endswith("_relaxed.json"):
-            filepath = os.path.join(filepath_dir,filename)
-            report_path = os.path.join(filepath_dir,filename + ".report") 
-            measure_path = os.path.join(filepath_dir,filename + ".measure") 
+    report_path = os.path.join(outpath_dir,"robot.report") 
+    measure_path = os.path.join(outpath_dir,"robot.measure")
 
     if not robot_report(robot_path=robot_path, 
                 input_path=filepath, 
