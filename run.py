@@ -22,6 +22,12 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                         Validation logs will be written to each output directory.
                         If an existing transform is found without a validation log,
                         a new validation will be run.""")
+@click.option("--robot_validate",
+                is_flag=True,
+                help="""If used, will run ROBOT measure and ROBOT report for each transformation. 
+                        Logs will be written to each output directory.
+                        If an existing transform is found without ROBOT logs,
+                        a new validation will be run.""")
 @click.option("--include_only",
                 callback=lambda _,__,x: x.split(',') if x else [],
                 help="""One or more ontologies to retreive and transform, and only these,
@@ -30,10 +36,10 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                 callback=lambda _,__,x: x.split(',') if x else [],
                 help="""One or more ontologies to exclude from transforms,
                      comma-delimited and named by their hashed file ID, e.g., dabd4d902360003975fb25ae56f8.""")
-def run(input: str, kgx_validate: bool, include_only=[], exclude=[]):
+def run(input: str, kgx_validate: bool, robot_validate: bool, include_only=[], exclude=[]):
 
     data_filepaths = examine_data_directory(input, include_only, exclude)
-    transform_status = do_transforms(data_filepaths, kgx_validate)
+    transform_status = do_transforms(data_filepaths, kgx_validate, robot_validate)
 
     successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))
     failures = ", ".join(list(dict(filter(lambda elem: not elem[1], transform_status.items()))))

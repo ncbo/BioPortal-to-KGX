@@ -177,3 +177,72 @@ def robot_remove(robot_path: str, input_path: str, output_path: str,
         success = False
 
     return success
+
+def robot_report(robot_path: str, input_path: str, output_path: str, 
+                 robot_env: dict) -> bool:
+    """
+    This method runs the ROBOT report command on a single ontology.
+
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file for input
+    :param output_path: Path to create report at
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+    success = False
+
+    print(f"Generating ROBOT report for {input_path}...")
+
+    robot_command = sh.Command(robot_path)
+
+    profile = 'Full'
+
+    try:
+        robot_command('report',
+            '-vvv',
+            '--input', input_path,
+            '--output', output_path,
+            _env=robot_env,
+        )
+        print(f"Complete. See {output_path}")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
+
+def robot_measure(robot_path: str, input_path: str, output_path: str, 
+                robot_env: dict) -> bool:
+    """
+    This method runs the ROBOT measure command on a single ontology,
+    returning all metrics.
+
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file for input
+    :param output_path: Path to create measure log at
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+    success = False
+
+    print(f"Generating ROBOT measure log for {input_path}...")
+
+    robot_command = sh.Command(robot_path)
+
+    profile = 'Full'
+
+    try:
+        robot_command('measure',
+            '-vvv',
+            '--input', input_path,
+            '--output', output_path,
+            _env=robot_env,
+        )
+        print(f"Complete. See {output_path}")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
