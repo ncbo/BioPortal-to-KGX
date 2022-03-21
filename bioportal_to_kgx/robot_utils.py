@@ -182,7 +182,7 @@ def robot_report(robot_path: str, input_path: str, output_path: str,
                  robot_env: dict) -> bool:
     """
     This method runs the ROBOT report command on a single ontology.
-
+    
     :param robot_path: Path to ROBOT files
     :param input_path: Ontology file for input
     :param output_path: Path to create report at
@@ -195,13 +195,12 @@ def robot_report(robot_path: str, input_path: str, output_path: str,
 
     robot_command = sh.Command(robot_path)
 
-    profile = 'Full'
-
     try:
         robot_command('report',
             '-vvv',
             '--input', input_path,
             '--output', output_path,
+            '--format', 'tsv',
             _env=robot_env,
         )
         print(f"Complete. See {output_path}")
@@ -230,13 +229,13 @@ def robot_measure(robot_path: str, input_path: str, output_path: str,
 
     robot_command = sh.Command(robot_path)
 
-    profile = 'Full'
-
     try:
         robot_command('measure',
             '-vvv',
             '--input', input_path,
             '--output', output_path,
+            '--format', 'tsv',
+            '--metrics', 'all',
             _env=robot_env,
         )
         print(f"Complete. See {output_path}")
