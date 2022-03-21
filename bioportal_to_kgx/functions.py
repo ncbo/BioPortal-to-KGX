@@ -256,7 +256,7 @@ def get_robot_reports(filepath_dir: str, robot_path: str, robot_env: dict) -> bo
     
     if not robot_measure(robot_path=robot_path, 
                 input_path=filepath, 
-                output_path=report_path, 
+                output_path=measure_path, 
                 robot_env=robot_env):
                 success = False
 
