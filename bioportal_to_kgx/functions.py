@@ -9,7 +9,7 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove  # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_convert, robot_report, robot_measure  # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -60,7 +60,7 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     
     return data_filepaths
 
-def do_transforms(paths: list, validate: bool) -> dict:
+def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -113,7 +113,8 @@ def do_transforms(paths: list, validate: bool) -> dict:
             # or if it contains a logfile - if not,
             # and the validate flag is True,
             # then validation is still required
-            have_validation_log = False
+            have_robot_report = False
+            have_kgx_validation_log = False
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
@@ -122,12 +123,18 @@ def do_transforms(paths: list, validate: bool) -> dict:
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
+                if filename.endswith(".report"):
+                    print(f"ROBOT report(s) present: {filename}")
+                    have_robot_report = True 
                 if filename.endswith(".log"):
-                    print(f"Validation log present: {filename}")
-                    have_validation_log = True
-            if validate and not have_validation_log and tx_filecount > 0:
-                print(f"Validation log not found for {outname} - will validate.")
-                validate_transform(outdir)
+                    print(f"KGX validation log present: {filename}")
+                    have_kgx_validation_log = True
+            if robot_validate and not have_robot_report and tx_filecount > 0:
+                print(f"ROBOT reports not found for {outname} - will generate.")
+                get_robot_reports(filepath, outdir, robot_path, robot_env)
+            if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
+                print(f"KGX validation log not found for {outname} - will validate.")
+                kgx_validate_transform(outdir)
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -174,6 +181,11 @@ def do_transforms(paths: list, validate: bool) -> dict:
                         txs_complete[outname] = False
                         os.remove(tempout.name)
                         continue
+                
+                if robot_validate and txs_complete[outname]:
+                    print("Generating ROBOT reports...")
+                    if not get_robot_reports(filepath, outdir, robot_path, robot_env):
+                        print(f"Could not get ROBOT reports for {outname}.")
 
                 print(f"KGX transform {outname}")
                 try:
@@ -202,9 +214,9 @@ def do_transforms(paths: list, validate: bool) -> dict:
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
-                if validate and txs_complete[outname]:
+                if kgx_validate and txs_complete[outname]:
                     print("Validating...")
-                    if not validate_transform(outdir):
+                    if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
 
             # Remove the tempfile
@@ -212,7 +224,44 @@ def do_transforms(paths: list, validate: bool) -> dict:
 
     return txs_complete
 
-def validate_transform(in_path: str) -> bool:
+def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
+    """
+    Given the path to an obojson file,
+    run both the ROBOT 'report' and 'measure'
+    commands.
+    Saves both to the same directory as 
+    the input ontology.
+    Runs a convert command first to ensure
+    ROBOT can parse the input.
+    Returns True if successful,
+    otherwise False.
+    :param filepath: path to the *original* ontology dump file
+    :param outpath_dir: directory where output
+    :param robot_path: path to ROBOT itself
+    :param robot_env: ROBOT environment parameters
+    :return: True if success
+    """
+
+    success = True
+
+    report_path = os.path.join(outpath_dir,"robot.report") 
+    measure_path = os.path.join(outpath_dir,"robot.measure")
+
+    if not robot_report(robot_path=robot_path, 
+                input_path=filepath, 
+                output_path=report_path, 
+                robot_env=robot_env):
+                success = False
+    
+    if not robot_measure(robot_path=robot_path, 
+                input_path=filepath, 
+                output_path=measure_path, 
+                robot_env=robot_env):
+                success = False
+
+    return success
+
+def kgx_validate_transform(in_path: str) -> bool:
     """
     Runs KGX validation on a single set of
     node/edge files, given a input directory
@@ -307,6 +356,7 @@ def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
     but it also needs the output format to be OWL
     first to ensure the final JSON is as expected.
     :param filepath: str, path to file
+    :param robot_path: path to ROBOT itself
     :param robot_env: ROBOT environment parameters
     :return: path to repaired file
     """

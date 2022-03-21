@@ -72,6 +72,36 @@ def relax_ontology(robot_path: str, input_path: str, output_path: str, robot_env
 
     return success
 
+def robot_convert(robot_path: str, input_path: str, output_path: str, robot_env: dict) -> bool:
+    """
+    This method runs a ROBOT convert command on a single ontology.
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file to be relaxed
+    :param output_path: Ontology file to be created (needs valid ROBOT suffix)
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+
+    success = False
+
+    print(f"Converting {input_path} to {output_path}...")
+
+    robot_command = sh.Command(robot_path)
+
+    try:
+        robot_command('convert',
+            '--input', input_path,
+            '--output', output_path,
+            '--vvv',
+            _env=robot_env
+        )
+        print("Complete.")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
 
 def merge_and_convert_ontology(robot_path: str, input_path: str, output_path: str, robot_env: dict) -> bool:
     """
@@ -168,6 +198,73 @@ def robot_remove(robot_path: str, input_path: str, output_path: str,
             '--input', input_path,
             '--term', term,
             '--output', output_path,
+            _env=robot_env,
+        )
+        print(f"Complete. See {output_path}")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
+
+def robot_report(robot_path: str, input_path: str, output_path: str, 
+                 robot_env: dict) -> bool:
+    """
+    This method runs the ROBOT report command on a single ontology.
+
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file for input
+    :param output_path: Path to create report at
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+    success = False
+
+    print(f"Generating ROBOT report for {input_path}...")
+
+    robot_command = sh.Command(robot_path)
+
+    try:
+        robot_command('report',
+            '--input', input_path,
+            '--output', output_path,
+            '--format', 'tsv',
+            _env=robot_env,
+        )
+        print(f"Complete. See {output_path}")
+        success = True
+    except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
+        print(f"ROBOT encountered an error: {e}")
+        success = False
+
+    return success
+
+def robot_measure(robot_path: str, input_path: str, output_path: str, 
+                robot_env: dict) -> bool:
+    """
+    This method runs the ROBOT measure command on a single ontology,
+    returning all metrics.
+
+    :param robot_path: Path to ROBOT files
+    :param input_path: Ontology file for input
+    :param output_path: Path to create measure log at
+    :param robot_env: dict of environment variables, including ROBOT_JAVA_ARGS
+    :return: True if completed without errors, False if errors
+    """
+    success = False
+
+    print(f"Generating ROBOT measure log for {input_path}...")
+
+    robot_command = sh.Command(robot_path)
+
+    try:
+        robot_command('measure',
+            '-vvv',
+            '--input', input_path,
+            '--output', output_path,
+            '--format', 'tsv',
+            '--metrics', 'all',
             _env=robot_env,
         )
         print(f"Complete. See {output_path}")
