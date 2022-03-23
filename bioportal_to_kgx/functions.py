@@ -9,7 +9,8 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_convert, robot_report, robot_measure  # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
+from bioportal_to_kgx.bioportal_utils import bioportal_metadata # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -60,7 +61,8 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     
     return data_filepaths
 
-def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict:
+def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
+                    get_bioportal_metadata) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -115,6 +117,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
             # then validation is still required
             have_robot_report = False
             have_kgx_validation_log = False
+            have_bioportal_metadata = False
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
@@ -129,12 +132,18 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                 if filename.endswith(".log"):
                     print(f"KGX validation log present: {filename}")
                     have_kgx_validation_log = True
+                if filename.endswith("_metadata.tsv"):
+                    print(f"BioPortal metadata present: {filename}")
+                    have_bioportal_metadata = True
             if robot_validate and not have_robot_report and tx_filecount > 0:
                 print(f"ROBOT reports not found for {outname} - will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
             if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
                 print(f"KGX validation log not found for {outname} - will validate.")
                 kgx_validate_transform(outdir)
+            if get_bioportal_metadata and not have_bioportal_metadata and tx_filecount > 0:
+                print(f"BioPortal metadata not found for {outname} - will retrieve.")
+                bioportal_metadata(outname, outdir)
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -234,7 +243,9 @@ def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_en
     Runs a convert command first to ensure
     ROBOT can parse the input.
     Returns True if successful,
-    otherwise False.
+    otherwise False - though any errors detected
+    in the target ontology by the report command
+    will yield False, too.
     :param filepath: path to the *original* ontology dump file
     :param outpath_dir: directory where output
     :param robot_path: path to ROBOT itself
@@ -247,11 +258,12 @@ def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_en
     report_path = os.path.join(outpath_dir,"robot.report") 
     measure_path = os.path.join(outpath_dir,"robot.measure")
 
+    # Will state 'Report failed!' if any errors present
     if not robot_report(robot_path=robot_path, 
                 input_path=filepath, 
                 output_path=report_path, 
                 robot_env=robot_env):
-                success = False
+                success = False 
     
     if not robot_measure(robot_path=robot_path, 
                 input_path=filepath, 
