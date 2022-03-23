@@ -62,7 +62,7 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     return data_filepaths
 
 def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
-                    get_bioportal_metadata) -> dict:
+                    get_bioportal_metadata, ncbo_key) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -143,7 +143,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                 kgx_validate_transform(outdir)
             if get_bioportal_metadata and not have_bioportal_metadata and tx_filecount > 0:
                 print(f"BioPortal metadata not found for {outname} - will retrieve.")
-                bioportal_metadata(outname, outdir)
+                bioportal_metadata(outname, outdir, ncbo_key)
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
