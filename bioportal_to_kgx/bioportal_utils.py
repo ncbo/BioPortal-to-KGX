@@ -18,7 +18,7 @@ def bioportal_metadata(outname: str, outdir: str, api_key: str) -> None:
     """
 
     req_url = BASE_ONTO_URL + outname
-    params = dict(key=api_key)
+    params = dict(apikey=api_key,display_context="False",include="all")
 
     print(f"Accessing {req_url}...")
 
@@ -26,3 +26,4 @@ def bioportal_metadata(outname: str, outdir: str, api_key: str) -> None:
     print(response)
 
     content = response.json()
+    print(content['name'])
