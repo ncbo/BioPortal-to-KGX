@@ -10,7 +10,7 @@ from json import dump as json_dump
 import kgx.cli # type: ignore
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
-from bioportal_to_kgx.bioportal_utils import bioportal_metadata # type: ignore
+from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -126,24 +126,25 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
+                    # Check to see if metadata properties are in the header
+                    if check_header_for_md(os.path.join(outdir,filename)):
+                        print(f"BioPortal metadata present.")
+                        have_bioportal_metadata = True
                 if filename.endswith(".report"):
                     print(f"ROBOT report(s) present: {filename}")
                     have_robot_report = True 
                 if filename.endswith(".log"):
                     print(f"KGX validation log present: {filename}")
                     have_kgx_validation_log = True
-                if filename.endswith("_metadata.tsv"):
-                    print(f"BioPortal metadata present: {filename}")
-                    have_bioportal_metadata = True
             if robot_validate and not have_robot_report and tx_filecount > 0:
                 print(f"ROBOT reports not found for {outname} - will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
             if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
                 print(f"KGX validation log not found for {outname} - will validate.")
                 kgx_validate_transform(outdir)
-            if get_bioportal_metadata and not have_bioportal_metadata and tx_filecount > 0:
+            if get_bioportal_metadata and not have_bioportal_metadata:
                 print(f"BioPortal metadata not found for {outname} - will retrieve.")
-                bioportal_metadata(dataname, outdir, ncbo_key)
+                onto_md = bioportal_metadata(dataname, ncbo_key)
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -196,6 +197,11 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
+                if onto_md:
+                    primary_knowledge_source = onto_md['name']
+                else:
+                    primary_knowledge_source = 'False'
+
                 print(f"KGX transform {outname}")
                 try:
                     kgx.cli.transform(inputs=[relaxed_outpath],
@@ -203,7 +209,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                             output=outpath,
                             output_format='tsv',
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", "False")])
+                                                ("primary_knowledge_source", primary_knowledge_source)])
                     txs_complete[outname] = True
                 except ValueError as e:
                     print(f"Encountered error during KGX transform of {outname}: {e}")
@@ -218,7 +224,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                             output=outpath,
                             output_format='tsv',
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", "False")])
+                                                ("primary_knowledge_source", primary_knowledge_source)])
                         txs_complete[outname] = True
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
@@ -228,9 +234,12 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
 
+            # TODO: add metadata to existing transforms
+
             # Remove the tempfile
             os.remove(tempout.name)
 
+    # TODO: clean up all remaining placeholders
     return txs_complete
 
 def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
