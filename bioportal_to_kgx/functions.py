@@ -146,6 +146,15 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                 print(f"BioPortal metadata not found for {outname} - will retrieve.")
                 onto_md = bioportal_metadata(dataname, ncbo_key)
                 # If we fail to retrieve metadata, onto_md['name'] == None
+                # Add metadata to existing transforms - just the edges for now
+                # If we don't have transforms yet, metadata will be added below
+                for filename in filelist:
+                    if filename.endswith("edges.tsv"):
+                        print(f"Adding metadata to {outname}...")
+                        if manually_add_md(os.path.join(outdir,filename), onto_md):
+                            print("Complete.")
+                        else:
+                            print("Something went wrong during metadata writing.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -236,16 +245,6 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     print("Validating...")
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
-
-            # Add metadata to existing transforms - just the edges for now
-            if get_bioportal_metadata and not have_bioportal_metadata:
-                print("FWOUBH")
-                if filename.endswith("edges.tsv"):
-                    print(f"Adding metadata to {outname}...")
-                    if manually_add_md(os.path.join(outdir,filename), onto_md):
-                        print("Complete.")
-                    else:
-                        print("Something went wrong during metadata writing.")
 
             # Remove the tempfile
             os.remove(tempout.name)
