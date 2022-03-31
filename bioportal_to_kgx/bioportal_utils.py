@@ -89,16 +89,17 @@ def manually_add_md(filepath: str, md: str) -> bool:
 
     try:
         with open(filepath,'r') as infile:
-            out_header_split = (infile.readline().rstrip()).split("/t")
+            out_header_split = ((infile.readline()).rstrip()).split("/t")
             with open(out_filepath,'w') as outfile:
                 for heading in MD_HEADINGS:
                     out_header_split.append(heading)
-                outfile.write("\t".join(out_header_split))
+                outfile.write("\t".join(out_header_split) + "\n")
                 for line in infile:
                     line_split = (line.rstrip()).split("/t")
                     for heading in MD_HEADINGS:
                         line_split.append(md[MD_HEADINGS[heading]])
-                    outfile.write("\t".join(line_split))
+                    outfile.write("\t".join(line_split) + "\n")
+        os.replace(out_filepath,filepath)
         success = True
     except (IOError, KeyError) as e:
         print(f"Failed to write metadata to {filepath}: {e}")
