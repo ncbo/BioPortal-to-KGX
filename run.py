@@ -59,6 +59,7 @@ def run(input: str, kgx_validate: bool, robot_validate: bool, get_bioportal_meta
 
     successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))
     failures = ", ".join(list(dict(filter(lambda elem: not elem[1], transform_status.items()))))
+    # TODO: don't print these if empty
     print(f"Successful transforms: {successes}")
     print(f"Failed transforms: {failures}")
 
