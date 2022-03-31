@@ -6,6 +6,10 @@ import requests # type: ignore
 
 BASE_ONTO_URL = "https://data.bioontology.org/ontologies/"
 
+# These are the Biolink slots (keys) and their corresponding
+# Bioportal metadata properties (values)
+MD_HEADINGS = {'primary_knowledge_source':'name'}
+
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     """
     Retrieve metadata for the given ontology.
@@ -51,17 +55,52 @@ def check_header_for_md(filepath: str) -> bool:
     Given a filename for a KGX edge or nodelist,
     checks for presence of metadata property names.
     :param filepath: str, path to KGX format file
-    :return: bool, True if metadata fiels appear present
+    :return: bool, True if metadata fields appear present
     """
 
     have_md = False
 
-    md_headings = ['primary_knowledge_source']
     with open(filepath,'r') as infile:
         header = infile.readline()
     
-    for heading in md_headings:
+    for heading in MD_HEADINGS:
         if heading in header:
             have_md = True
 
     return have_md
+
+def manually_add_md(filepath: str, md: str) -> bool:
+    """
+    Given a filename for a KGX edge or nodelist,
+    create a new header slot and add values to
+    each entry.
+    This only needs to happen if the
+    node/edgefile already exists.
+    Otherwise the metadata is added at graph
+    file creation.
+    :param filepath: str, path to KGX format file
+    :param md: dict, the metadata
+    :return: bool, True if successful
+    """
+
+    success = False
+
+    out_filepath = filepath + ".tmp"
+
+    try:
+        with open(filepath,'r') as infile:
+            out_header_split = (infile.readline().rstrip()).split("/t")
+            with open(out_filepath,'w') as outfile:
+                for heading in MD_HEADINGS:
+                    out_header_split.append(heading)
+                outfile.write("\t".join(out_header_split))
+                for line in infile:
+                    line_split = (line.rstrip()).split("/t")
+                    for heading in MD_HEADINGS:
+                        line_split.append(md[MD_HEADINGS[heading]])
+                    outfile.write("\t".join(line_split))
+        success = True
+    except (IOError, KeyError) as e:
+        print(f"Failed to write metadata to {filepath}: {e}")
+
+    return success

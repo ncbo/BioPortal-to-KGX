@@ -10,7 +10,7 @@ from json import dump as json_dump
 import kgx.cli # type: ignore
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
-from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md # type: ignore
+from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -145,6 +145,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
             if get_bioportal_metadata and not have_bioportal_metadata:
                 print(f"BioPortal metadata not found for {outname} - will retrieve.")
                 onto_md = bioportal_metadata(dataname, ncbo_key)
+                # If we fail to retrieve metadata, onto_md['name'] == None
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -197,8 +198,10 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
-                if onto_md:
+                if get_bioportal_metadata and not have_bioportal_metadata \
+                    and onto_md['name']:
                     primary_knowledge_source = onto_md['name']
+                    have_bioportal_metadata = True
                 else:
                     primary_knowledge_source = 'False'
 
@@ -234,7 +237,15 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
 
-            # TODO: add metadata to existing transforms
+            # Add metadata to existing transforms - just the edges for now
+            if get_bioportal_metadata and not have_bioportal_metadata:
+                print("FWOUBH")
+                if filename.endswith("edges.tsv"):
+                    print(f"Adding metadata to {outname}...")
+                    if manually_add_md(os.path.join(outdir,filename), onto_md):
+                        print("Complete.")
+                    else:
+                        print("Something went wrong during metadata writing.")
 
             # Remove the tempfile
             os.remove(tempout.name)
