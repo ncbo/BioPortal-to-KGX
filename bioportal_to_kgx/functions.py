@@ -159,13 +159,14 @@ def do_transforms(paths: list,
                 # If we fail to retrieve metadata, onto_md['name'] == None
                 # Add metadata to existing transforms - just the edges for now
                 # If we don't have transforms yet, metadata will be added below
-                for filename in filelist:
-                    if filename.endswith("edges.tsv"):
-                        print(f"Adding metadata to {outname}...")
-                        if manually_add_md(os.path.join(outdir,filename), onto_md):
-                            print("Complete.")
-                        else:
-                            print("Something went wrong during metadata writing.")
+                if onto_md['name']: # This will be None if metadata retrieval failed
+                    for filename in filelist:
+                        if filename.endswith("edges.tsv"):
+                            print(f"Adding metadata to {outname}...")
+                            if manually_add_md(os.path.join(outdir,filename), onto_md):
+                                print("Complete.")
+                            else:
+                                print("Something went wrong during metadata writing.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
