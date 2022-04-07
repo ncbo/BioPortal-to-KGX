@@ -62,8 +62,12 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     
     return data_filepaths
 
-def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
-                    get_bioportal_metadata, ncbo_key) -> dict:
+def do_transforms(paths: list,
+                    kgx_validate: bool, 
+                    robot_validate: bool,
+                    pandas_validate: bool,
+                    get_bioportal_metadata, 
+                    ncbo_key) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -138,6 +142,11 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                 if filename.endswith(".log"):
                     print(f"KGX validation log present: {filename}")
                     have_kgx_validation_log = True
+            if pandas_validate and tx_filecount > 0:
+                print("Validating graph files can be parsed...")
+                if not pandas_validate_transform(outdir):
+                    print(f"Validation did not complete for {outname}.")
+                    txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
                 print(f"ROBOT reports not found for {outname} - will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
@@ -251,23 +260,8 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                 
                 # One last mandatory validation step - can pandas load it?
                 print("Validating graph files with pandas...")
-                tx_filepaths = []
-                for filepath in os.listdir(outdir):
-                    if filepath[-3:] == 'tsv':
-                        if not is_file_too_short(os.path.join(outdir,filepath)):
-                            tx_filepaths.append(os.path.join(outdir,filepath))
-                try:
-                    for filepath in tx_filepaths:
-                        file_iter = pd.read_csv(
-                            filepath,
-                            dtype=str,
-                            chunksize=10000,
-                            low_memory=False,
-                            keep_default_na=False)
-                        for chunk in file_iter:
-                            pass    #Just making sure it loads
-                except pd.errors.ParserError as e:
-                    print(f"Encountered parsing error in {filepath}: {e}")
+                if not pandas_validate_transform(outdir):
+                    print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
 
             # Remove the tempfile
@@ -279,6 +273,43 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
 
     # TODO: clean up all remaining placeholders
     return txs_complete
+
+def pandas_validate_transform(in_path: str) -> bool:
+    """
+    Validates transforms by parsing them
+    with pandas. Will raise a caught error
+    if there's an issue with format rendering
+    the graph files un-parsible.
+    :param in_path: str, path to directory
+    :return: True if complete, False otherwise
+    """
+
+    tx_filepaths = []
+    for filepath in os.listdir(in_path):
+        if filepath[-3:] == 'tsv':
+            if not is_file_too_short(os.path.join(in_path,filepath)):
+                tx_filepaths.append(os.path.join(in_path,filepath))
+
+        if len(tx_filepaths) == 0:
+            print(f"All transforms in {in_path} are blank or very short.")
+            return False
+    try:
+        for filepath in tx_filepaths:
+            file_iter = pd.read_csv(
+                filepath,
+                dtype=str,
+                chunksize=10000,
+                low_memory=False,
+                keep_default_na=False)
+            for chunk in file_iter:
+                pass    #Just making sure it loads
+        success = True
+    except pd.errors.ParserError as e:
+        print(f"Encountered parsing error in {filepath}: {e}")
+        success = False
+    
+    return success
+
 
 def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
     """
