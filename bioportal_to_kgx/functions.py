@@ -300,9 +300,13 @@ def pandas_validate_transform(in_path: str) -> bool:
                 dtype=str,
                 chunksize=10000,
                 low_memory=False,
-                keep_default_na=False)
+                keep_default_na=False,
+                quoting=3,
+                lineterminator="\n",
+                delimiter="\t")
             for chunk in file_iter:
                 pass    #Just making sure it loads
+        print(f"Graph file {filepath} parses OK.")
         success = True
     except pd.errors.ParserError as e:
         print(f"Encountered parsing error in {filepath}: {e}")

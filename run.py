@@ -29,6 +29,10 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                         Logs will be written to each output directory.
                         If an existing transform is found without ROBOT logs,
                         a new validation will be run.""")
+@click.option("--pandas_validate",
+                is_flag=True,
+                help="""If used, will verify that each new and existing transform
+                        can be parsed with pandas without encountering format errors.""")
 @click.option("--get_bioportal_metadata",
                 is_flag=True,
                 help="""If used, will retrieve metadata from BioPortal. 
@@ -47,14 +51,14 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                 help="""One or more ontologies to exclude from transforms,
                      comma-delimited and named by their hashed file ID, e.g., dabd4d902360003975fb25ae56f8.""")
 
-def run(input: str, kgx_validate: bool, robot_validate: bool, get_bioportal_metadata: bool,
+def run(input: str, kgx_validate: bool, robot_validate: bool, pandas_validate: bool, get_bioportal_metadata: bool, 
         ncbo_key=None, include_only=[], exclude=[]):
 
     if get_bioportal_metadata and not ncbo_key:
       sys.exit("Cannot access BioPortal metadata without API key. Specify in --ncbo_key parameter.")
 
     data_filepaths = examine_data_directory(input, include_only, exclude)
-    transform_status = do_transforms(data_filepaths, kgx_validate, robot_validate, 
+    transform_status = do_transforms(data_filepaths, kgx_validate, robot_validate, pandas_validate, 
                                       get_bioportal_metadata, ncbo_key)
 
     successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))
