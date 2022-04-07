@@ -8,6 +8,7 @@ import re
 from json import dump as json_dump
 
 import kgx.cli # type: ignore
+import pandas as pd
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
 from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
@@ -89,6 +90,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
     print(f"ROBOT evironment variables: {robot_env['ROBOT_JAVA_ARGS']}")
 
     txs_complete = {}
+    txs_invalid = []
 
     print("Transforming all...")
 
@@ -242,12 +244,38 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool,
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
                 if kgx_validate and txs_complete[outname]:
-                    print("Validating...")
+                    print("Validating graph files with KGX...")
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
+                        txs_invalid.append(outname)
+                
+                # One last mandatory validation step - can pandas load it?
+                print("Validating graph files with pandas...")
+                tx_filepaths = []
+                for filepath in os.listdir(outdir):
+                    if filepath[-3:] == 'tsv':
+                        if not is_file_too_short(os.path.join(outdir,filepath)):
+                            tx_filepaths.append(os.path.join(outdir,filepath))
+                try:
+                    for filepath in tx_filepaths:
+                        file_iter = pd.read_csv(
+                            filepath,
+                            dtype=str,
+                            chunksize=10000,
+                            low_memory=False,
+                            keep_default_na=False)
+                        for chunk in file_iter:
+                            pass    #Just making sure it loads
+                except pd.errors.ParserError as e:
+                    print(f"Encountered parsing error in {filepath}: {e}")
+                    txs_invalid.append(outname)
 
             # Remove the tempfile
             os.remove(tempout.name)
+
+    # Notify about any invalid transforms (i.e., completed but broken somehow)
+    if len(txs_invalid) > 0:
+        print(f"The following transforms may have issues:{txs_invalid}")
 
     # TODO: clean up all remaining placeholders
     return txs_complete
