@@ -286,13 +286,12 @@ def pandas_validate_transform(in_path: str) -> bool:
 
     tx_filepaths = []
     for filepath in os.listdir(in_path):
-        if filepath[-3:] == 'tsv':
-            if not is_file_too_short(os.path.join(in_path,filepath)):
-                tx_filepaths.append(os.path.join(in_path,filepath))
+        if filepath.endswith('.tsv'):
+            tx_filepaths.append(os.path.join(in_path,filepath))
 
-        if len(tx_filepaths) == 0:
-            print(f"All transforms in {in_path} are blank or very short.")
-            return False
+    if len(tx_filepaths) == 0:
+        print(f"Could not find graph files in {in_path}.")
+        return False
     try:
         for filepath in tx_filepaths:
             file_iter = pd.read_csv(
