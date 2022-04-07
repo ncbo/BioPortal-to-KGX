@@ -429,7 +429,7 @@ def remove_bad_curie(filepath: str) -> str:
     with open(filepath, 'r') as infile:
         with open(repaired_filepath, 'w') as outfile:
             for line in infile:
-                line = re.sub("file:", "", line)
+                line = re.sub("file:C:", "", line)
                 outfile.write(line)
 
     return repaired_filepath
