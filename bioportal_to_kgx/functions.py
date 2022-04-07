@@ -8,7 +8,7 @@ import re
 from json import dump as json_dump
 
 import kgx.cli # type: ignore
-import pandas as pd
+import pandas as pd # type: ignore
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
 from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
