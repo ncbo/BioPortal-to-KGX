@@ -8,8 +8,10 @@ import re
 from json import dump as json_dump
 
 import kgx.cli # type: ignore
+import pandas as pd # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_convert, robot_report, robot_measure  # type: ignore
+from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
+from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -60,7 +62,12 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     
     return data_filepaths
 
-def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict:
+def do_transforms(paths: list,
+                    kgx_validate: bool, 
+                    robot_validate: bool,
+                    pandas_validate: bool,
+                    get_bioportal_metadata, 
+                    ncbo_key) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -87,6 +94,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
     print(f"ROBOT evironment variables: {robot_env['ROBOT_JAVA_ARGS']}")
 
     txs_complete = {}
+    txs_invalid = []
 
     print("Transforming all...")
 
@@ -115,6 +123,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
             # then validation is still required
             have_robot_report = False
             have_kgx_validation_log = False
+            have_bioportal_metadata = False
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
@@ -123,18 +132,41 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
+                    # Check to see if metadata properties are in the header
+                    if check_header_for_md(os.path.join(outdir,filename)):
+                        print(f"BioPortal metadata present.")
+                        have_bioportal_metadata = True
                 if filename.endswith(".report"):
                     print(f"ROBOT report(s) present: {filename}")
                     have_robot_report = True 
                 if filename.endswith(".log"):
                     print(f"KGX validation log present: {filename}")
                     have_kgx_validation_log = True
+            if pandas_validate and tx_filecount > 0:
+                print("Validating graph files can be parsed...")
+                if not pandas_validate_transform(outdir):
+                    print(f"Validation did not complete for {outname}.")
+                    txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
                 print(f"ROBOT reports not found for {outname} - will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
             if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
                 print(f"KGX validation log not found for {outname} - will validate.")
                 kgx_validate_transform(outdir)
+            if get_bioportal_metadata and not have_bioportal_metadata:
+                print(f"BioPortal metadata not found for {outname} - will retrieve.")
+                onto_md = bioportal_metadata(dataname, ncbo_key)
+                # If we fail to retrieve metadata, onto_md['name'] == None
+                # Add metadata to existing transforms - just the edges for now
+                # If we don't have transforms yet, metadata will be added below
+                if onto_md['name']: # This will be None if metadata retrieval failed
+                    for filename in filelist:
+                        if filename.endswith("edges.tsv"):
+                            print(f"Adding metadata to {outname}...")
+                            if manually_add_md(os.path.join(outdir,filename), onto_md):
+                                print("Complete.")
+                            else:
+                                print("Something went wrong during metadata writing.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -187,6 +219,13 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                     if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
+                if get_bioportal_metadata and not have_bioportal_metadata \
+                    and onto_md['name']:
+                    primary_knowledge_source = onto_md['name']
+                    have_bioportal_metadata = True
+                else:
+                    primary_knowledge_source = 'False'
+
                 print(f"KGX transform {outname}")
                 try:
                     kgx.cli.transform(inputs=[relaxed_outpath],
@@ -194,7 +233,7 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                             output=outpath,
                             output_format='tsv',
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", "False")])
+                                                ("primary_knowledge_source", primary_knowledge_source)])
                     txs_complete[outname] = True
                 except ValueError as e:
                     print(f"Encountered error during KGX transform of {outname}: {e}")
@@ -209,20 +248,72 @@ def do_transforms(paths: list, kgx_validate: bool, robot_validate: bool) -> dict
                             output=outpath,
                             output_format='tsv',
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", "False")])
+                                                ("primary_knowledge_source", primary_knowledge_source)])
                         txs_complete[outname] = True
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
                 if kgx_validate and txs_complete[outname]:
-                    print("Validating...")
+                    print("Validating graph files with KGX...")
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
+                        txs_invalid.append(outname)
+                
+                # One last mandatory validation step - can pandas load it?
+                print("Validating graph files with pandas...")
+                if not pandas_validate_transform(outdir):
+                    print(f"Validation did not complete for {outname}.")
+                    txs_invalid.append(outname)
 
             # Remove the tempfile
             os.remove(tempout.name)
 
+    # Notify about any invalid transforms (i.e., completed but broken somehow)
+    if len(txs_invalid) > 0:
+        print(f"The following transforms may have issues:{txs_invalid}")
+
+    # TODO: clean up all remaining placeholders
     return txs_complete
+
+def pandas_validate_transform(in_path: str) -> bool:
+    """
+    Validates transforms by parsing them
+    with pandas. Will raise a caught error
+    if there's an issue with format rendering
+    the graph files un-parsible.
+    :param in_path: str, path to directory
+    :return: True if complete, False otherwise
+    """
+
+    tx_filepaths = []
+    for filepath in os.listdir(in_path):
+        if filepath.endswith('.tsv'):
+            tx_filepaths.append(os.path.join(in_path,filepath))
+
+    if len(tx_filepaths) == 0:
+        print(f"Could not find graph files in {in_path}.")
+        return False
+    try:
+        for filepath in tx_filepaths:
+            file_iter = pd.read_csv(
+                filepath,
+                dtype=str,
+                chunksize=10000,
+                low_memory=False,
+                keep_default_na=False,
+                quoting=3,
+                lineterminator="\n",
+                delimiter="\t")
+            for chunk in file_iter:
+                pass    #Just making sure it loads
+        print(f"Graph file {filepath} parses OK.")
+        success = True
+    except pd.errors.ParserError as e:
+        print(f"Encountered parsing error in {filepath}: {e}")
+        success = False
+    
+    return success
+
 
 def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
     """
@@ -234,7 +325,9 @@ def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_en
     Runs a convert command first to ensure
     ROBOT can parse the input.
     Returns True if successful,
-    otherwise False.
+    otherwise False - though any errors detected
+    in the target ontology by the report command
+    will yield False, too.
     :param filepath: path to the *original* ontology dump file
     :param outpath_dir: directory where output
     :param robot_path: path to ROBOT itself
@@ -247,11 +340,12 @@ def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_en
     report_path = os.path.join(outpath_dir,"robot.report") 
     measure_path = os.path.join(outpath_dir,"robot.measure")
 
+    # Will state 'Report failed!' if any errors present
     if not robot_report(robot_path=robot_path, 
                 input_path=filepath, 
                 output_path=report_path, 
                 robot_env=robot_env):
-                success = False
+                success = False 
     
     if not robot_measure(robot_path=robot_path, 
                 input_path=filepath, 
@@ -339,7 +433,7 @@ def remove_bad_curie(filepath: str) -> str:
     with open(filepath, 'r') as infile:
         with open(repaired_filepath, 'w') as outfile:
             for line in infile:
-                line = re.sub("file:", "", line)
+                line = re.sub("file:C:", "", line)
                 outfile.write(line)
 
     return repaired_filepath

@@ -232,10 +232,12 @@ def robot_report(robot_path: str, input_path: str, output_path: str,
             '--format', 'tsv',
             _env=robot_env,
         )
-        print(f"Complete. See {output_path}")
+        print(f"No errors here! See {output_path}")
         success = True
     except sh.ErrorReturnCode_1 as e: # If ROBOT runs but returns an error
-        print(f"ROBOT encountered an error: {e}")
+        # For report, this is expected, as the error may be
+        # in the target ontology.
+        print(f"ROBOT report results: {e}\nSee {output_path}")
         success = False
 
     return success
