@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from typing import List
 import requests # type: ignore
 
 BASE_ONTO_URL = "https://data.bioontology.org/ontologies/"
@@ -23,7 +24,7 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     """
 
     md = {}
-    missing_pages = []
+    missing_pages = [] # type: List[str]
         
     # Return content from the Ontology endpoint
     # http://data.bioontology.org/metadata/Ontology
