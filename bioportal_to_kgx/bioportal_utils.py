@@ -6,9 +6,9 @@ import requests # type: ignore
 
 BASE_ONTO_URL = "https://data.bioontology.org/ontologies/"
 
-# These are the Biolink slots (keys) and their corresponding
-# Bioportal metadata properties (values)
-MD_HEADINGS = {'primary_knowledge_source':'name'}
+# Mapping from Biolink slots (keys) to a custom value
+# assembled from metadata
+MD_HEADINGS = {'primary_knowledge_source':'full_name'}
 
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     """
@@ -50,6 +50,12 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
             elif rec_type == "latest_submission":
                 for md_type in ['submissionId','creationDate']:
                     md[md_type] = content[md_type]
+        
+        # Assemble the full name
+        if all(md_type in md for md_type in ['name', 'submissionId']):
+            md['full_name'] = f"{md['name']} - submission {md['submissionId']}"
+        elif 'name' in md:
+            md['full_name'] = md['name']
 
     if len(missing_pages) == 0:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
