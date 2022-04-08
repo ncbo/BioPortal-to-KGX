@@ -37,11 +37,11 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
         response = requests.get(req_url, params=params)
         print(response)
 
-        content = response.json()
-        #API doesn't return status on 200
-        # but status is still a meaningful keyword sometimes
-        if 'status' in content and rec_type == "": 
+        if response.status_code != 200: 
             content = None
+            missing_pages.append(req_url)
+        else:
+            content = response.json()
         
         # Reduce the content to just what we want
         if content:
@@ -62,6 +62,7 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
     else:
         print(f"Tried metadata retrieval for {ontoid}, but failed on {missing_pages}")
+        md['name'] = ''
 
     return md
 
