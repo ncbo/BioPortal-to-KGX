@@ -159,7 +159,7 @@ def do_transforms(paths: list,
                 # If we fail to retrieve metadata, onto_md['name'] == None
                 # Add metadata to existing transforms - just the edges for now
                 # If we don't have transforms yet, metadata will be added below
-                if onto_md['name']: # This will be None if metadata retrieval failed
+                if onto_md['name'] != '': # This will be empty string if metadata retrieval failed
                     for filename in filelist:
                         if filename.endswith("edges.tsv"):
                             print(f"Adding metadata to {outname}...")
