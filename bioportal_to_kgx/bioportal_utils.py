@@ -21,32 +21,40 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     :param outdir: directory to write outfile to
     :param api_key: str, NCBO API key
     """
-    desired_metadata = ['name']
-    md = {key: None for key in desired_metadata}
+
+    md = {}
+    missing_pages = []
         
     # Return content from the Ontology endpoint
     # http://data.bioontology.org/metadata/Ontology
-    req_url = BASE_ONTO_URL + ontoid
-    params = dict(apikey=api_key,display_context="False",include="all")
+    # Get the base ontology record and the latest_submission record
+    for rec_type in ["","latest_submission"]:
+        req_url = f"{BASE_ONTO_URL}{ontoid}/{rec_type}"
+        params = dict(apikey=api_key,display_context="False",include="all")
+        print(f"Accessing {req_url}...")
 
-    print(f"Accessing {req_url}...")
+        response = requests.get(req_url, params=params)
+        print(response)
 
-    response = requests.get(req_url, params=params)
-    print(response)
+        content = response.json()
+        #API doesn't return status on 200
+        # but status is still a meaningful keyword sometimes
+        if 'status' in content and rec_type == "": 
+            content = None
+        
+        # Reduce the content to just what we want
+        if content:
+            if rec_type == "":
+                for md_type in ['name','ontologyType']:
+                    md[md_type] = content[md_type]
+            elif rec_type == "latest_submission":
+                for md_type in ['submissionId','creationDate']:
+                    md[md_type] = content[md_type]
 
-    content = response.json()
-    if 'status' in content: #API doesn't return status on 200
-        content = None
-    
-    # Reduce the content to just what we want
-    if content:
-        for md_type in desired_metadata:
-            md[md_type] = content[md_type]
-
+    if len(missing_pages) == 0:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
-    
     else:
-        print(f"Could not retrieve metadata for {ontoid}.")
+        print(f"Tried metadata retrieval for {ontoid}, but failed on {missing_pages}")
 
     return md
 
