@@ -26,6 +26,8 @@ all_errortypes=("MISSING_NODE_PROPERTY"
 )
 
 # Run
+echo "*** General ontology counts:"
+
 printf "%10s\t"  "All processed ontologies:"
 ls -d $TX_PATH* | wc -l
 
@@ -47,11 +49,15 @@ find $TX_PATH -name "robot.report" | wc -l
 printf "%10s\t"  "Ontologies with failed transforms:"
 find $TX_PATH -maxdepth 1 -type d -exec bash -c "echo -ne '{} '; ls '{}' | wc -l" \; | awk '$NF==1{print $1}'
 
-echo "Transforms with at least one of the following errors:"
+echo "*** Transforms with at least one of the following errors:"
 for ((i=0; i < ${#all_errortypes[@]}; i++))
 do
     printf "%10s\t" "${all_errortypes[$i]}"
     grep -r -m1 --include \*.log "${all_errortypes[$i]}" $TX_PATH | wc -l
 done
+
+echo "*** Entity type counts:"
+
+echo "*** Relation type counts:"
 
 echo "Complete."
