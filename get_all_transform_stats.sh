@@ -26,22 +26,31 @@ all_errortypes=("MISSING_NODE_PROPERTY"
 )
 
 # Run
-echo "All processed ontologies:"
-ls -d $TX_PATH | wc -l
+printf "%10s\t"  "All processed ontologies:"
+ls -d $TX_PATH* | wc -l
 
-echo "All successful JSON transforms:"
+printf "%10s\t"  "All successful JSON transforms:"
 find $TX_PATH -name "*.json" | wc -l
 
-echo "All successful KGX TSV transforms:"
+printf "%10s\t"  "All successful KGX TSV transforms:"
 find $TX_PATH -name "*_edges.tsv" | wc -l
 
-echo "Ontologies with failed transforms:"
+printf "%10s\t"  "All transforms with KGX validation logs:"
+find $TX_PATH -name "kgx_validate_*.log" | wc -l
+
+printf "%10s\t"  "All transforms with ROBOT measure reports:"
+find $TX_PATH -name "robot.measure" | wc -l
+
+printf "%10s\t"  "All transforms with ROBOT validation reports:"
+find $TX_PATH -name "robot.report" | wc -l
+
+printf "%10s\t"  "Ontologies with failed transforms:"
 find $TX_PATH -maxdepth 1 -type d -exec bash -c "echo -ne '{} '; ls '{}' | wc -l" \; | awk '$NF==1{print $1}'
 
 echo "Transforms with at least one of the following errors:"
 for ((i=0; i < ${#all_errortypes[@]}; i++))
 do
-    echo "${all_errortypes[$i]}"
+    printf "%10s\t" "${all_errortypes[$i]}"
     grep -r -m1 --include \*.log "${all_errortypes[$i]}" $TX_PATH | wc -l
 done
 
