@@ -24,7 +24,7 @@ ALL_EDGE_TYPES=""
 for f in $ALL_EDGE_FILES
 do
     printf "%10s\t" "$f"
-    edgetypes=$(cut -f 2 $f | xargs -n1 | sort | uniq | xargs)
+    edgetypes=$(cut -f 3 $f | xargs -n1 | sort | uniq | xargs)
     printf "%10s\n" "$edgetypes"
     ALL_EDGE_TYPES+=$edgetypes
 done
