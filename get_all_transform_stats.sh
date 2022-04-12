@@ -25,6 +25,14 @@ all_errortypes=("MISSING_NODE_PROPERTY"
  "VALIDATION_SYSTEM_ERROR"
 )
 
+all_nodetypes=("biolink:NamedThing"
+ "biolink:OntologyClass"
+)
+
+all_edgetypes=("biolink:related_to"
+ "biolink:subclass_of"
+)
+
 # Run
 echo "*** General ontology counts:"
 
@@ -56,8 +64,18 @@ do
     grep -r -m1 --include \*.log "${all_errortypes[$i]}" $TX_PATH | wc -l
 done
 
-echo "*** Entity type counts:"
+echo "*** Node type counts:"
+for ((i=0; i < ${#all_nodetypes[@]}; i++))
+do
+    printf "%10s\t" "${all_nodetypes[$i]}"
+    grep -r -m1 --include \*_nodes.tsv "${all_nodetypes[$i]}" $TX_PATH | wc -l
+done
 
-echo "*** Relation type counts:"
+echo "*** Edge type counts (i.e., predicate types):"
+for ((i=0; i < ${#all_edgetypes[@]}; i++))
+do
+    printf "%10s\t" "${all_edgetypes[$i]}"
+    grep -r -m1 --include \*_edges.tsv "${all_edgetypes[$i]}" $TX_PATH | wc -l
+done
 
 echo "Complete."
