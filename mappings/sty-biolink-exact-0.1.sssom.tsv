@@ -8,3 +8,126 @@ STY:T071	skos:exactMatch	biolink:Entity	Lexical	entity	Entity
 STY:T051	skos:exactMatch	biolink:Event	Lexical	event	Event
 STY:T127	skos:exactMatch	biolink:Vitamin	Lexical	vitamin	Vitamin
 STY:T168	skos:exactMatch	biolink:Food	Lexical	food	Food
+STY:T007	NA	NA	NA	bacterium	NA
+STY:T002	NA	NA	NA	plant	NA
+STY:T061	skos:broadMatch	biolink:ClinicalEntity	Logical	therapeutic or preventive procedure	ClinicalEntity
+STY:T004	NA	NA	NA	fungus	NA
+STY:T109	skos:closeMatch	biolink:ChemicalEntity	Logical	organic chemical	ChemicalEntity
+STY:T200	skos:closeMatch	biolink:Drug	Logical	clinical drug	Drug
+STY:T121	skos:closeMatch	biolink:Drug	Logical	pharmacologic substance	Drug
+STY:T116	skos:closeMatch	biolink:Polypeptide	Logical	"amino acid, peptide, or protein"	Polypeptide
+STY:T047	skos:exactMatch	biolink:Disease	Logical	disease or syndrome	Disease
+STY:T037	NA	NA	NA	injury or poisoning	NA
+STY:T033	skos:closeMatch	biolink:ClinicalFinding	Logical	finding	ClinicalFinding
+STY:T123	skos:broadMatch	biolink:BiologicalEntity	Logical	biologically active substance	BiologicalEntity
+STY:T013	NA	NA	NA	fish	NA
+STY:T028	skos:closeMatch	biolink:Gene	Logical	gene or genome	Gene
+STY:T005	NA	NA	NA	virus	NA
+STY:T126	skos:broadMatch	biolink:Protein	Logical	enzyme	Protein
+STY:T060				diagnostic procedure	
+STY:T074				medical device	
+STY:T191				neoplastic process	
+STY:T046				pathologic function	
+STY:T129				immunologic factor	
+STY:T023				"body part, organ, or organ component"	
+STY:T012	NA	NA	NA	bird	NA
+STY:T014	NA	NA	NA	reptile	NA
+STY:T015	NA	NA	NA	mammal	NA
+STY:T019				congenital abnormality	
+STY:T011	NA	NA	NA	amphibian	NA
+STY:T114				"nucleic acid, nucleoside, or nucleotide"	
+STY:T130				"indicator, reagent, or diagnostic aid"	
+STY:T184				sign or symptom	
+STY:T059				laboratory procedure	
+STY:T194	NA	NA	NA	archaeon	NA
+STY:T048				mental or behavioral dysfunction	
+STY:T122				biomedical or dental material	
+STY:T170				intellectual product	
+STY:T197				inorganic chemical	
+STY:T195				antibiotic	
+STY:T058				health care activity	
+STY:T131				hazardous or poisonous substance	
+STY:T192				receptor	
+STY:T097				professional or occupational group	
+STY:T125				hormone	
+STY:T190				anatomical abnormality	
+STY:T020				acquired abnormality	
+STY:T034				laboratory or test result	
+STY:T073				manufactured object	
+STY:T081				quantitative concept	
+STY:T203				drug delivery device	
+STY:T029				body location or region	
+STY:T196				"element, ion, or isotope"	
+STY:T169				functional concept	
+STY:T042				organ or tissue function	
+STY:T098				population group	
+STY:T082				spatial concept	
+STY:T093				health care related organization	
+STY:T030				body space or junction	
+STY:T044				molecular function	
+STY:T080				qualitative concept	
+STY:T078				idea or concept	
+STY:T083				geographic area	
+STY:T031				body substance	
+STY:T067				phenomenon or process	
+STY:T079				temporal concept	
+STY:T041				mental process	
+STY:T026	skos:exactMatch	biolink:CellularComponent	Logical	cell component	CellularComponent
+STY:T171	NA	NA	NA	language	NA
+STY:T024				tissue	
+STY:T167				substance	
+STY:T040				organism function	
+STY:T185				classification	
+STY:T039				physiologic function	
+STY:T049				cell or molecular dysfunction	
+STY:T070				natural phenomenon or process	
+STY:T091				biomedical occupation or discipline	
+STY:T055				individual behavior	
+STY:T054				social behavior	
+STY:T043				cell function	
+STY:T057				occupational activity	
+STY:T056				daily or recreational activity	
+STY:T120	skos:closeMatch	biolink:ChemicalEntity	Logical	chemical viewed functionally	ChemicalEntity
+STY:T062				research activity	
+STY:T104	skos:closeMatch	biolink:ChemicalEntity	Logical	chemical viewed structurally	ChemicalEntity
+STY:T018				embryonic structure	
+STY:T090				occupation or discipline	
+STY:T099				family group	
+STY:T077				conceptual entity	
+STY:T068				human-caused phenomenon or process	
+STY:T045				genetic function	
+STY:T065				educational activity	
+STY:T022				body system	
+STY:T092				organization	
+STY:T064				governmental or regulatory activity	
+STY:T001				organism	
+STY:T038				biologic function	
+STY:T010	NA	NA	NA	vertebrate	NA
+STY:T101				patient or disabled group	
+STY:T063				molecular biology research technique	
+STY:T096				group	
+STY:T008				animal	
+STY:T072				physical object	
+STY:T021				fully formed anatomical structure	
+STY:T017				anatomical structure	
+STY:T089	NA	NA	NA	regulation or law	NA
+STY:T085				molecular sequence	
+STY:T103	skos:closeMatch	biolink:ChemicalEntity	Logical	chemical	ChemicalEntity
+STY:T102				group attribute	
+STY:T100				age group	
+STY:T086				nucleotide sequence	
+STY:T069				environmental effect of humans	
+STY:T066				machine activity	
+STY:T050				experimental model of disease	
+STY:T087	skos:closeMatch	biolink:Polypeptide	Logical	amino acid sequence	Polypeptide
+STY:T075				research device	
+STY:T095				self-help or relief organization	
+STY:T094				professional society	
+STY:T016				human	
+STY:T088				carbohydrate sequence	
+STY:T119				lipid	
+STY:T124				neuroreactive substance or biogenic amine	
+STY:T118				carbohydrate	
+STY:T115				organophosphorus compound	
+STY:T111				eicosanoid	
+STY:T110				steroid	
