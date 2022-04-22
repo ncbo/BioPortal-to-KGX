@@ -1,0 +1,10 @@
+subject_id	predicate_id	object_id	match_type	subject_label	object_label
+STY:T032	skos:exactMatch	biolink:OrganismAttribute	Lexical	organism attribute	OrganismAttribute
+STY:T025	skos:exactMatch	biolink:Cell	Lexical	cell	Cell
+STY:T052	skos:exactMatch	biolink:Activity	Lexical	activity	Activity
+STY:T053	skos:exactMatch	biolink:Behavior	Lexical	behavior	Behavior
+STY:T201	skos:exactMatch	biolink:Clinical Attribute	Lexical	clinical attribute	ClinicalAttribute
+STY:T071	skos:exactMatch	biolink:Entity	Lexical	entity	Entity
+STY:T051	skos:exactMatch	biolink:Event	Lexical	event	Event
+STY:T127	skos:exactMatch	biolink:Vitamin	Lexical	vitamin	Vitamin
+STY:T168	skos:exactMatch	biolink:Food	Lexical	food	Food
