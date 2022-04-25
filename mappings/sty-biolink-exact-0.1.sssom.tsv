@@ -8,38 +8,38 @@ STY:T071	skos:exactMatch	biolink:Entity	Lexical	entity	Entity
 STY:T051	skos:exactMatch	biolink:Event	Lexical	event	Event
 STY:T127	skos:exactMatch	biolink:Vitamin	Lexical	vitamin	Vitamin
 STY:T168	skos:exactMatch	biolink:Food	Lexical	food	Food
-STY:T007	NA	NA	NA	bacterium	NA
-STY:T002	NA	NA	NA	plant	NA
+STY:T007	skos:broadMatch	biolink:OrganismTaxon	Logical	bacterium	OrganismTaxon
+STY:T002	skos:broadMatch	biolink:OrganismTaxon	Logical	plant	OrganismTaxon
 STY:T061	skos:broadMatch	biolink:ClinicalEntity	Logical	therapeutic or preventive procedure	ClinicalEntity
-STY:T004	NA	NA	NA	fungus	NA
+STY:T004	skos:broadMatch	biolink:OrganismTaxon	Logical	fungus	OrganismTaxon
 STY:T109	skos:closeMatch	biolink:ChemicalEntity	Logical	organic chemical	ChemicalEntity
 STY:T200	skos:closeMatch	biolink:Drug	Logical	clinical drug	Drug
 STY:T121	skos:closeMatch	biolink:Drug	Logical	pharmacologic substance	Drug
 STY:T116	skos:closeMatch	biolink:Polypeptide	Logical	"amino acid, peptide, or protein"	Polypeptide
 STY:T047	skos:exactMatch	biolink:Disease	Logical	disease or syndrome	Disease
-STY:T037	NA	NA	NA	injury or poisoning	NA
+STY:T037	skos:broadMatch	biolink:NamedThing	Logical	injury or poisoning	NamedThing
 STY:T033	skos:closeMatch	biolink:ClinicalFinding	Logical	finding	ClinicalFinding
 STY:T123	skos:broadMatch	biolink:BiologicalEntity	Logical	biologically active substance	BiologicalEntity
-STY:T013	NA	NA	NA	fish	NA
+STY:T013	skos:broadMatch	biolink:OrganismTaxon	Logical	fish	OrganismTaxon
 STY:T028	skos:closeMatch	biolink:Gene	Logical	gene or genome	Gene
-STY:T005	NA	NA	NA	virus	NA
+STY:T005	skos:broadMatch	biolink:OrganismTaxon	Logical	virus	OrganismTaxon
 STY:T126	skos:broadMatch	biolink:Protein	Logical	enzyme	Protein
-STY:T060				diagnostic procedure	
-STY:T074				medical device	
-STY:T191				neoplastic process	
+STY:T060	skos:closeMatch	biolink:Procedure	Logical	diagnostic procedure	Procedure
+STY:T074	skos:closeMatch	biolink:Device	Logical	medical device	Device
+STY:T191	skos:broadMatch	biolink:BiologicalProcess	Logical	neoplastic process	BiologicalProcess
 STY:T046				pathologic function	
 STY:T129				immunologic factor	
 STY:T023				"body part, organ, or organ component"	
-STY:T012	NA	NA	NA	bird	NA
-STY:T014	NA	NA	NA	reptile	NA
-STY:T015	NA	NA	NA	mammal	NA
-STY:T019				congenital abnormality	
-STY:T011	NA	NA	NA	amphibian	NA
+STY:T012	skos:broadMatch	biolink:OrganismTaxon	Logical	bird	OrganismTaxon
+STY:T014	skos:broadMatch	biolink:OrganismTaxon	Logical	reptile	OrganismTaxon
+STY:T015	skos:broadMatch	biolink:OrganismTaxon	Logical	mammal	OrganismTaxon
+STY:T019	skos:broadMatch	biolink:PhenotypicFeature	Logical	congenital abnormality	PhenotypicFeature
+STY:T011	skos:broadMatch	biolink:OrganismTaxon	Logical	amphibian	OrganismTaxon
 STY:T114				"nucleic acid, nucleoside, or nucleotide"	
 STY:T130				"indicator, reagent, or diagnostic aid"	
 STY:T184				sign or symptom	
 STY:T059				laboratory procedure	
-STY:T194	NA	NA	NA	archaeon	NA
+STY:T194	skos:broadMatch	biolink:OrganismTaxon	Logical	archaeon	OrganismTaxon
 STY:T048				mental or behavioral dysfunction	
 STY:T122				biomedical or dental material	
 STY:T170				intellectual product	
@@ -66,18 +66,18 @@ STY:T093				health care related organization
 STY:T030				body space or junction	
 STY:T044				molecular function	
 STY:T080				qualitative concept	
-STY:T078				idea or concept	
+STY:T078	skos:closeMatch	biolink:NamedThing	Logical	idea or concept	NamedThing
 STY:T083				geographic area	
 STY:T031				body substance	
 STY:T067				phenomenon or process	
 STY:T079				temporal concept	
 STY:T041				mental process	
 STY:T026	skos:exactMatch	biolink:CellularComponent	Logical	cell component	CellularComponent
-STY:T171	NA	NA	NA	language	NA
+STY:T171	skos:broadMatch	biolink:NamedThing	Logical	language	NamedThing
 STY:T024				tissue	
-STY:T167				substance	
+STY:T167	skos:closeMatch	biolink:PhysicalEntity	Logical	substance	PhysicalEntity
 STY:T040				organism function	
-STY:T185				classification	
+STY:T185	skos:closeMatch	biolink:NamedThing	Logical	classification	NamedThing
 STY:T039				physiologic function	
 STY:T049				cell or molecular dysfunction	
 STY:T070				natural phenomenon or process	
@@ -93,24 +93,24 @@ STY:T104	skos:closeMatch	biolink:ChemicalEntity	Logical	chemical viewed structur
 STY:T018				embryonic structure	
 STY:T090				occupation or discipline	
 STY:T099				family group	
-STY:T077				conceptual entity	
+STY:T077	skos:closeMatch	biolink:NamedThing	Logical	conceptual entity	NamedThing
 STY:T068				human-caused phenomenon or process	
 STY:T045				genetic function	
 STY:T065				educational activity	
 STY:T022				body system	
-STY:T092				organization	
+STY:T092	skos:closeMatch	biolink:AdministrativeEntity	Logical	organization	AdministrativeEntity
 STY:T064				governmental or regulatory activity	
-STY:T001				organism	
+STY:T001	skos:closeMatch	biolink:OrganismalEntity	Logical	organism	OrganismalEntity
 STY:T038				biologic function	
-STY:T010	NA	NA	NA	vertebrate	NA
+STY:T010	skos:broadMatch	biolink:OrganismTaxon	Logical	vertebrate	OrganismTaxon
 STY:T101				patient or disabled group	
 STY:T063				molecular biology research technique	
 STY:T096				group	
-STY:T008				animal	
-STY:T072				physical object	
+STY:T008	skos:broadMatch	biolink:OrganismTaxon	Logical	animal	OrganismTaxon
+STY:T072	skos:broadMatch	biolink:NamedThing	Logical	physical object	NamedThing
 STY:T021				fully formed anatomical structure	
 STY:T017				anatomical structure	
-STY:T089	NA	NA	NA	regulation or law	NA
+STY:T089	skos:broadMatch	biolink:NamedThing	Logical	regulation or law	NamedThing
 STY:T085				molecular sequence	
 STY:T103	skos:closeMatch	biolink:ChemicalEntity	Logical	chemical	ChemicalEntity
 STY:T102				group attribute	
@@ -118,16 +118,16 @@ STY:T100				age group
 STY:T086				nucleotide sequence	
 STY:T069				environmental effect of humans	
 STY:T066				machine activity	
-STY:T050				experimental model of disease	
+STY:T050	skos:broadMatch	biolink:NamedThing	Logical	experimental model of disease	NamedThing
 STY:T087	skos:closeMatch	biolink:Polypeptide	Logical	amino acid sequence	Polypeptide
-STY:T075				research device	
-STY:T095				self-help or relief organization	
-STY:T094				professional society	
-STY:T016				human	
-STY:T088				carbohydrate sequence	
-STY:T119				lipid	
-STY:T124				neuroreactive substance or biogenic amine	
-STY:T118				carbohydrate	
-STY:T115				organophosphorus compound	
-STY:T111				eicosanoid	
-STY:T110				steroid	
+STY:T075	skos:closeMatch	biolink:Device	Logical	research device	Device
+STY:T095	skos:closeMatch	biolink:AdministrativeEntity	Logical	self-help or relief organization	AdministrativeEntity
+STY:T094	skos:closeMatch	biolink:AdministrativeEntity	Logical	professional society	AdministrativeEntity
+STY:T016	skos:closeMatch	biolink:Case	Logical	human	Case
+STY:T088	skos:broadMatch	biolink:ChemicalEntity	Logical	carbohydrate sequence	ChemicalEntity
+STY:T119	skos:broadMatch	biolink:ChemicalEntity	Logical	lipid	ChemicalEntity
+STY:T124	skos:broadMatch	biolink:ChemicalEntity	Logical	neuroreactive substance or biogenic amine	ChemicalEntity
+STY:T118	skos:broadMatch	biolink:ChemicalEntity	Logical	carbohydrate	ChemicalEntity
+STY:T115	skos:broadMatch	biolink:ChemicalEntity	Logical	organophosphorus compound	ChemicalEntity
+STY:T111	skos:broadMatch	biolink:ChemicalEntity	Logical	eicosanoid	ChemicalEntity
+STY:T110	skos:broadMatch	biolink:ChemicalEntity	Logical	steroid	ChemicalEntity
