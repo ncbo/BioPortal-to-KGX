@@ -45,7 +45,7 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
 @click.option("--remap_types",
                 is_flag=True,
                 help="""If used, will use the SSSOM maps in the mappings/ directory
-                        to replace node and edge types with more specific Biolink types.""")
+                        to append more specific Biolink types to existing types.""")
 @click.option("--include_only",
                 callback=lambda _,__,x: x.split(',') if x else [],
                 help="""One or more ontologies to retreive and transform, and only these,

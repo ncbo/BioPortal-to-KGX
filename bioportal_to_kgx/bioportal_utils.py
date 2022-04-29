@@ -111,7 +111,7 @@ def manually_add_md(filepath: str, md: str) -> bool:
                     out_header_split.append(heading)
                 outfile.write("\t".join(out_header_split) + "\n")
                 for line in infile:
-                    line_split = (line.rstrip()).split("/t")
+                    line_split = (line.rstrip()).split("\t")
                     for heading in MD_HEADINGS:
                         line_split.append(md[MD_HEADINGS[heading]]) # type: ignore
                     outfile.write("\t".join(line_split) + "\n")

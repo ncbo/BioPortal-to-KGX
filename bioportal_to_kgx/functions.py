@@ -107,6 +107,8 @@ def do_transforms(paths: list,
         for filepath in os.listdir(MAPPING_DIR):
             this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
             all_maps.append(this_table)
+    #TODO: instead of making a list, merge SSSOMs with sssom.util.merge_msdf
+    #       then pass as a single set of mappings
 
     print("Transforming all...")
 
@@ -282,6 +284,8 @@ def do_transforms(paths: list,
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
 
+                #TODO: If remapping to Biolink is requested, do it now
+
             # Remove the tempfile
             os.remove(tempout.name)
 
@@ -420,13 +424,15 @@ def update_types(in_path: str, maps: list) -> bool:
     """
     Update node and edge types to be
     more specific Biolink Model types.
+    New types are *appended* to existing types.
     :param in_path: str, path to directory
     :param maps: list of sssom.util.MappingSetDataFrame objects
     :return: True if complete, False otherwise
     """
 
-
     tx_filepaths = []
+
+    success = True
 
     # Find node/edgefiles
     # and check if they are empty
@@ -437,13 +443,72 @@ def update_types(in_path: str, maps: list) -> bool:
 
     if len(tx_filepaths) == 0:
         print(f"All transforms in {in_path} are blank or very short.")
-        return False
+        success = False
     
-    tx_filename = os.path.basename(tx_filepaths[0])
+    # Convert the SSSOM map to a dict of originaltype:newtype
+    type_map = {}
+    for msdf in maps:
+        for i, row in msdf.df.iterrows():
+            subj = None
+            obj = None
+            for k, v in row.iteritems():
+                if k == 'subject_id':
+                    subj = v
+                if k == 'object_id':
+                    obj = v
+                if subj and obj:
+                    type_map[subj] = obj
 
-    print(tx_filepaths)
+    for filepath in tx_filepaths:
+        if not append_new_types(filepath, type_map):
+            success = False
+
+    return success
+
+def append_new_types(filepath: str, type_map: dict) -> bool:
+    """
+    Given a filename for a KGX edge or nodelist,
+    update node or edge types.
+    :param filepath: str, path to KGX format file
+    :param type_map: dict of strs, with keys as type to find
+                    and values as type to append
+    :return: bool, True if successful
+    """
+
+    success = False
+
+    out_filepath = filepath + ".tmp"
+
+    try:
+        with open(filepath,'r') as infile:
+            if filepath.endswith('_nodes.tsv'):
+                type_col = 1
+            if filepath.endswith('_edges.tsv'):
+                type_col = 2
+            with open(out_filepath,'w') as outfile:
+                for line in infile:
+                    append_here = False
+                    line_split = (line.rstrip()).split("\t")
+                    # Check if there's a direct match already
+                    # e.g., the category is literally "STY:T120"
+                    if line_split[type_col] in type_map:
+                        line_split[type_col] = line_split[type_col] + "|" + type_map[line_split[type_col]]
+                    # Check if the subject id contains a type we recognize
+                    # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                    try:
+                        iri_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
+                        if iri_id in type_map:
+                            line_split[type_col] = line_split[type_col] + "|" + type_map[iri_id]
+                    except KeyError:
+                        pass
+                    outfile.write("\t".join(line_split) + "\n")
+        os.replace(out_filepath,filepath)
+        success = True
+    except (IOError, KeyError) as e:
+        print(f"Failed to write types to {filepath}: {e}")
+
+    return success
     
-
 def is_file_too_short(filepath: str) -> bool:
     """
     Checks if a file contains only an empty line
