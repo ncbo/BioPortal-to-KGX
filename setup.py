@@ -55,7 +55,8 @@ setup(
         'requests',
         'setuptools',
         'click',
-        'sh'
+        'sh',
+        'sssom @ git+https://github.com/mapping-commons/sssom-py'
     ],
     extras_require=extras,
 )
