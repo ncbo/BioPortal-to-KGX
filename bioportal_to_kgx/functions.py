@@ -66,8 +66,9 @@ def do_transforms(paths: list,
                     kgx_validate: bool, 
                     robot_validate: bool,
                     pandas_validate: bool,
-                    get_bioportal_metadata, 
-                    ncbo_key) -> dict:
+                    get_bioportal_metadata: bool, 
+                    ncbo_key: str,
+                    remap_types: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
