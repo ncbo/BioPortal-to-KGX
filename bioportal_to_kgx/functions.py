@@ -9,6 +9,8 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 import pandas as pd # type: ignore
+from sssom.parsers import read_sssom_table # type: ignore
+from sssom.util import MappingSetDataFrame # type: ignore
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
 from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
@@ -16,6 +18,7 @@ from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_fo
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
+MAPPING_DIR = "mappings"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -97,6 +100,14 @@ def do_transforms(paths: list,
     txs_complete = {}
     txs_invalid = []
 
+    # If planning to do maps, load them first
+    if remap_types:
+        print(f"Loading type maps from {MAPPING_DIR}/")
+        all_maps = []
+        for filepath in os.listdir(MAPPING_DIR):
+            this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
+            all_maps.append(this_table)
+
     print("Transforming all...")
 
     for filepath in paths:
@@ -168,6 +179,11 @@ def do_transforms(paths: list,
                                 print("Complete.")
                             else:
                                 print("Something went wrong during metadata writing.")
+            # If remapping to Biolink is requested, do it now
+            if remap_types and tx_filecount > 0:
+                print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                if not update_types(outdir, all_maps):
+                    print(f"Type mapping did not complete for {outname}.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -399,6 +415,34 @@ def kgx_validate_transform(in_path: str) -> bool:
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
             return False
+
+def update_types(in_path: str, maps: list) -> bool:
+    """
+    Update node and edge types to be
+    more specific Biolink Model types.
+    :param in_path: str, path to directory
+    :param maps: list of sssom.util.MappingSetDataFrame objects
+    :return: True if complete, False otherwise
+    """
+
+
+    tx_filepaths = []
+
+    # Find node/edgefiles
+    # and check if they are empty
+    for filepath in os.listdir(in_path):
+        if filepath[-3:] == 'tsv':
+            if not is_file_too_short(os.path.join(in_path,filepath)):
+                tx_filepaths.append(os.path.join(in_path,filepath))
+
+    if len(tx_filepaths) == 0:
+        print(f"All transforms in {in_path} are blank or very short.")
+        return False
+    
+    tx_filename = os.path.basename(tx_filepaths[0])
+
+    print(tx_filepaths)
+    
 
 def is_file_too_short(filepath: str) -> bool:
     """
