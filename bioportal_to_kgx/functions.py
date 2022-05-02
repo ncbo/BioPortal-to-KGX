@@ -487,12 +487,7 @@ def append_new_types(filepath: str, type_map: dict) -> bool:
                 type_col = 2
             with open(out_filepath,'w') as outfile:
                 for line in infile:
-                    append_here = False
                     line_split = (line.rstrip()).split("\t")
-                    # Check if there's a direct match already
-                    # e.g., the category is literally "STY:T120"
-                    if line_split[type_col] in type_map:
-                        line_split[type_col] = line_split[type_col] + "|" + type_map[line_split[type_col]]
                     # Check if the subject id contains a type we recognize
                     # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
                     try:
