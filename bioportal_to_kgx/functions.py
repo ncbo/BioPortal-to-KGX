@@ -479,6 +479,9 @@ def append_new_types(filepath: str, type_map: dict) -> bool:
 
     out_filepath = filepath + ".tmp"
 
+    # TODO: for full STY mapping, check hasSTY edges, get node ID,
+    # and map that node ID to new category
+
     try:
         with open(filepath,'r') as infile:
             if filepath.endswith('_nodes.tsv'):
@@ -490,6 +493,8 @@ def append_new_types(filepath: str, type_map: dict) -> bool:
                     line_split = (line.rstrip()).split("\t")
                     # Check if the subject id contains a type we recognize
                     # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                    # note this will just map categories to categories,
+                    # not classes to more appripriate categories.
                     try:
                         iri_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
                         if iri_id in type_map:
