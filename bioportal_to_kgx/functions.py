@@ -102,13 +102,26 @@ def do_transforms(paths: list,
 
     # If planning to do maps, load them first
     if remap_types:
+        #TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
         print(f"Loading type maps from {MAPPING_DIR}/")
-        all_maps = []
+        type_map = {}
+        all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
             this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
-            all_maps.append(this_table)
-    #TODO: instead of making a list, merge SSSOMs with sssom.util.merge_msdf
-    #       then pass as a single set of mappings
+            all_map_paths.append(this_table)
+        # Convert the SSSOM map to a dict of originaltype:newtype
+        for msdf in all_map_paths:
+            for i, row in msdf.df.iterrows():
+                subj = None
+                obj = None
+                for k, v in row.iteritems():
+                    if k == 'subject_id':
+                        subj = v
+                    if k == 'object_id':
+                        obj = v
+                    if subj and obj:
+                        type_map[subj] = obj
+
 
     print("Transforming all...")
 
@@ -184,7 +197,7 @@ def do_transforms(paths: list,
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
                 print(f"Will remap node/edge types in {outname} to Biolink Model.")
-                if not update_types(outdir, all_maps):
+                if not update_types(outdir, type_map):
                     print(f"Type mapping did not complete for {outname}.")
                     
             # Need version of file w/o first line or KGX will choke
@@ -420,7 +433,7 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_types(in_path: str, maps: list) -> bool:
+def update_types(in_path: str, type_map: dict) -> bool:
     """
     Update node and edge types to be
     more specific Biolink Model types.
@@ -444,20 +457,6 @@ def update_types(in_path: str, maps: list) -> bool:
     if len(tx_filepaths) == 0:
         print(f"All transforms in {in_path} are blank or very short.")
         success = False
-    
-    # Convert the SSSOM map to a dict of originaltype:newtype
-    type_map = {}
-    for msdf in maps:
-        for i, row in msdf.df.iterrows():
-            subj = None
-            obj = None
-            for k, v in row.iteritems():
-                if k == 'subject_id':
-                    subj = v
-                if k == 'object_id':
-                    obj = v
-                if subj and obj:
-                    type_map[subj] = obj
 
     for filepath in tx_filepaths:
         if not append_new_types(filepath, type_map):
@@ -469,6 +468,7 @@ def append_new_types(filepath: str, type_map: dict) -> bool:
     """
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
+    Requires both node and edgelist.
     :param filepath: str, path to KGX format file
     :param type_map: dict of strs, with keys as type to find
                     and values as type to append
