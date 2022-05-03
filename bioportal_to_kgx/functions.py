@@ -9,6 +9,8 @@ from json import dump as json_dump
 
 import kgx.cli # type: ignore
 import pandas as pd # type: ignore
+from sssom.parsers import read_sssom_table # type: ignore
+from sssom.util import MappingSetDataFrame # type: ignore
 
 from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
 from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
@@ -16,6 +18,7 @@ from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_fo
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
+MAPPING_DIR = "mappings"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -66,8 +69,9 @@ def do_transforms(paths: list,
                     kgx_validate: bool, 
                     robot_validate: bool,
                     pandas_validate: bool,
-                    get_bioportal_metadata, 
-                    ncbo_key) -> dict:
+                    get_bioportal_metadata: bool, 
+                    ncbo_key: str,
+                    remap_types: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -95,6 +99,29 @@ def do_transforms(paths: list,
 
     txs_complete = {}
     txs_invalid = []
+
+    # If planning to do maps, load them first
+    if remap_types:
+        #TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
+        print(f"Loading type maps from {MAPPING_DIR}/")
+        type_map = {}
+        all_map_paths = []
+        for filepath in os.listdir(MAPPING_DIR):
+            this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
+            all_map_paths.append(this_table)
+        # Convert the SSSOM map to a dict of originaltype:newtype
+        for msdf in all_map_paths:
+            for i, row in msdf.df.iterrows():
+                subj = None
+                obj = None
+                for k, v in row.iteritems():
+                    if k == 'subject_id':
+                        subj = v
+                    if k == 'object_id':
+                        obj = v
+                    if subj and obj:
+                        type_map[subj] = obj
+
 
     print("Transforming all...")
 
@@ -167,6 +194,11 @@ def do_transforms(paths: list,
                                 print("Complete.")
                             else:
                                 print("Something went wrong during metadata writing.")
+            # If remapping to Biolink is requested, do it now
+            if remap_types and tx_filecount > 0:
+                print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                if not update_types(outdir, type_map):
+                    print(f"Type mapping did not complete for {outname}.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -264,6 +296,8 @@ def do_transforms(paths: list,
                 if not pandas_validate_transform(outdir):
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
+
+                #TODO: If remapping to Biolink is requested, do it now
 
             # Remove the tempfile
             os.remove(tempout.name)
@@ -399,6 +433,109 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
+def update_types(in_path: str, type_map: dict) -> bool:
+    """
+    Update node and edge types to be
+    more specific Biolink Model types.
+    New types are *appended* to existing types.
+    :param in_path: str, path to directory
+    :param maps: list of sssom.util.MappingSetDataFrame objects
+    :return: True if complete, False otherwise
+    """
+
+    tx_filepaths = []
+
+    success = True
+
+    # Find node/edgefiles
+    # and check if they are empty
+    for filepath in os.listdir(in_path):
+        if filepath[-3:] == 'tsv':
+            if not is_file_too_short(os.path.join(in_path,filepath)):
+                tx_filepaths.append(os.path.join(in_path,filepath))
+
+    if len(tx_filepaths) == 0:
+        print(f"All transforms in {in_path} are blank or very short.")
+        success = False
+
+    filepaths = {}
+    for filepath in tx_filepaths:
+        if filepath.endswith("_nodes.tsv"):
+            filepaths["nodelist"] = filepath
+        elif filepath.endswith("_edges.tsv"):
+            filepaths["edgelist"] = filepath
+    if not append_new_types(filepaths, type_map):
+        success = False
+
+    return success
+
+def append_new_types(filepaths: dict, type_map: dict) -> bool:
+    """
+    Given a filename for a KGX edge or nodelist,
+    update node or edge types.
+    Requires both node and edgelist.
+    :param filepath: str, path to KGX format file
+    :param type_map: dict of strs, with keys as type to find
+                    and values as type to append
+    :return: bool, True if successful
+    """
+
+    success = False
+
+    nodepath = filepaths["nodelist"]
+    edgepath = filepaths["edgelist"]
+
+    outnodepath = nodepath + ".tmp"
+    outedgepath = edgepath + ".tmp"
+
+    remap_these_nodes = {}
+
+    try:
+        with open(nodepath,'r') as innodefile, \
+            open(edgepath, 'r') as inedgefile:
+            with open(outnodepath,'w') as outnodefile, \
+                open(outedgepath, 'w') as outedgefile:
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    # Check for edges representing node types to be remapped
+                    if line_split[4].endswith("hasSTY"):
+                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
+                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
+                        remap_these_nodes[node_id] = type_id
+                    outedgefile.write("\t".join(line_split) + "\n")
+                for line in innodefile:
+                    line_split = (line.rstrip()).split("\t")
+                    try:
+                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
+                        # Check if the node id is a type we recognize
+                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                        if node_id in type_map:
+                            line_split[1] = line_split[1] + "|" + type_map[node_id]
+                        # Check if we saw a type assignment among the edges already
+                        if node_id in remap_these_nodes:
+                            line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
+                    except KeyError:
+                        pass
+                    
+                    # Before writing, remove any redundant types
+                    try:
+                        this_type_list = line_split[1].split("|")
+                        this_type_list = list(set(this_type_list))
+                        line_split[1] = "|".join(this_type_list)
+                    except KeyError:
+                        pass
+
+                    outnodefile.write("\t".join(line_split) + "\n")
+                
+        os.replace(outnodepath,nodepath)
+        os.replace(outedgepath,edgepath)
+        success = True
+    except (IOError, KeyError) as e:
+        print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
+        success = False
+
+    return success
+    
 def is_file_too_short(filepath: str) -> bool:
     """
     Checks if a file contains only an empty line
