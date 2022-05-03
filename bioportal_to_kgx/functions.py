@@ -458,13 +458,18 @@ def update_types(in_path: str, type_map: dict) -> bool:
         print(f"All transforms in {in_path} are blank or very short.")
         success = False
 
+    filepaths = {}
     for filepath in tx_filepaths:
-        if not append_new_types(filepath, type_map):
-            success = False
+        if filepath.endswith("_nodes.tsv"):
+            filepaths["nodelist"] = filepath
+        elif filepath.endswith("_edges.tsv"):
+            filepaths["edgelist"] = filepath
+    if not append_new_types(filepaths, type_map):
+        success = False
 
     return success
 
-def append_new_types(filepath: str, type_map: dict) -> bool:
+def append_new_types(filepaths: dict, type_map: dict) -> bool:
     """
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
@@ -477,35 +482,35 @@ def append_new_types(filepath: str, type_map: dict) -> bool:
 
     success = False
 
-    out_filepath = filepath + ".tmp"
+    nodepath = filepaths["nodelist"]
+    edgepath = filepaths["edgelist"]
 
-    # TODO: for full STY mapping, check hasSTY edges, get node ID,
-    # and map that node ID to new category
+    outnodepath = nodepath + ".tmp"
+    outedgepath = edgepath + ".tmp"
 
     try:
-        with open(filepath,'r') as infile:
-            if filepath.endswith('_nodes.tsv'):
-                type_col = 1
-            if filepath.endswith('_edges.tsv'):
-                type_col = 2
-            with open(out_filepath,'w') as outfile:
-                for line in infile:
+        with open(nodepath,'r') as innodefile, \
+            open(edgepath, 'r') as inedgefile:
+            with open(outnodepath,'w') as outnodefile, \
+                open(outedgepath, 'w') as outedgefile:
+                for line in innodefile:
                     line_split = (line.rstrip()).split("\t")
                     # Check if the subject id contains a type we recognize
                     # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
-                    # note this will just map categories to categories,
-                    # not classes to more appripriate categories.
                     try:
                         iri_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
                         if iri_id in type_map:
-                            line_split[type_col] = line_split[type_col] + "|" + type_map[iri_id]
+                            line_split[1] = line_split[1] + "|" + type_map[iri_id]
                     except KeyError:
                         pass
-                    outfile.write("\t".join(line_split) + "\n")
-        os.replace(out_filepath,filepath)
-        success = True
+                    outnodefile.write("\t".join(line_split) + "\n")
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    outedgefile.write("\t".join(line_split) + "\n")
+        os.replace(nodepath,outnodepath)
+        os.replace(edgepath,outedgepath)
     except (IOError, KeyError) as e:
-        print(f"Failed to write types to {filepath}: {e}")
+        print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
 
     return success
     
