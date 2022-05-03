@@ -480,6 +480,10 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     :return: bool, True if successful
     """
 
+    # TODO: don't add new types if they already exist
+
+    # TODO: find all hasSTY edges, get node IDs, and update corresponding nodes
+
     success = False
 
     nodepath = filepaths["nodelist"]
@@ -488,25 +492,35 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     outnodepath = nodepath + ".tmp"
     outedgepath = edgepath + ".tmp"
 
+    remap_these_nodes = {}
+
     try:
         with open(nodepath,'r') as innodefile, \
             open(edgepath, 'r') as inedgefile:
             with open(outnodepath,'w') as outnodefile, \
                 open(outedgepath, 'w') as outedgefile:
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    # Check for edges representing node types to be remapped
+                    if line_split[4].endswith("hasSTY"):
+                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
+                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
+                        remap_these_nodes[node_id] = type_id
+                    outedgefile.write("\t".join(line_split) + "\n")
                 for line in innodefile:
                     line_split = (line.rstrip()).split("\t")
-                    # Check if the subject id contains a type we recognize
-                    # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
                     try:
-                        iri_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
-                        if iri_id in type_map:
-                            line_split[1] = line_split[1] + "|" + type_map[iri_id]
+                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
+                        # Check if the node id is a type we recognize
+                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                        if node_id in type_map:
+                            line_split[1] = line_split[1] + "|" + type_map[node_id]
+                        # Check if we saw a type assignment among the edges already
+                        if node_id in remap_these_nodes:
+                            line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
                     except KeyError:
                         pass
                     outnodefile.write("\t".join(line_split) + "\n")
-                for line in inedgefile:
-                    line_split = (line.rstrip()).split("\t")
-                    outedgefile.write("\t".join(line_split) + "\n")
         os.replace(nodepath,outnodepath)
         os.replace(edgepath,outedgepath)
     except (IOError, KeyError) as e:
