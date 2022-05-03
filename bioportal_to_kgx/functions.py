@@ -518,7 +518,17 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                             line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
                     except KeyError:
                         pass
+                    
+                    # Before writing, remove any redundant types
+                    try:
+                        this_type_list = line_split[1].split("|")
+                        this_type_list = list(set(this_type_list))
+                        line_split[1] = "|".join(this_type_list)
+                    except KeyError:
+                        pass
+
                     outnodefile.write("\t".join(line_split) + "\n")
+                
         os.replace(outnodepath,nodepath)
         os.replace(outedgepath,edgepath)
         success = True
