@@ -131,3 +131,4 @@ STY:T118	skos:closeMatch	biolink:MolecularEntity	Logical	carbohydrate	MolecularE
 STY:T115	skos:broadMatch	biolink:ChemicalEntity	Logical	organophosphorus compound	ChemicalEntity	orcid:0000-0001-5705-7831	orcid:0000-0001-5705-7831	
 STY:T111	skos:broadMatch	biolink:ChemicalEntity	Logical	eicosanoid	ChemicalEntity	orcid:0000-0001-5705-7831	orcid:0000-0001-5705-7831	
 STY:T110	skos:broadMatch	biolink:ChemicalEntity	Logical	steroid	ChemicalEntity	orcid:0000-0001-5705-7831	orcid:0000-0001-5705-7831	
+STY:T204	skos:broadMatch	biolink:OrganismTaxon	Logical	eukaryote	OrganismTaxon	orcid:0000-0001-5705-7831	orcid:0000-0001-5705-7831
