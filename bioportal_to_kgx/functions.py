@@ -480,8 +480,6 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     :return: bool, True if successful
     """
 
-    # TODO: don't add new types if they already exist
-
     success = False
 
     nodepath = filepaths["nodelist"]
