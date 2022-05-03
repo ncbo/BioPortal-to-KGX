@@ -482,8 +482,6 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
 
     # TODO: don't add new types if they already exist
 
-    # TODO: find all hasSTY edges, get node IDs, and update corresponding nodes
-
     success = False
 
     nodepath = filepaths["nodelist"]
@@ -521,10 +519,12 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                     except KeyError:
                         pass
                     outnodefile.write("\t".join(line_split) + "\n")
-        os.replace(nodepath,outnodepath)
-        os.replace(edgepath,outedgepath)
+        os.replace(outnodepath,nodepath)
+        os.replace(outedgepath,edgepath)
+        success = True
     except (IOError, KeyError) as e:
         print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
+        success = False
 
     return success
     
