@@ -448,14 +448,16 @@ def update_types(in_path: str, type_map: dict) -> bool:
     success = True
 
     # Find node/edgefiles
-    # and check if they are empty
     for filepath in os.listdir(in_path):
         if filepath[-3:] == 'tsv':
             if not is_file_too_short(os.path.join(in_path,filepath)):
                 tx_filepaths.append(os.path.join(in_path,filepath))
 
     if len(tx_filepaths) == 0:
-        print(f"All transforms in {in_path} are blank or very short.")
+        print(f"No transforms found for {in_path}.")
+        success = False
+    elif len(tx_filepaths) < 2:
+        print(f"Could not find node or edgelist for {in_path}.")
         success = False
 
     filepaths = {}
@@ -464,8 +466,10 @@ def update_types(in_path: str, type_map: dict) -> bool:
             filepaths["nodelist"] = filepath
         elif filepath.endswith("_edges.tsv"):
             filepaths["edgelist"] = filepath
-    if not append_new_types(filepaths, type_map):
-        success = False
+    
+    if success:
+        if not append_new_types(filepaths, type_map):
+            success = False
 
     return success
 
