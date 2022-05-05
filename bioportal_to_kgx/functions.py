@@ -107,9 +107,10 @@ def do_transforms(paths: list,
         type_map = {}
         all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
-            this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
-            all_map_paths.append(this_table)
-        # Convert the SSSOM map to a dict of originaltype:newtype
+            if filepath.endswith("sssom.tsv"):
+                this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
+                all_map_paths.append(this_table)
+        # Convert the SSSOM maps to a dict of originaltype:newtype
         for msdf in all_map_paths:
             for i, row in msdf.df.iterrows():
                 subj = None
