@@ -135,6 +135,9 @@ def do_transforms(paths: list,
                     if subj and obj:
                         type_map[subj] = obj
 
+    # TODO: If planning to write new CURIEs, need to load prefixes/bioportal-prefixes first
+    if write_curies:
+        pass
 
     print("Transforming all...")
 
