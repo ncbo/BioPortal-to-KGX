@@ -20,6 +20,11 @@ NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 MAPPING_DIR = "mappings"
 
+#TODO: reduce redundancy among "Find node/edgefiles" functions
+#       could probably just rename+refactor update_types()
+#       and have it pass output to the functions for
+#       remap_types and write_curies
+
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
     Given a path, generates paths for all data files
@@ -207,6 +212,11 @@ def do_transforms(paths: list,
                 print(f"Will remap node/edge types in {outname} to Biolink Model.")
                 if not update_types(outdir, type_map):
                     print(f"Type mapping did not complete for {outname}.")
+            # If writing CURIEs is requested, do it now
+            if write_curies and tx_filecount > 0:
+                print(f"Will write new CURIEs for nodes in {outname}.")
+                if not update_curies(outdir):
+                    print(f"CURIE writing did not complete for {outname}.")
                     
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -549,7 +559,45 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
         success = False
 
     return success
-    
+
+def update_curies(in_path: str) -> bool:
+    """
+    Update node id field in an edgefile 
+    and each corresponding subject/object 
+    node in the corresponding edges 
+    to have a CURIE, where the prefix is 
+    the ontology ID and the class is
+    inferred from the IRI.
+    :param in_path: str, path to directory
+    :return: True if complete, False otherwise
+    """
+
+    tx_filepaths = []
+
+    success = True
+
+    # Find node/edgefiles
+    for filepath in os.listdir(in_path):
+        if filepath[-3:] == 'tsv':
+            if not is_file_too_short(os.path.join(in_path,filepath)):
+                tx_filepaths.append(os.path.join(in_path,filepath))
+
+    if len(tx_filepaths) == 0:
+        print(f"No transforms found for {in_path}.")
+        success = False
+    elif len(tx_filepaths) < 2:
+        print(f"Could not find node or edgelist for {in_path}.")
+        success = False
+
+    filepaths = {}
+    for filepath in tx_filepaths:
+        if filepath.endswith("_nodes.tsv"):
+            filepaths["nodelist"] = filepath
+        elif filepath.endswith("_edges.tsv"):
+            filepaths["edgelist"] = filepath
+
+    return success
+
 def is_file_too_short(filepath: str) -> bool:
     """
     Checks if a file contains only an empty line
