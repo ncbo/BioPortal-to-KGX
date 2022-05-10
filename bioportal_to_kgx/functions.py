@@ -293,6 +293,8 @@ def do_transforms(paths: list,
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
+                # TODO: if remap_types, do that remapping for any new transforms
+
                 if kgx_validate and txs_complete[outname]:
                     print("Validating graph files with KGX...")
                     if not kgx_validate_transform(outdir):
