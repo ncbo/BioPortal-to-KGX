@@ -71,7 +71,8 @@ def do_transforms(paths: list,
                     pandas_validate: bool,
                     get_bioportal_metadata: bool, 
                     ncbo_key: str,
-                    remap_types: bool) -> dict:
+                    remap_types: bool,
+                    write_curies: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -81,7 +82,13 @@ def do_transforms(paths: list,
     Parses header for each to get
     metadata.
     :param paths: list of file paths as strings
-    :param validate: bool, do validations if True
+    :param kgx_validate: bool
+    :param robot_validate: bool
+    :param pandas_validate: bool
+    :param get_bioportal_metadata: bool
+    :param ncbo_key: str
+    :param remap_types: bool
+    :param write_curies: bool
     :return: dict of transform success/failure,
             with ontology names as keys,
             bools for values with success as True
