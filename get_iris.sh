@@ -1,6 +1,7 @@
 #!/bin/bash
 # Get details of all IRIs across all Bioportal transforms
 # This creates bioportal-prefixes.tsv
+# yes, it's kind of awkward but it works
 #
 
 TX_PATH="./transformed/ontologies/"
@@ -18,7 +19,7 @@ do
 
     # If this delimiter didn't appear to work, try another
     prefix_count=$(wc -w <<< "$prefixes")
-    too_many=10
+    too_many=100
     if (( $prefix_count > $too_many ))
     then
         prefixes=$(cut -f1 $file | rev | cut -d"/" -f2- | rev | sort | uniq)
@@ -29,11 +30,19 @@ do
     # Keeping in mind that : is the standard CURIE delimiter
     # at least for OBO imports
     prefix_count=$(wc -w <<< "$prefixes")
-    too_many=10
+    too_many=100
     if (( $prefix_count > $too_many ))
     then
         prefixes=$(cut -f1 $file | rev | cut -d":" -f2- | rev | sort | uniq)
         delimiter=$(printf ":")
+    fi
+
+    prefix_count=$(wc -w <<< "$prefixes")
+    too_many=100
+    if (( $prefix_count > $too_many ))
+    then
+        prefixes=$(cut -f1 $file | rev | cut -d"." -f2- | rev | sort | uniq)
+        delimiter=$(printf ".")
     fi
 
     # Ran out of standard delimiters, so we may have some strangeness in IRI format
@@ -46,8 +55,16 @@ do
     fi
 
     for prefix in $prefixes
-    do 
-        native=$(printf "unknown")
+    do
+        if [[ "$ontology" = "$prefix" ]]
+        then 
+            native=$(printf "True")
+        elif [[ "$prefix" = "id" ]]
+        then
+            native=$(printf "False")
+        else
+            native=$(printf "Unknown")
+        fi
         printf "$ontology\t$prefix\t$delimiter\t$native\n"
     done
 done
