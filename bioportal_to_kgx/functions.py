@@ -175,6 +175,7 @@ def do_transforms(paths: list,
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
+                        txs_complete[outname] = True
                     # Check to see if metadata properties are in the header
                     if check_header_for_md(os.path.join(outdir,filename)):
                         print(f"BioPortal metadata present.")
@@ -210,17 +211,17 @@ def do_transforms(paths: list,
                                 print("Complete.")
                             else:
                                 print("Something went wrong during metadata writing.")
-            # If remapping to Biolink is requested, do it now
-            if remap_types and tx_filecount > 0:
-                print(f"Will remap node/edge types in {outname} to Biolink Model.")
-                if not update_types(outdir, type_map):
-                    print(f"Type mapping did not complete for {outname}.")
             # If writing CURIEs is requested, do it now
             if write_curies and tx_filecount > 0:
                 print(f"Will write new CURIEs for nodes in {outname}.")
                 if not update_curies(outdir):
                     print(f"CURIE writing did not complete for {outname}.")
-                    
+            # If remapping to Biolink is requested, do it now
+            if remap_types and tx_filecount > 0:
+                print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                if not update_types(outdir, type_map):
+                    print(f"Type mapping did not complete for {outname}.")
+
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
@@ -306,21 +307,36 @@ def do_transforms(paths: list,
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
-                # TODO: if remap_types, do that remapping for any new transforms
-
+                # Validation
                 if kgx_validate and txs_complete[outname]:
                     print("Validating graph files with KGX...")
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
+                        txs_complete[outname] = False
+                        txs_invalid.append(outname)
+
+                # Writing CURIEs
+                if write_curies and txs_complete[outname]:
+                    print(f"Will write new CURIEs for nodes in {outname}.")
+                    if not update_curies(outdir):
+                        print(f"CURIE writing did not complete for {outname}.")
+                        txs_complete[outname] = False
+                        txs_invalid.append(outname)
+
+                # Remapping to Biolink
+                if remap_types and txs_complete[outname]:
+                    print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                    if not update_types(outdir, type_map):
+                        print(f"Type mapping did not complete for {outname}.")
+                        txs_complete[outname] = False
                         txs_invalid.append(outname)
                 
                 # One last mandatory validation step - can pandas load it?
                 print("Validating graph files with pandas...")
                 if not pandas_validate_transform(outdir):
                     print(f"Validation did not complete for {outname}.")
+                    txs_complete[outname] = False
                     txs_invalid.append(outname)
-
-                #TODO: If remapping to Biolink is requested, do it now
 
             # Remove the tempfile
             os.remove(tempout.name)
