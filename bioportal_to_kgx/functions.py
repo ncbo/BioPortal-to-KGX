@@ -630,6 +630,7 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
             with open(outnodepath,'w') as outnodefile, \
                 open(outedgepath, 'w') as outedgefile:
                 for line in innodefile:
+                    updated_node = False
                     line_split = (line.rstrip()).split("\t")
                     node_iri = line_split[0]
                     if ontoid in prefix_map:
@@ -637,10 +638,27 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
                             if node_iri.startswith(prefix[0]):
                                 split_iri = node_iri.split(prefix[1])
                                 new_curie = f"{ontoid}:{split_iri[1]}"
-                                line_split[0] = new_curie
+                                if len(split_iri) == 2:
+                                    new_curie = f"{ontoid}:{split_iri[1]}"
+                                else:
+                                    new_curie = f"{ontoid}:"
                                 update_these_nodes[node_iri] = new_curie
+                                updated_node = True
                                 continue
-                    # TODO: handle the case of ontoid not in prefix_map
+                    # If we don't have a native prefix OR this is a foreign prefix
+                    # then look at other ontologies
+                    if ontoid not in prefix_map or not updated_node:
+                        for prefix_set in prefix_map:
+                            for prefix in prefix_map[prefix_set]["prefixes"]:
+                                 if node_iri.startswith(prefix[0]):
+                                    split_iri = node_iri.split(prefix[1])
+                                    if len(split_iri) == 2:
+                                        new_curie = f"{prefix_set}:{split_iri[1]}"
+                                    else:
+                                        new_curie = f"{prefix_set}:"
+                                    line_split[0] = new_curie
+                                    update_these_nodes[node_iri] = new_curie
+                                    continue
                     outnodefile.write("\t".join(line_split) + "\n")
                 for line in inedgefile:
                     line_split = (line.rstrip()).split("\t")
