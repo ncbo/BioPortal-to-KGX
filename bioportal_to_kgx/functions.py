@@ -136,7 +136,7 @@ def do_transforms(paths: list,
     # If planning to write new CURIEs, need to load prefixes first
     if write_curies:
         print(f"Loading prefix maps from {PREFIX_DIR}/")
-        prefix_map = {} 
+        prefix_map = {} # type: ignore
         with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
             prefix_file.readline() # Skip header
             for line in prefix_file:
