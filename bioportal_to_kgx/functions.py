@@ -637,7 +637,6 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
                         for prefix in prefix_map[ontoid]["prefixes"]:
                             if node_iri.startswith(prefix[0]):
                                 split_iri = node_iri.split(prefix[1])
-                                new_curie = f"{ontoid}:{split_iri[1]}"
                                 if len(split_iri) == 2:
                                     new_curie = f"{ontoid}:{split_iri[1]}"
                                 else:
