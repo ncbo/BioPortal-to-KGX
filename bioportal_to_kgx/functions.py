@@ -136,7 +136,7 @@ def do_transforms(paths: list,
     # If planning to write new CURIEs, need to load prefixes first
     if write_curies:
         print(f"Loading prefix maps from {PREFIX_DIR}/")
-        PREFIX_MAP = {}
+        prefix_map = {}
         with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
             prefix_file.readline() # Skip header
             for line in prefix_file:
@@ -145,15 +145,11 @@ def do_transforms(paths: list,
                 prefix = splitline[1]
                 delim = splitline[2]
                 native = splitline[3]
-                if ontoid in PREFIX_MAP:
-                    PREFIX_MAP[ontoid]["prefixes"].append(prefix)
-                    PREFIX_MAP[ontoid]["delims"].append(delim)
-                    PREFIX_MAP[ontoid]["natives"].append(native)
+                if ontoid in prefix_map:
+                    prefix_map[ontoid]["prefixes"].append([prefix, delim, native])
                 else:
-                    PREFIX_MAP[ontoid] = {"prefixes":[prefix],
-                                            "delims":[delim],
-                                            "natives":[native]}
-        print(f"Loaded prefixes for {len(PREFIX_MAP)} ontologies.")
+                    prefix_map[ontoid] = {"prefixes":[[prefix, delim, native]]}
+        print(f"Loaded prefixes for {len(prefix_map)} ontologies.")
 
     print("Transforming all...")
 
@@ -230,7 +226,7 @@ def do_transforms(paths: list,
             # If writing CURIEs is requested, do it now
             if write_curies and tx_filecount > 0:
                 print(f"Will write new CURIEs for nodes in {outname}.")
-                if not update_nodes("curies", outdir):
+                if not update_nodes("curies", outdir, prefix_map):
                     print(f"CURIE writing did not complete for {outname}.")
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
@@ -334,7 +330,7 @@ def do_transforms(paths: list,
                 # Writing CURIEs
                 if write_curies and txs_complete[outname]:
                     print(f"Will write new CURIEs for nodes in {outname}.")
-                    if not update_nodes("curies", outdir):
+                    if not update_nodes("curies", outdir, prefix_map):
                         print(f"CURIE writing did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
@@ -488,13 +484,13 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_nodes(operation: str, in_path: str, type_map: dict) -> bool:
+def update_nodes(operation: str, in_path: str, operation_map: dict) -> bool:
     """
     Checks on node and edgefile
     suitability for updating node details.
     :param operation: str, one of "curies" or "types"
     :param in_path: str, path to directory
-    :param maps: list of sssom.util.MappingSetDataFrame objects
+    :param operation_map: dict of mappings to use
     :return: True if complete, False otherwise
     """
 
@@ -524,10 +520,13 @@ def update_nodes(operation: str, in_path: str, type_map: dict) -> bool:
     
     if success:
         if operation == "curies":
-            if not write_curies(filepaths):
+            ontoid = os.path.basename(in_path)
+            if ontoid not in operation_map:
+                print(f"Don't know native prefixes for {ontoid} - will search others.")
+            if not write_curies(filepaths, ontoid, operation_map):
                 success = False
         elif operation == "types":
-            if not append_new_types(filepaths, type_map):
+            if not append_new_types(filepaths, operation_map):
                 success = False
 
     return success
@@ -602,7 +601,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
 
     return success
 
-def write_curies(filepaths: dict) -> bool:
+def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
     """
     Update node id field in an edgefile 
     and each corresponding subject/object 
@@ -611,6 +610,7 @@ def write_curies(filepaths: dict) -> bool:
     the ontology ID and the class is
     inferred from the IRI.
     :param in_path: str, path to directory
+    :param ontoid: the Bioportal ID of the ontology
     :return: True if complete, False otherwise
     """
 
@@ -622,50 +622,40 @@ def write_curies(filepaths: dict) -> bool:
     outnodepath = nodepath + ".tmp"
     outedgepath = edgepath + ".tmp"
 
-    remap_these_nodes = {}
+    update_these_nodes = {}
 
     try:
         with open(nodepath,'r') as innodefile, \
             open(edgepath, 'r') as inedgefile:
             with open(outnodepath,'w') as outnodefile, \
                 open(outedgepath, 'w') as outedgefile:
-                for line in inedgefile:
-                    line_split = (line.rstrip()).split("\t")
-                    # Check for edges representing node types to be remapped
-                    if line_split[4].endswith("hasSTY"):
-                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
-                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
-                        remap_these_nodes[node_id] = type_id
-                    outedgefile.write("\t".join(line_split) + "\n")
                 for line in innodefile:
                     line_split = (line.rstrip()).split("\t")
-                    try:
-                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
-                        # Check if the node id is a type we recognize
-                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
-                        if node_id in type_map:
-                            line_split[1] = line_split[1] + "|" + type_map[node_id]
-                        # Check if we saw a type assignment among the edges already
-                        if node_id in remap_these_nodes:
-                            line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
-                    except KeyError:
-                        pass
-                    
-                    # Before writing, remove any redundant types
-                    try:
-                        this_type_list = line_split[1].split("|")
-                        this_type_list = list(set(this_type_list))
-                        line_split[1] = "|".join(this_type_list)
-                    except KeyError:
-                        pass
-
+                    node_iri = line_split[0]
+                    if ontoid in prefix_map:
+                        for prefix in prefix_map[ontoid]["prefixes"]:
+                            if node_iri.startswith(prefix[0]):
+                                split_iri = node_iri.split(prefix[1])
+                                new_curie = f"{ontoid}:{split_iri[1]}"
+                                line_split[0] = new_curie
+                                update_these_nodes[node_iri] = new_curie
+                                continue
+                    # TODO: handle the case of ontoid not in prefix_map
                     outnodefile.write("\t".join(line_split) + "\n")
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    # Check for edges containing nodes to be updated
+                    if line_split[1] in update_these_nodes:
+                        line_split[1] = update_these_nodes[line_split[1]]
+                    if line_split[3] in update_these_nodes:
+                        line_split[3] = update_these_nodes[line_split[3]]  
+                    outedgefile.write("\t".join(line_split) + "\n")
                 
         os.replace(outnodepath,nodepath)
         os.replace(outedgepath,edgepath)
         success = True
     except (IOError, KeyError) as e:
-        print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
+        print(f"Failed to write CURIES for {nodepath} and/or {edgepath}: {e}")
         success = False
 
     return success
