@@ -477,3 +477,5 @@ ZFA	ZFA	:	True
 ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
 ZONMW-CONTENT	http://purl.org/zonmw	/	True
 ZP	ZP	:	True
+GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
+GML	http://www.opengis.net/ont/gml	#	False
