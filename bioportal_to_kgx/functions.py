@@ -19,11 +19,8 @@ TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 MAPPING_DIR = "mappings"
-
-#TODO: reduce redundancy among "Find node/edgefiles" functions
-#       could probably just rename+refactor update_types()
-#       and have it pass output to the functions for
-#       remap_types and write_curies
+PREFIX_DIR = "prefixes"
+PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -134,10 +131,29 @@ def do_transforms(paths: list,
                         obj = v
                     if subj and obj:
                         type_map[subj] = obj
+        print(f"Loaded {len(type_map)} mappings.")
 
-    # TODO: If planning to write new CURIEs, need to load prefixes/bioportal-prefixes first
+    # If planning to write new CURIEs, need to load prefixes first
     if write_curies:
-        pass
+        print(f"Loading prefix maps from {PREFIX_DIR}/")
+        PREFIX_MAP = {}
+        with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline() # Skip header
+            for line in prefix_file:
+                splitline = (line.rstrip()).split("\t")
+                ontoid = splitline[0]
+                prefix = splitline[1]
+                delim = splitline[2]
+                native = splitline[3]
+                if ontoid in PREFIX_MAP:
+                    PREFIX_MAP[ontoid]["prefixes"].append(prefix)
+                    PREFIX_MAP[ontoid]["delims"].append(delim)
+                    PREFIX_MAP[ontoid]["natives"].append(native)
+                else:
+                    PREFIX_MAP[ontoid] = {"prefixes":[prefix],
+                                            "delims":[delim],
+                                            "natives":[native]}
+        print(f"Loaded prefixes for {len(PREFIX_MAP)} ontologies.")
 
     print("Transforming all...")
 
@@ -214,12 +230,12 @@ def do_transforms(paths: list,
             # If writing CURIEs is requested, do it now
             if write_curies and tx_filecount > 0:
                 print(f"Will write new CURIEs for nodes in {outname}.")
-                if not update_curies(outdir):
+                if not update_nodes("curies", outdir):
                     print(f"CURIE writing did not complete for {outname}.")
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
                 print(f"Will remap node/edge types in {outname} to Biolink Model.")
-                if not update_types(outdir, type_map):
+                if not update_nodes("types", outdir, type_map):
                     print(f"Type mapping did not complete for {outname}.")
 
             # Need version of file w/o first line or KGX will choke
@@ -318,7 +334,7 @@ def do_transforms(paths: list,
                 # Writing CURIEs
                 if write_curies and txs_complete[outname]:
                     print(f"Will write new CURIEs for nodes in {outname}.")
-                    if not update_curies(outdir):
+                    if not update_nodes("curies", outdir):
                         print(f"CURIE writing did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
@@ -326,7 +342,7 @@ def do_transforms(paths: list,
                 # Remapping to Biolink
                 if remap_types and txs_complete[outname]:
                     print(f"Will remap node/edge types in {outname} to Biolink Model.")
-                    if not update_types(outdir, type_map):
+                    if not update_nodes("types", outdir, type_map):
                         print(f"Type mapping did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
@@ -472,11 +488,11 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_types(in_path: str, type_map: dict) -> bool:
+def update_nodes(operation: str, in_path: str, type_map: dict) -> bool:
     """
-    Update node and edge types to be
-    more specific Biolink Model types.
-    New types are *appended* to existing types.
+    Checks on node and edgefile
+    suitability for updating node details.
+    :param operation: str, one of "curies" or "types"
     :param in_path: str, path to directory
     :param maps: list of sssom.util.MappingSetDataFrame objects
     :return: True if complete, False otherwise
@@ -507,8 +523,12 @@ def update_types(in_path: str, type_map: dict) -> bool:
             filepaths["edgelist"] = filepath
     
     if success:
-        if not append_new_types(filepaths, type_map):
-            success = False
+        if operation == "curies":
+            if not write_curies(filepaths):
+                success = False
+        elif operation == "types":
+            if not append_new_types(filepaths, type_map):
+                success = False
 
     return success
 
@@ -517,6 +537,9 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
     Requires both node and edgelist.
+    Updates types to be more specific 
+    Biolink Model types.
+    New types are *appended* to existing types.
     :param filepath: str, path to KGX format file
     :param type_map: dict of strs, with keys as type to find
                     and values as type to append
@@ -579,7 +602,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
 
     return success
 
-def update_curies(in_path: str) -> bool:
+def write_curies(filepaths: dict) -> bool:
     """
     Update node id field in an edgefile 
     and each corresponding subject/object 
@@ -591,29 +614,59 @@ def update_curies(in_path: str) -> bool:
     :return: True if complete, False otherwise
     """
 
-    tx_filepaths = []
+    success = False
 
-    success = True
+    nodepath = filepaths["nodelist"]
+    edgepath = filepaths["edgelist"]
 
-    # Find node/edgefiles
-    for filepath in os.listdir(in_path):
-        if filepath[-3:] == 'tsv':
-            if not is_file_too_short(os.path.join(in_path,filepath)):
-                tx_filepaths.append(os.path.join(in_path,filepath))
+    outnodepath = nodepath + ".tmp"
+    outedgepath = edgepath + ".tmp"
 
-    if len(tx_filepaths) == 0:
-        print(f"No transforms found for {in_path}.")
+    remap_these_nodes = {}
+
+    try:
+        with open(nodepath,'r') as innodefile, \
+            open(edgepath, 'r') as inedgefile:
+            with open(outnodepath,'w') as outnodefile, \
+                open(outedgepath, 'w') as outedgefile:
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    # Check for edges representing node types to be remapped
+                    if line_split[4].endswith("hasSTY"):
+                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
+                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
+                        remap_these_nodes[node_id] = type_id
+                    outedgefile.write("\t".join(line_split) + "\n")
+                for line in innodefile:
+                    line_split = (line.rstrip()).split("\t")
+                    try:
+                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
+                        # Check if the node id is a type we recognize
+                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                        if node_id in type_map:
+                            line_split[1] = line_split[1] + "|" + type_map[node_id]
+                        # Check if we saw a type assignment among the edges already
+                        if node_id in remap_these_nodes:
+                            line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
+                    except KeyError:
+                        pass
+                    
+                    # Before writing, remove any redundant types
+                    try:
+                        this_type_list = line_split[1].split("|")
+                        this_type_list = list(set(this_type_list))
+                        line_split[1] = "|".join(this_type_list)
+                    except KeyError:
+                        pass
+
+                    outnodefile.write("\t".join(line_split) + "\n")
+                
+        os.replace(outnodepath,nodepath)
+        os.replace(outedgepath,edgepath)
+        success = True
+    except (IOError, KeyError) as e:
+        print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
         success = False
-    elif len(tx_filepaths) < 2:
-        print(f"Could not find node or edgelist for {in_path}.")
-        success = False
-
-    filepaths = {}
-    for filepath in tx_filepaths:
-        if filepath.endswith("_nodes.tsv"):
-            filepaths["nodelist"] = filepath
-        elif filepath.endswith("_edges.tsv"):
-            filepaths["edgelist"] = filepath
 
     return success
 
