@@ -113,7 +113,7 @@ def do_transforms(paths: list,
     if remap_types:
         #TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
         print(f"Loading type maps from {MAPPING_DIR}/")
-        type_map = {}
+        type_map = {} # type: ignore
         all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
             if filepath.endswith("sssom.tsv"):
@@ -136,7 +136,7 @@ def do_transforms(paths: list,
     # If planning to write new CURIEs, need to load prefixes first
     if write_curies:
         print(f"Loading prefix maps from {PREFIX_DIR}/")
-        prefix_map = {}
+        prefix_map = {} 
         with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
             prefix_file.readline() # Skip header
             for line in prefix_file:
