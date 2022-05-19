@@ -28,6 +28,7 @@ AO	http://childhealthservicemodels.eu/asthma	#	True
 APAOCUEMPLOY	http://www.semanticweb.org/ontologies/2015/0/ocupationalemploymentcluster.owl	#	True
 APATREATMENT	http://www.semanticweb.org/ontologies/2015/0/treatmentcluster.owl	#	True
 APO	APO	:	True
+ARCRC	http://purl.dataone.org/odo/ARCRC	_	True
 ARO	ARO	:	True
 ASDPTO	http://cbmi.med.harvard.edu/asdphenotype	#	True
 ASPECT	http://purl.org/aspect	/	True
