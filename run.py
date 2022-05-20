@@ -46,6 +46,10 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                 is_flag=True,
                 help="""If used, will use the SSSOM maps in the mappings/ directory
                         to append more specific Biolink types to existing types.""")
+@click.option("--write_curies",
+                is_flag=True,
+                help="""If used, will convert node IDs to CURIEs, with the ontology
+                        id as prefix. IRIs will be kept in each node's iri field.""")
 @click.option("--include_only",
                 callback=lambda _,__,x: x.split(',') if x else [],
                 help="""One or more ontologies to retreive and transform, and only these,
@@ -56,14 +60,14 @@ from bioportal_to_kgx.functions import examine_data_directory, do_transforms # t
                      comma-delimited and named by their hashed file ID, e.g., dabd4d902360003975fb25ae56f8.""")
 
 def run(input: str, kgx_validate: bool, robot_validate: bool, pandas_validate: bool, get_bioportal_metadata: bool, 
-        remap_types: bool, ncbo_key=None, include_only=[], exclude=[]):
+        remap_types: bool, write_curies: bool, ncbo_key=None, include_only=[], exclude=[]):
 
     if get_bioportal_metadata and not ncbo_key:
       sys.exit("Cannot access BioPortal metadata without API key. Specify in --ncbo_key parameter.")
 
     data_filepaths = examine_data_directory(input, include_only, exclude)
     transform_status = do_transforms(data_filepaths, kgx_validate, robot_validate, pandas_validate, 
-                                      get_bioportal_metadata, ncbo_key, remap_types)
+                                      get_bioportal_metadata, ncbo_key, remap_types, write_curies)
 
     successes = ", ".join(list(dict(filter(lambda elem: elem[1], transform_status.items()))))
     failures = ", ".join(list(dict(filter(lambda elem: not elem[1], transform_status.items()))))
