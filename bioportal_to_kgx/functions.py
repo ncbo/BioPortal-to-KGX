@@ -236,7 +236,7 @@ def do_transforms(paths: list,
             # If writing CURIEs is requested, do it now
             if write_curies and tx_filecount > 0:
                 print(f"Will write new CURIEs for nodes in {outname}.")
-                if not update_nodes("curies", outdir, prefix_map):
+                if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
                     print(f"CURIE writing did not complete for {outname}.")
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
@@ -340,7 +340,7 @@ def do_transforms(paths: list,
                 # Writing CURIEs
                 if write_curies and txs_complete[outname]:
                     print(f"Will write new CURIEs for nodes in {outname}.")
-                    if not update_nodes("curies", outdir, prefix_map):
+                    if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
                         print(f"CURIE writing did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
@@ -494,13 +494,14 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_nodes(operation: str, in_path: str, operation_map: dict) -> bool:
+def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: dict={}) -> bool:
     """
     Checks on node and edgefile
     suitability for updating node details.
     :param operation: str, one of "curies" or "types"
     :param in_path: str, path to directory
     :param operation_map: dict of mappings to use
+    :param extra_map: additional maps, if needed by further operations
     :return: True if complete, False otherwise
     """
 
@@ -533,7 +534,7 @@ def update_nodes(operation: str, in_path: str, operation_map: dict) -> bool:
             ontoid = os.path.basename(in_path)
             if ontoid not in operation_map:
                 print(f"Don't know native prefixes for {ontoid} - will search others.")
-            if not write_curies(filepaths, ontoid, operation_map):
+            if not write_curies(filepaths, ontoid, operation_map, extra_map):
                 success = False
         elif operation == "types":
             if not append_new_types(filepaths, operation_map):
@@ -611,7 +612,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
 
     return success
 
-def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
+def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map: dict) -> bool:
     """
     Update node id field in an edgefile 
     and each corresponding subject/object 
@@ -647,6 +648,8 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
                         for prefix in prefix_map[ontoid]["prefixes"]:
                             if node_iri.startswith(prefix[0]):
                                 split_iri = node_iri.split(prefix[1])
+                                if ontoid in pref_prefix_map:
+                                        prefix_set = pref_prefix_map[ontoid]
                                 if len(split_iri) == 2:
                                     new_curie = f"{ontoid}:{split_iri[1]}"
                                 else:
@@ -661,6 +664,8 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict) -> bool:
                             for prefix in prefix_map[prefix_set]["prefixes"]:
                                  if node_iri.startswith(prefix[0]):
                                     split_iri = node_iri.split(prefix[1])
+                                    if prefix_set in pref_prefix_map:
+                                        prefix_set = pref_prefix_map[prefix_set]
                                     if len(split_iri) == 2:
                                         new_curie = f"{prefix_set}:{split_iri[1]}"
                                     else:
