@@ -19,6 +19,9 @@ TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 MAPPING_DIR = "mappings"
+PREFIX_DIR = "prefixes"
+PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
+PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -71,7 +74,8 @@ def do_transforms(paths: list,
                     pandas_validate: bool,
                     get_bioportal_metadata: bool, 
                     ncbo_key: str,
-                    remap_types: bool) -> dict:
+                    remap_types: bool,
+                    write_curies: bool) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -81,7 +85,13 @@ def do_transforms(paths: list,
     Parses header for each to get
     metadata.
     :param paths: list of file paths as strings
-    :param validate: bool, do validations if True
+    :param kgx_validate: bool
+    :param robot_validate: bool
+    :param pandas_validate: bool
+    :param get_bioportal_metadata: bool
+    :param ncbo_key: str
+    :param remap_types: bool
+    :param write_curies: bool
     :return: dict of transform success/failure,
             with ontology names as keys,
             bools for values with success as True
@@ -104,12 +114,13 @@ def do_transforms(paths: list,
     if remap_types:
         #TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
         print(f"Loading type maps from {MAPPING_DIR}/")
-        type_map = {}
+        type_map = {} # type: ignore
         all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
-            this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
-            all_map_paths.append(this_table)
-        # Convert the SSSOM map to a dict of originaltype:newtype
+            if filepath.endswith("sssom.tsv"):
+                this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
+                all_map_paths.append(this_table)
+        # Convert the SSSOM maps to a dict of originaltype:newtype
         for msdf in all_map_paths:
             for i, row in msdf.df.iterrows():
                 subj = None
@@ -121,7 +132,34 @@ def do_transforms(paths: list,
                         obj = v
                     if subj and obj:
                         type_map[subj] = obj
+        print(f"Loaded {len(type_map)} mappings.")
 
+    # If planning to write new CURIEs, need to load prefixes first
+    if write_curies:
+        print(f"Loading prefix maps from {PREFIX_DIR}/")
+        prefix_map = {} # type: ignore
+        pref_prefix_map = {} # type: ignore
+        with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline() # Skip header
+            for line in prefix_file:
+                splitline = (line.rstrip()).split("\t")
+                ontoid = splitline[0]
+                prefix = splitline[1]
+                delim = splitline[2]
+                native = splitline[3]
+                if ontoid in prefix_map:
+                    prefix_map[ontoid]["prefixes"].append([prefix, delim, native])
+                else:
+                    prefix_map[ontoid] = {"prefixes":[[prefix, delim, native]]}
+        with open(os.path.join(PREFIX_DIR,PREF_PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline() # Skip header
+            for line in prefix_file:
+                splitline = (line.rstrip()).split("\t")
+                pref_prefix_map[splitline[0]] = splitline[1]
+
+        print(f"Loaded prefixes for {len(prefix_map)} ontologies.")
+        print(f"Loaded preferred prefixes for {len(pref_prefix_map)} ontologies.")
+        
 
     print("Transforming all...")
 
@@ -159,6 +197,7 @@ def do_transforms(paths: list,
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
+                        txs_complete[outname] = True
                     # Check to see if metadata properties are in the header
                     if check_header_for_md(os.path.join(outdir,filename)):
                         print(f"BioPortal metadata present.")
@@ -194,12 +233,17 @@ def do_transforms(paths: list,
                                 print("Complete.")
                             else:
                                 print("Something went wrong during metadata writing.")
+            # If writing CURIEs is requested, do it now
+            if write_curies and tx_filecount > 0:
+                print(f"Will write new CURIEs for nodes in {outname}.")
+                if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
+                    print(f"CURIE writing did not complete for {outname}.")
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
                 print(f"Will remap node/edge types in {outname} to Biolink Model.")
-                if not update_types(outdir, type_map):
+                if not update_nodes("types", outdir, type_map):
                     print(f"Type mapping did not complete for {outname}.")
-                    
+
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
@@ -285,19 +329,36 @@ def do_transforms(paths: list,
                     except ValueError as e:
                         print(f"Encountered error during KGX transform of {outname}: {e}")
 
+                # Validation
                 if kgx_validate and txs_complete[outname]:
                     print("Validating graph files with KGX...")
                     if not kgx_validate_transform(outdir):
                         print(f"Validation did not complete for {outname}.")
+                        txs_complete[outname] = False
+                        txs_invalid.append(outname)
+
+                # Writing CURIEs
+                if write_curies and txs_complete[outname]:
+                    print(f"Will write new CURIEs for nodes in {outname}.")
+                    if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
+                        print(f"CURIE writing did not complete for {outname}.")
+                        txs_complete[outname] = False
+                        txs_invalid.append(outname)
+
+                # Remapping to Biolink
+                if remap_types and txs_complete[outname]:
+                    print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                    if not update_nodes("types", outdir, type_map):
+                        print(f"Type mapping did not complete for {outname}.")
+                        txs_complete[outname] = False
                         txs_invalid.append(outname)
                 
                 # One last mandatory validation step - can pandas load it?
                 print("Validating graph files with pandas...")
                 if not pandas_validate_transform(outdir):
                     print(f"Validation did not complete for {outname}.")
+                    txs_complete[outname] = False
                     txs_invalid.append(outname)
-
-                #TODO: If remapping to Biolink is requested, do it now
 
             # Remove the tempfile
             os.remove(tempout.name)
@@ -433,13 +494,14 @@ def kgx_validate_transform(in_path: str) -> bool:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_types(in_path: str, type_map: dict) -> bool:
+def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: dict={}) -> bool:
     """
-    Update node and edge types to be
-    more specific Biolink Model types.
-    New types are *appended* to existing types.
+    Checks on node and edgefile
+    suitability for updating node details.
+    :param operation: str, one of "curies" or "types"
     :param in_path: str, path to directory
-    :param maps: list of sssom.util.MappingSetDataFrame objects
+    :param operation_map: dict of mappings to use
+    :param extra_map: additional maps, if needed by further operations
     :return: True if complete, False otherwise
     """
 
@@ -468,8 +530,15 @@ def update_types(in_path: str, type_map: dict) -> bool:
             filepaths["edgelist"] = filepath
     
     if success:
-        if not append_new_types(filepaths, type_map):
-            success = False
+        if operation == "curies":
+            ontoid = os.path.basename(in_path)
+            if ontoid not in operation_map:
+                print(f"Don't know native prefixes for {ontoid} - will search others.")
+            if not write_curies(filepaths, ontoid, operation_map, extra_map):
+                success = False
+        elif operation == "types":
+            if not append_new_types(filepaths, operation_map):
+                success = False
 
     return success
 
@@ -478,6 +547,9 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
     Requires both node and edgelist.
+    Updates types to be more specific 
+    Biolink Model types.
+    New types are *appended* to existing types.
     :param filepath: str, path to KGX format file
     :param type_map: dict of strs, with keys as type to find
                     and values as type to append
@@ -539,7 +611,88 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
         success = False
 
     return success
-    
+
+def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map: dict) -> bool:
+    """
+    Update node id field in an edgefile 
+    and each corresponding subject/object 
+    node in the corresponding edges 
+    to have a CURIE, where the prefix is 
+    the ontology ID and the class is
+    inferred from the IRI.
+    :param in_path: str, path to directory
+    :param ontoid: the Bioportal ID of the ontology
+    :return: True if complete, False otherwise
+    """
+
+    success = False
+
+    nodepath = filepaths["nodelist"]
+    edgepath = filepaths["edgelist"]
+
+    outnodepath = nodepath + ".tmp"
+    outedgepath = edgepath + ".tmp"
+
+    update_these_nodes = {}
+
+    try:
+        with open(nodepath,'r') as innodefile, \
+            open(edgepath, 'r') as inedgefile:
+            with open(outnodepath,'w') as outnodefile, \
+                open(outedgepath, 'w') as outedgefile:
+                for line in innodefile:
+                    updated_node = False
+                    line_split = (line.rstrip()).split("\t")
+                    node_iri = line_split[0]
+                    if ontoid in prefix_map:
+                        for prefix in prefix_map[ontoid]["prefixes"]:
+                            if node_iri.startswith(prefix[0]):
+                                split_iri = node_iri.rsplit(prefix[1],1)
+                                if ontoid in pref_prefix_map:
+                                    ontoid = pref_prefix_map[ontoid]
+                                if len(split_iri) == 2:
+                                    new_curie = f"{ontoid}:{split_iri[1]}"
+                                else:
+                                    new_curie = f"{ontoid}:"
+                                line_split[0] = new_curie
+                                update_these_nodes[node_iri] = new_curie
+                                updated_node = True
+                                continue
+                    # If we don't have a native prefix OR this is a foreign prefix
+                    # then look at other ontologies
+                    if ontoid not in prefix_map or not updated_node:
+                        for prefix_set in prefix_map:
+                            for prefix in prefix_map[prefix_set]["prefixes"]:
+                                 if node_iri.startswith(prefix[0]):
+                                    split_iri = node_iri.rsplit(prefix[1],1)
+                                    if prefix_set in pref_prefix_map:
+                                        prefix_set = pref_prefix_map[prefix_set]
+                                    if len(split_iri) == 2:
+                                        new_curie = f"{prefix_set}:{split_iri[1]}"
+                                    else:
+                                        new_curie = f"{prefix_set}:"
+                                    line_split[0] = new_curie
+                                    update_these_nodes[node_iri] = new_curie
+                                    continue
+                    outnodefile.write("\t".join(line_split) + "\n")
+                for line in inedgefile:
+                    line_split = (line.rstrip()).split("\t")
+                    # Check for edges containing nodes to be updated
+                    if line_split[1] in update_these_nodes:
+                        line_split[1] = update_these_nodes[line_split[1]]
+                    if line_split[3] in update_these_nodes:
+                        line_split[3] = update_these_nodes[line_split[3]]  
+                    outedgefile.write("\t".join(line_split) + "\n")
+                
+        os.replace(outnodepath,nodepath)
+        os.replace(outedgepath,edgepath)
+        success = True
+    except (IOError, KeyError) as e:
+        print(f"Failed to write CURIES for {nodepath} and/or {edgepath}: {e}")
+        success = False
+
+    return success
+
 def is_file_too_short(filepath: str) -> bool:
     """
     Checks if a file contains only an empty line
