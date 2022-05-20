@@ -21,6 +21,7 @@ TARGET_TYPE = "ontologies"
 MAPPING_DIR = "mappings"
 PREFIX_DIR = "prefixes"
 PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
+PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -137,6 +138,7 @@ def do_transforms(paths: list,
     if write_curies:
         print(f"Loading prefix maps from {PREFIX_DIR}/")
         prefix_map = {} # type: ignore
+        pref_prefix_map = {} # type: ignore
         with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
             prefix_file.readline() # Skip header
             for line in prefix_file:
@@ -149,7 +151,15 @@ def do_transforms(paths: list,
                     prefix_map[ontoid]["prefixes"].append([prefix, delim, native])
                 else:
                     prefix_map[ontoid] = {"prefixes":[[prefix, delim, native]]}
+        with open(os.path.join(PREFIX_DIR,PREF_PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline() # Skip header
+            for line in prefix_file:
+                splitline = (line.rstrip()).split("\t")
+                pref_prefix_map[splitline[0]] = splitline[1]
+
         print(f"Loaded prefixes for {len(prefix_map)} ontologies.")
+        print(f"Loaded preferred prefixes for {len(pref_prefix_map)} ontologies.")
+        
 
     print("Transforming all...")
 
