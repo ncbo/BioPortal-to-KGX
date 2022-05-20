@@ -647,13 +647,15 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
                     if ontoid in prefix_map:
                         for prefix in prefix_map[ontoid]["prefixes"]:
                             if node_iri.startswith(prefix[0]):
-                                split_iri = node_iri.split(prefix[1])
+                                split_iri = node_iri.rsplit(prefix[1],1)
+                                print(split_iri)
                                 if ontoid in pref_prefix_map:
-                                        prefix_set = pref_prefix_map[ontoid]
+                                    ontoid = pref_prefix_map[ontoid]
                                 if len(split_iri) == 2:
                                     new_curie = f"{ontoid}:{split_iri[1]}"
                                 else:
                                     new_curie = f"{ontoid}:"
+                                line_split[0] = new_curie
                                 update_these_nodes[node_iri] = new_curie
                                 updated_node = True
                                 continue
@@ -663,7 +665,7 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
                         for prefix_set in prefix_map:
                             for prefix in prefix_map[prefix_set]["prefixes"]:
                                  if node_iri.startswith(prefix[0]):
-                                    split_iri = node_iri.split(prefix[1])
+                                    split_iri = node_iri.rsplit(prefix[1],1)
                                     if prefix_set in pref_prefix_map:
                                         prefix_set = pref_prefix_map[prefix_set]
                                     if len(split_iri) == 2:
