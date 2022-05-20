@@ -14,3 +14,5 @@ Not all ontologies have a native prefix - some are entirely imports.
 
 Manually-curated prefixes are primarily native, rather than the set of all prefixes used within each ontology.
 Some non-native prefixes are included.
+
+The file `bioportal-preferred-prefixes` contains mappings from Bioportal ontology names to preferred names. These are used in order to avoid conflicts across ontology sources, e.g., `RO` in OBO Foundry is the Relation Ontology, while in BioPortal `RO` refers to the Radiomics Ontology. To avoid conflict, CURIEs for nodes from the latter are prefixed with BIOPORTAL.RO. The BioPortal name for the Relation Ontology, `OBOREL`, is prefixed as `RO` for greater cross-platform interoperability.
