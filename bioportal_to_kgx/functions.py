@@ -403,7 +403,7 @@ def pandas_validate_transform(in_path: str) -> bool:
                 pass    #Just making sure it loads
         print(f"Graph file {filepath} parses OK.")
         success = True
-    except pd.errors.ParserError as e:
+    except (pd.errors.ParserError, pd.errors.EmptyDataError) as e:
         print(f"Encountered parsing error in {filepath}: {e}")
         success = False
     
