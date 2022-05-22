@@ -16,10 +16,10 @@ The dump will be in the form of n-triples, with individual sets of records in ne
 Run BioPortal-to-KGX with all validation and metadata retrieval options as:
 
 ```
-python run.py --input ../path/to/your/data/ --kgx_validate --robot_validate --pandas_validate --get_bioportal_metadata --ncbo_key YOUR_NCBO_API_KEY_HERE
+python run.py --input ../path/to/your/data/ --kgx_validate --robot_validate --pandas_validate --write_curies --remap_types --get_bioportal_metadata --ncbo_key YOUR_NCBO_API_KEY_HERE 
 ```
 
-Specify individual ontologies to include or exclude with the --include_only and --exclude options, respectively, each followed by a comma-delimited list of the original hashed file ID from the 4store dump. 
+Specify individual ontologies to include or exclude with the --include_only and --exclude options, respectively, each followed by a comma-delimited list of the original hashed file ID from the 4store dump.
 
 For example:
 ```
@@ -29,3 +29,7 @@ python run.py --input ../path/to/your/data/ --include_only dabd4d902360003975fb2
 Output will be written to the `/bioportal_to_kgx` directory within `/transformed`, with subdirectories named for the 4store graph and each subgraph.
 
 Each subgraph will contain node and edge files ({subgraph_name}_nodes.tsv and {subgraph_name}_edges.tsv, respectively) along with logs containing any validation messages about the transforms.
+
+## Troubleshooting
+
+* The `--robot_validate` option may fail on larger ontologies like `NCBITAXON` with `java.lang.OutOfMemoryError`. Consider omitting this option or running ROBOT on files directly, as needed.
