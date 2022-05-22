@@ -308,6 +308,7 @@ def do_transforms(paths: list,
                             input_format='obojson',
                             output=outpath,
                             output_format='tsv',
+                            stream=True,
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
                                                 ("primary_knowledge_source", primary_knowledge_source)])
                     txs_complete[outname] = True
