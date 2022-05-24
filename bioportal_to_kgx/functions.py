@@ -308,6 +308,7 @@ def do_transforms(paths: list,
                             input_format='obojson',
                             output=outpath,
                             output_format='tsv',
+                            stream=True,
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
                                                 ("primary_knowledge_source", primary_knowledge_source)])
                     txs_complete[outname] = True
@@ -323,6 +324,7 @@ def do_transforms(paths: list,
                             input_format='obojson',
                             output=outpath,
                             output_format='tsv',
+                            stream=True,
                             knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
                                                 ("primary_knowledge_source", primary_knowledge_source)])
                         txs_complete[outname] = True
@@ -727,7 +729,8 @@ def remove_bad_curie(filepath: str) -> str:
     with open(filepath, 'r') as infile:
         with open(repaired_filepath, 'w') as outfile:
             for line in infile:
-                line = re.sub("file:C:", "", line)
+                for pattern in ["file:C:","file:"]:
+                    line = re.sub(pattern, "", line)
                 outfile.write(line)
 
     return repaired_filepath
