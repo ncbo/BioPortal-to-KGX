@@ -179,6 +179,7 @@ GVO	http://genome-variation.org/resource/gvo	#	True
 HAO	HAO	:	True
 HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	True
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
+HEIO	http://whistl.uwaterloo.ca/heio.owl	#	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
 HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl	#	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
@@ -329,9 +330,13 @@ ONL-DP	http://neurolog.unice.fr/ontoneurolog/v3.0/ontoneurolog-dataset-processin
 ONL-TASKS	http://www.semanticweb.org/bakaev/ontologies/2020/3/untitled-ontology-25	#	True
 ONLIRA	http://vavlab.ee.boun.edu.tr/carera/onlira.owl	#	True
 ONTOAD	http://doe-generated-ontology.com/OntoAD	#	True
+ONTODT	http://ontodm.com/OntoDT	#	True
+ONTODT	http://www.ontodm.com/OntoDT	#	True
 ONTONEO	ONTONEO	:	True
 ONTOPNEUMO	http://doe-generated-ontology.com/OntoPneumo	#	True
 ONTOSIM	http://www.semanticweb.org/DIASUS/OntoSIM	#	True
+ONTOSINASC	http://www.semanticweb.org/DIASUS/OntoSINASC	#	True
+ONTOTOX	http://OntoTox.owl	#	True
 OOEVV	http://bmkeg.isi.edu/ooevv	/	True
 OOSTT	OOSTT	:	True
 OPE	http://www.semanticweb.org/ontologies/2013/2/OPE.owl	#	True
@@ -340,6 +345,7 @@ OSM	https://saudeconectada.org/saude_mental.owl	#	True
 OVAE	OVAE	:	True
 PANDA	http://purl.bioontology.org/net/brunel/panda	#	True
 PANET	PaNET	:	True
+PANET	http://purl.org/pan-science/PaNET	/	True
 PATCT	https://pat.nichd.nih.gov/placentalcelltype	/	True
 PATEL	http://www.semanticweb.org/ambrish/ontologies/2020/10/untitled-ontology-24	#	True
 PATGV	https://pat.nichd.nih.gov/patgeneticvariance	/	True
@@ -359,6 +365,7 @@ PE-O	http://www.pepathway.org/peo/1.2	#	True
 PEAO	https://bitbucket.org/PlantExpAssay/ontology/raw/v0.1/PlantExperimentalAssayOntology.owl#PEAO	:	True
 PECO	PECO	:	True
 PEDTERM	http://www.owl-ontologies.com/Ontology1358660052.owl	#	True
+PEO	http://knoesis.wright.edu/ParasiteExperiment.owl	#	True
 PESONT	http://www.semanticweb.org/patienceusip/ontologies/2021/7/untitled-ontology-23	#	True
 PGXO	http://pgxo.loria.fr	/	True
 PHENX	http://purl.bioontology.org/ontology/phenX	/	True
@@ -377,6 +384,7 @@ PP	https://bitbucket.org/PlantExpAssay/ontology/raw/v0.1/PipelinePatterns.owl	#	
 PPO	PPO	:	True
 PR	PR	:	True
 PREGONTO	http://www.clininf.eu/pregnancy	#	True
+PREO	http://presence-ontology.org/ontology/	/	True
 PROCCHEMICAL	http://sweet.jpl.nasa.gov/2.3/propChemical.owl	#	True
 PROJ	http://linked.data.gov.au/def/project	/	True
 PROPREO	http://lsdis.cs.uga.edu/projects/glycomics/propreo	#	True
