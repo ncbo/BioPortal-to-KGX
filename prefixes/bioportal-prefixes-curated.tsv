@@ -35,7 +35,9 @@ ASPECT	http://purl.org/aspect	/	True
 ATC	http://purl.bioontology.org/ontology/ATC	/	True
 ATO	ATO	:	True
 ATOL	http://opendata.inra.fr/ATOL	/	True
+AURA	http://www.projecthalo.com/aura	#	True
 BCO	BCO	:	True
+BCTT	http://purl.bioontology.org/ontology/BCTT	#	True
 BFO	BFO	:	True
 BIBFRAME	http://id.loc.gov/ontologies/bibframe	/	True
 BIBLIOTEK-O	http://bibliotek-o.org/1.1/ontology	/	True
@@ -178,6 +180,7 @@ HAO	HAO	:	True
 HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	True
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
+HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl	#	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
 HMIS033B	http://vocab.vodana.org/hmis033b	/	True
 HNS	http://www.humannervousystem.org/KAnOE/2014/dave86	#	True
