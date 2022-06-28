@@ -596,9 +596,13 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         pass
                     
                     # Before writing, remove any redundant types
+                    # and OntologyClass, unless it's the only type
                     try:
                         this_type_list = line_split[1].split("|")
                         this_type_list = list(set(this_type_list))
+                        if "biolink:OntologyClass" in this_type_list and \
+                            len(this_type_list) > 1:
+                            this_type_list.remove("biolink:OntologyClass")
                         line_split[1] = "|".join(this_type_list)
                     except KeyError:
                         pass

@@ -35,7 +35,9 @@ ASPECT	http://purl.org/aspect	/	True
 ATC	http://purl.bioontology.org/ontology/ATC	/	True
 ATO	ATO	:	True
 ATOL	http://opendata.inra.fr/ATOL	/	True
+AURA	http://www.projecthalo.com/aura	#	True
 BCO	BCO	:	True
+BCTT	http://purl.bioontology.org/ontology/BCTT	#	True
 BFO	BFO	:	True
 BIBFRAME	http://id.loc.gov/ontologies/bibframe	/	True
 BIBLIOTEK-O	http://bibliotek-o.org/1.1/ontology	/	True
@@ -66,8 +68,10 @@ CDAO	CDAO	:	True
 CDPEO	http://www.semanticweb.org/ontologies/chronic-diease-patient-education-ontology	#	True
 CEDARVS	http://www.semanticweb.org/jgraybeal/ontologies/2015/7/cedarvaluesets	#	True
 CEPH	CEPH	:	True
+CHD	http://homes.esat.kuleuven.be/~bioiuser/chdwiki/index.php/CHD:CaseReport?id	=	True
 CHEBI	CHEBI	:	True
 CHMO	CHMO	:	True
+CIDOC-CRM	http://www.cidoc-crm.org/cidoc-crm	/	True
 CIO	CIO	:	True
 CL	CL	:	True
 CLO	CLO	:	True
@@ -153,6 +157,7 @@ FLU	FLU	:	True
 FLYGLYCODB	http://www.flyglycodb.org/ontologies/2015	/	True
 FMA	http://purl.org/obo/owlapi/fma	#	False
 FMA	http://purl.org/sig/ont/fma	/	True
+FMA	http://sig.uw.edu/fma	#	True
 FOAF	foaf	:	True
 FOODON	FOODON	:	True
 FYPO	FYPO	:	True
@@ -170,6 +175,8 @@ GFO	http://www.onto-med.de/ontologies/gfo-basic.owl	#	True
 GFO	http://www.onto-med.de/ontologies/gfo.owl	#	True
 GLYCO	http://glycomics.ccrc.uga.edu/ontologies/GlycO	#	True
 GLYCOCOO	http://purl.jp/bio/12/glyco	/	True
+GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
+GML	http://www.opengis.net/ont/gml	#	False
 GO	GO	:	True
 GO	http://www.informatics.jax.org/vocab/gene_ontology/GO	:	False
 GSSO	OBO:GSSO	_	True
@@ -177,7 +184,9 @@ GVO	http://genome-variation.org/resource/gvo	#	True
 HAO	HAO	:	True
 HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	True
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
+HEIO	http://whistl.uwaterloo.ca/heio.owl	#	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
+HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl	#	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
 HMIS033B	http://vocab.vodana.org/hmis033b	/	True
 HNS	http://www.humannervousystem.org/KAnOE/2014/dave86	#	True
@@ -265,6 +274,7 @@ MIRO	MIRO	:	True
 MIXS	http://gensc.org/ns/mixs	/	True
 MMO	MMO	:	True
 MOC	http://sweet.jpl.nasa.gov/2.3/matrOrganicCompound.owl	#	True
+MODSCI	https://w3id.org/skgo/modsci	#	True
 MONDO	MONDO	:	True
 MONO	http://www.owl-ontologies.com/MO.owl	#	True
 MOP	MOP	:	True
@@ -326,9 +336,13 @@ ONL-DP	http://neurolog.unice.fr/ontoneurolog/v3.0/ontoneurolog-dataset-processin
 ONL-TASKS	http://www.semanticweb.org/bakaev/ontologies/2020/3/untitled-ontology-25	#	True
 ONLIRA	http://vavlab.ee.boun.edu.tr/carera/onlira.owl	#	True
 ONTOAD	http://doe-generated-ontology.com/OntoAD	#	True
+ONTODT	http://ontodm.com/OntoDT	#	True
+ONTODT	http://www.ontodm.com/OntoDT	#	True
 ONTONEO	ONTONEO	:	True
 ONTOPNEUMO	http://doe-generated-ontology.com/OntoPneumo	#	True
 ONTOSIM	http://www.semanticweb.org/DIASUS/OntoSIM	#	True
+ONTOSINASC	http://www.semanticweb.org/DIASUS/OntoSINASC	#	True
+ONTOTOX	http://OntoTox.owl	#	True
 OOEVV	http://bmkeg.isi.edu/ooevv	/	True
 OOSTT	OOSTT	:	True
 OPE	http://www.semanticweb.org/ontologies/2013/2/OPE.owl	#	True
@@ -337,6 +351,7 @@ OSM	https://saudeconectada.org/saude_mental.owl	#	True
 OVAE	OVAE	:	True
 PANDA	http://purl.bioontology.org/net/brunel/panda	#	True
 PANET	PaNET	:	True
+PANET	http://purl.org/pan-science/PaNET	/	True
 PATCT	https://pat.nichd.nih.gov/placentalcelltype	/	True
 PATEL	http://www.semanticweb.org/ambrish/ontologies/2020/10/untitled-ontology-24	#	True
 PATGV	https://pat.nichd.nih.gov/patgeneticvariance	/	True
@@ -356,6 +371,7 @@ PE-O	http://www.pepathway.org/peo/1.2	#	True
 PEAO	https://bitbucket.org/PlantExpAssay/ontology/raw/v0.1/PlantExperimentalAssayOntology.owl#PEAO	:	True
 PECO	PECO	:	True
 PEDTERM	http://www.owl-ontologies.com/Ontology1358660052.owl	#	True
+PEO	http://knoesis.wright.edu/ParasiteExperiment.owl	#	True
 PESONT	http://www.semanticweb.org/patienceusip/ontologies/2021/7/untitled-ontology-23	#	True
 PGXO	http://pgxo.loria.fr	/	True
 PHENX	http://purl.bioontology.org/ontology/phenX	/	True
@@ -365,6 +381,7 @@ PLANA	PLANA	:	True
 PLIO	http://www.semanticweb.org/ontologies/2010/3/Ontology1271664172453.owl	#	True
 PLOSTHES	http://localhost/plosthes.2017-1	#	True
 PMD	http://www.onto-med.de/ontologies/gfo-persian-medicine-diseases.owl	#	True
+PMDO	http://www.case.edu/PMDO	#	True
 PMO	http://performedmusicontology.org/ontology	/	True
 PMO-SPEED	http://performedmusicontology.org/ontologies/vocabularies/playing_speed	/	True
 PMR	http://purl.bioontology.org/ontology/PMR.owl	#	True
@@ -374,6 +391,7 @@ PP	https://bitbucket.org/PlantExpAssay/ontology/raw/v0.1/PipelinePatterns.owl	#	
 PPO	PPO	:	True
 PR	PR	:	True
 PREGONTO	http://www.clininf.eu/pregnancy	#	True
+PREO	http://presence-ontology.org/ontology/	/	True
 PROCCHEMICAL	http://sweet.jpl.nasa.gov/2.3/propChemical.owl	#	True
 PROJ	http://linked.data.gov.au/def/project	/	True
 PROPREO	http://lsdis.cs.uga.edu/projects/glycomics/propreo	#	True
@@ -413,6 +431,7 @@ SD3	http://www.wiser.pitt.edu/ontologies/SimulationScenarioDeviations.owl	#	True
 SENSO	http://purl.dataone.org/odo/SENSO	_	True
 SEPIO	SEPIO	:	True
 SEQ	http://www.ontologydesignpatterns.org/cp/owl/sequence.owl	#	True
+SHR	http://www.shojaee.com/shr/shr.owl	#	True
 SIBO	SIBO	:	True
 SIO	SIO	:	True
 SITBAC	http://www.semanticweb.org/ontologies/2008/1/Ontology1204037102846.owl	#	True
@@ -431,6 +450,7 @@ SSO	http://www.medicine.mcgill.ca/epidemiology/buckeridge/syndromes.owl	#	True
 STATO	STATO	:	True
 STY	http://purl.bioontology.org/ontology/STY	/	True
 SURGICAL	http://www.cablesat.com.au/research	/	True
+SWEET	http://sweetontology.net	/	True
 SWO	http://www.ebi.ac.uk/swo	/	True
 SYMP	SYMP	:	True
 TADS	TADS	:	True
@@ -477,5 +497,3 @@ ZFA	ZFA	:	True
 ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
 ZONMW-CONTENT	http://purl.org/zonmw	/	True
 ZP	ZP	:	True
-GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
-GML	http://www.opengis.net/ont/gml	#	False
