@@ -157,6 +157,7 @@ FLU	FLU	:	True
 FLYGLYCODB	http://www.flyglycodb.org/ontologies/2015	/	True
 FMA	http://purl.org/obo/owlapi/fma	#	False
 FMA	http://purl.org/sig/ont/fma	/	True
+FMA	http://sig.uw.edu/fma	#	True
 FOAF	foaf	:	True
 FOODON	FOODON	:	True
 FYPO	FYPO	:	True
