@@ -157,6 +157,7 @@ FAO	FAO	:	True
 FBbi	FBbi	:	True
 FBbi	http://purl.org/obo/owl/FBbi#FBbi	_	False
 FCC1	http://www.semanticweb.org/diwaleva/ontologies/2019/9/fcc-ontology	#	True
+FDC-GDMT	http://vocab.fairdatacollective.org/gdmt	/	True
 FG	https://w3id.org/fair-genomes/ontology	/	True
 FHHO	http://www.owl-ontologies.com/Ontology1172270693.owl	#	True
 FIRE	http://cerrado.linkeddata.es/ecology/fire	#	True
@@ -189,6 +190,7 @@ GLYCOCOO	http://purl.jp/bio/12/glyco	/	True
 GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
 GML	http://www.opengis.net/ont/gml	#	False
 GO	GO	:	True
+GO	http://purl.org/obo/owl/GO#GO	_	False
 GO	http://www.informatics.jax.org/vocab/gene_ontology/GO	:	False
 GSSO	OBO:GSSO	_	True
 GVO	http://genome-variation.org/resource/gvo	#	True
@@ -297,6 +299,7 @@ MSO	http://scai.fraunhofer.de/MSOntology	#	True
 MSTDE	http://purl.bioontology.org/ontology/MSTDE	/	True
 MSV	http://purl.jp/bio/11/msv	/	True
 NBO	NBO	:	True
+NCBITAXON	OBO:NCBITAXON	_	False
 NCBITAXON	http://purl.bioontology.org/ontology/NCBITAXON	/	True
 NCBITAXON	http://www.ncbi.nlm.nih.gov/taxonomy	/	False
 NCCNEHR	http://www.semanticweb.org/lamb/ontologies/NCCN-EHR	#	True
@@ -326,6 +329,7 @@ OBCS	OBCS	:	True
 OBI	OBI	:	True
 OBIB	OBIB	:	True
 OBOE	http://ecoinformatics.org/oboe/oboe.1.2	/	True
+OBOREL	http://www.obofoundry.org/ro/ro.owl	#	False
 OBS	http://www.semanticweb.org/bito2/ontologies/2021/3/untitled-ontology-11	#	True
 OCIMIDO	https://github.com/sap218/ocimido/blob/master/ontology/ocimido.owl	#	True
 OCRE	http://purl.org/net/OCRe	/	True
@@ -480,12 +484,19 @@ TOP-MENELAS	http://www.limics.fr/ontologies/menelastop	#	True
 TRIAGE	http://www.semanticweb.org/philshields/ontologies/2015/4/untitled-ontology-59	#	True
 TRON	OBO:TrOn	_	True
 TTO	TTO	:	True
+TXPO	OBO:TXPO	_	True
 TYPON	http://purl.phyloviz.net/ontology/typon	#	True
 UBERON	UBERON	:	True
+UNITSONT	http://mimi.case.edu/ontologies/2009/1/UnitsOntology	#	True
 UO	UO	:	True
+UPA	OBO:UPa	_	True
 UPHENO	UPHENO	:	True
+VANDF	http://purl.bioontology.org/ontology/VANDF	/	True
 VARIO	OBO:VariO	_	True
+VDOT	http://www.ifomis.org/vdot/vdot_core.owl#vdot	_	True
+VEO	http://sbmi.uth.tmc.edu/ontology/VEO	#	True
 VHOG	VHOG	:	True
+VIDO	OBO:VIDO	_	True
 VIVO	VIVO	:	True
 VO	VO	:	True
 VODANADISEASES	http://vocab.vodan-totafrica.info/vodana-terms/vdiseases	/	True
@@ -493,6 +504,8 @@ VODANAMFLCODE	http://vocab.vodana.org/vmfl	/	True
 VSAO	VSAO	:	True
 VT	VT	:	True
 VTO	VTO	:	True
+WB-LS	OBO:WBls	_	True
+WC	OBO:WC	_	True
 WEAR	http://purl.org/wear	/	True
 WEAVE	http://purl.org/weave	/	True
 WETAXTOPICS	http://purl.org/neat	/	True
@@ -504,9 +517,11 @@ XAO	XAO	:	True
 XCO	XCO	:	True
 XEO	OBO:XEO	_	True
 XLMOD	OBO:XLMOD	_	True
+XPO	OBO:XPO	_	True
 ZEA	ZEA	:	True
 ZECO	ZECO	:	True
 ZFA	ZFA	:	True
 ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
-ZONMW-CONTENT	http://purl.org/zonmw	/	True
+ZONMW-CONTENT	http://purl.org/zonmw/covid19	/	True
+ZONMW-GENERIC	http://purl.org/zonmw/generic	/	True
 ZP	ZP	:	True
