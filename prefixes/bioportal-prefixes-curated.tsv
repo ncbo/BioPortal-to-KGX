@@ -551,3 +551,4 @@ ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
 ZONMW-CONTENT	http://purl.org/zonmw/covid19	/	True
 ZONMW-GENERIC	http://purl.org/zonmw/generic	/	True
 ZP	ZP	:	True
+NCBIGene	OBO:NCBIGene	_	False
