@@ -300,6 +300,7 @@ MSO	http://scai.fraunhofer.de/MSOntology	#	True
 MSTDE	http://purl.bioontology.org/ontology/MSTDE	/	True
 MSV	http://purl.jp/bio/11/msv	/	True
 NBO	NBO	:	True
+NCBIGene	OBO:NCBIGene	_	False
 NCBITAXON	OBO:NCBITAXON	_	False
 NCBITAXON	http://purl.bioontology.org/ontology/NCBITAXON	/	True
 NCBITAXON	http://www.ncbi.nlm.nih.gov/taxonomy	/	False
@@ -355,15 +356,20 @@ ONLIRA	http://vavlab.ee.boun.edu.tr/carera/onlira.owl	#	True
 ONTOAD	http://doe-generated-ontology.com/OntoAD	#	True
 ONTODT	http://ontodm.com/OntoDT	#	True
 ONTODT	http://www.ontodm.com/OntoDT	#	True
+ONTOLURGENCES	http://www.limics.fr/ontologies/ontolurgences	#	True
 ONTONEO	ONTONEO	:	True
+ONTOPBM	http://w3id.org/ontopbm#OntoPBM	_	True
 ONTOPNEUMO	http://doe-generated-ontology.com/OntoPneumo	#	True
 ONTOSIM	http://www.semanticweb.org/DIASUS/OntoSIM	#	True
 ONTOSINASC	http://www.semanticweb.org/DIASUS/OntoSINASC	#	True
 ONTOTOX	http://OntoTox.owl	#	True
 OOEVV	http://bmkeg.isi.edu/ooevv	/	True
 OOSTT	OOSTT	:	True
+OPB	http://bhi.washington.edu/OPB#OPB	_	True
 OPE	http://www.semanticweb.org/ontologies/2013/2/OPE.owl	#	True
 OPL	OPL	:	True
+OPTION-ONTOLOGY	http://w3id.org/ontoopt	/	True
+ORCS	OBO:ORCS	_	True
 ORTH	http://purl.org/net/orth	#	True
 OSM	https://saudeconectada.org/saude_mental.owl	#	True
 OVAE	OVAE	:	True
@@ -551,4 +557,3 @@ ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
 ZONMW-CONTENT	http://purl.org/zonmw/covid19	/	True
 ZONMW-GENERIC	http://purl.org/zonmw/generic	/	True
 ZP	ZP	:	True
-NCBIGene	OBO:NCBIGene	_	False
