@@ -24,6 +24,8 @@ AGRO	AGRO	:	True
 AGROCYMAC	http://www.semanticweb.org/yali/ontologies/2019/0/cultivos	#	True
 AGROMOP	http://www.semanticweb.org/vera/ontologies/2020/1/untitled-ontology-5	#	True
 AHOL	http://opendata.inra.fr/AHOL/AHOL	_	True
+AHSO	https://w3id.org/ahso	#	True
+AISM	OBO:AISM	_	True
 AMINO-ACID	http://www.co-ode.org/ontologies/amino-acid/2006/05/18/amino-acid.owl	#	True
 AO	http://childhealthservicemodels.eu/asthma	#	True
 APAOCUEMPLOY	http://www.semanticweb.org/ontologies/2015/0/ocupationalemploymentcluster.owl	#	True
@@ -35,7 +37,7 @@ ASDPTO	http://cbmi.med.harvard.edu/asdphenotype	#	True
 ASPECT	http://purl.org/aspect	/	True
 ATC	http://purl.bioontology.org/ontology/ATC	/	True
 ATO	ATO	:	True
-ATOL	http://opendata.inra.fr/ATOL	/	True
+ATOL	http://opendata.inra.fr/ATOL/ATOL	_	True
 AURA	http://www.projecthalo.com/aura	#	True
 BAO	http://www.bioassayontology.org/bao#BAO	_	True
 BCO	BCO	:	True
@@ -52,11 +54,15 @@ BIN	http://purl.bioontology.org/ontology/BIN	/	True
 BIOLINK	biolink	:	True
 BIRNLEX	http://bioontology.org/projects/ontologies/birnlex	#	True
 BNO	http://www.owl-ontologies.com/Ontology1361987617.owl	#	True
+BOF	http://www.owl-ontologies.com/BiodiversityOntologyFull.owl	#	True
 BP	http://www.biopax.org/release/biopax-level3.owl	#	True
 BRCT	http://www.semanticweb.org/latitude_user/ontologies/2014/8/untitled-ontology-7	#	True
 BRCT	http://www.semanticweb.org/ontologies/2009/9/Ontology1255357986125.owl	#	True
 BRIDG	http://www.bridgmodel.org/owl	#	True
+BRO	http://bioontology.org/ontologies/BiomedicalResourceOntology.owl	#	True
 BRSO	http://purl.jp/bio/10/brso	/	True
+BRSO	http://purl.org/brso/BiologicalResourceStatus	#	True
+BSAO	OBO:BSA	_	True
 BSPO	BSPO	:	True
 BT	http://purl.org/biotop/biotop.owl	#	True
 BTO	BTO	:	True
@@ -82,9 +88,13 @@ CMDO	http://purl.bioontology.org/ontology/CMDO	/	True
 CMO	CMO	:	True
 CMR-QA	http://www.semanticweb.org/ukbiobank/ocmr_isg/CMR-QA	#	True
 CN	http://mmisw.org/ont/Technology/ComputerNetworks	#	True
+CN	http://mmisw.org/ont/Technology/ComputerNetworks	/	True
+CO-WHEAT	OBO:CO_321	_	True
 CODO	http://www.isibang.ac.in/ns/codo	#	True
 COGAT	file:/srv/ncbo/repository/COGAT/8	/	True
 COGPO	http://www.cogpo.org/ontologies/COGPO	_	True
+COGPO	http://www.cogpo.org/ontologies/CogPOver1.owl	#	True
+COGPO	http://www.cogpo.org/ontologies/CogPOver2010.owl#COGPO	_	True
 COKPME	http://www.iiitdwd.ac.in/ACB/COKPME	#	True
 COMODI	http://purl.uni-rostock.de/comodi/comodi	#	True
 CRO	CRO	:	True
