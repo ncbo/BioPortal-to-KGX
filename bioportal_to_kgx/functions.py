@@ -167,7 +167,11 @@ def do_transforms(paths: list,
         print(f"Starting on {filepath}")
         with open(filepath) as infile:
             header = (infile.readline()).rstrip()
-            metadata = (header.split(NAMESPACE))[1]
+            try:    # Throws IndexError if input header is malformed
+                metadata = (header.split(NAMESPACE))[1]
+            except IndexError:
+                print(f"Header of {filepath} looks wrong...will skip.")
+                continue
             metadata = metadata.lstrip('/')
             metadata_split = (metadata.split("/"))
             if metadata_split[0] == TARGET_TYPE:
