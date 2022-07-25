@@ -209,7 +209,7 @@ HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	T
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
 HEIO	http://whistl.uwaterloo.ca/heio.owl	#	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
-HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl	#	True
+HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl#HGNC	_	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
 HMIS033B	http://vocab.vodana.org/hmis033b	/	True
 HNS	http://www.humannervousystem.org/KAnOE/2014/dave86	#	True
@@ -295,7 +295,8 @@ MI	MI	:	True
 MIAPA	MIAPA	:	True
 MIM	http://purl.bioontology.org/ontology/MIM	#	True
 MIRO	MIRO	:	True
-MIXS	http://gensc.org/ns/mixs	/	True
+MIXS	https://w3id.org/mixs/terms	/	True
+MIXS	https://w3id.org/mixs/vocab	/	True
 MMO	MMO	:	True
 MOC	http://sweet.jpl.nasa.gov/2.3/matrOrganicCompound.owl	#	True
 MODSCI	https://w3id.org/skgo/modsci	#	True
@@ -392,6 +393,7 @@ PATGV	https://pat.nichd.nih.gov/patgeneticvariance	/	True
 PATIT	https://pat.nichd.nih.gov/patinvestigativetechniques	/	True
 PATMHC	http://pat.nichd.nih.gov/maternalconditions	/	True
 PATO	PATO	:	True
+PATO	http://purl.obolibrary.org/obo/PATO	_	False
 PAV	pav	:	True
 PCO	PCO	:	True
 PDO	http://purl.jp/bio/11/pdo	/	True
