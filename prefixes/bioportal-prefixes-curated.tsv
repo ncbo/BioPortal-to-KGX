@@ -25,6 +25,7 @@ AGROCYMAC	http://www.semanticweb.org/yali/ontologies/2019/0/cultivos	#	True
 AGROMOP	http://www.semanticweb.org/vera/ontologies/2020/1/untitled-ontology-5	#	True
 AHOL	http://opendata.inra.fr/AHOL/AHOL	_	True
 AHSO	https://w3id.org/ahso	#	True
+AIRBUS	http://protege.stanford.edu/thesauri/aero	/	True
 AISM	OBO:AISM	_	True
 AMINO-ACID	http://www.co-ode.org/ontologies/amino-acid/2006/05/18/amino-acid.owl	#	True
 AO	http://childhealthservicemodels.eu/asthma	#	True
@@ -62,6 +63,7 @@ BRIDG	http://www.bridgmodel.org/owl	#	True
 BRO	http://bioontology.org/ontologies/BiomedicalResourceOntology.owl	#	True
 BRSO	http://purl.jp/bio/10/brso	/	True
 BRSO	http://purl.org/brso/BiologicalResourceStatus	#	True
+BRSO	http://purl.org/brso/BiologicalResourceType	#	True
 BSAO	OBO:BSA	_	True
 BSPO	BSPO	:	True
 BT	http://purl.org/biotop/biotop.owl	#	True
@@ -97,6 +99,7 @@ COGPO	http://www.cogpo.org/ontologies/CogPOver1.owl	#	True
 COGPO	http://www.cogpo.org/ontologies/CogPOver2010.owl#COGPO	_	True
 COKPME	http://www.iiitdwd.ac.in/ACB/COKPME	#	True
 COMODI	http://purl.uni-rostock.de/comodi/comodi	#	True
+CRISP	http://purl.bioontology.org/ontology/CSP	/	True
 CRO	CRO	:	True
 CRYOEM	http://scipion.i2pc.es/ontology/CRYOEM	_	True
 CSSO	http://purl.jp/bio/11/csso/CSSO	_	True
@@ -112,6 +115,7 @@ DCM	http://dicom.nema.org/resources/ontology/DCM	/	True
 DDANAT	DDANAT	:	True
 DDPHENO	DDPHENO	:	True
 DEB	http://www.semanticweb.org/osnathakimi/ontologies/deb	#	True
+DERMO	OBO:DERMO	_	True
 DFO	https://w3id.org/dfo	/	True
 DIDEO	DIDEO	:	True
 DIKB	http://purl.org/net/drug-interaction-knowledge-base/DIKB_evidence_ontology.owl	#	True
@@ -238,6 +242,7 @@ IDO	IDO	:	True
 IDOMAL	IDOMAL	:	True
 IMGT-ONTOLOGY	http://www.imgt.org/download/IMGT-ONTOLOGY/IMGT-ONTOLOGY-v1-0-3.owl	#	True
 INBIODIV	http://www.semanticweb.org/mca/ontologies/2018/8/untitled-ontology-47	#	True
+INCENTIVE	http://purl.org/incentive	/	True
 INCENTIVE-VARS	http://purl.org/incentive/variables	/	True
 INFRARISK	https://www.infrarisk-fp7.eu/vocabs/	#	True
 INSECTH	http://neuromorpho.org/ontologies/insectH.owl	#	True
