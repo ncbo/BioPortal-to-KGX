@@ -553,6 +553,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
     Requires both node and edgelist.
+    This assumes the nodes are all already CURIEs.
     Updates types to be more specific 
     Biolink Model types.
     New types are *appended* to existing types.
@@ -581,18 +582,20 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                     line_split = (line.rstrip()).split("\t")
                     # Check for edges representing node types to be remapped
                     if line_split[4].endswith("hasSTY"):
-                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
-                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
+                        node_id = line_split[1]
+                        type_id = line_split[3]
                         remap_these_nodes[node_id] = type_id
                     outedgefile.write("\t".join(line_split) + "\n")
                 for line in innodefile:
                     line_split = (line.rstrip()).split("\t")
                     try:
-                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
-                        # Check if the node id is a type we recognize
-                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                        node_id = line_split[0]
+                        # Check if the node id is already a semantic type
                         if node_id in type_map:
-                            line_split[1] = line_split[1] + "|" + type_map[node_id]
+                            if line_split[1] == "biolink:OntologyClass":
+                                line_split[1] = type_map[node_id]
+                            else:
+                                line_split[1] = line_split[1] + "|" + type_map[node_id]
                         # Check if we saw a type assignment among the edges already
                         if node_id in remap_these_nodes:
                             line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
@@ -600,7 +603,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         pass
                     
                     # Before writing, remove any redundant types
-                    # and OntologyClass, unless it's the only type
+                    # and any remaining OntologyClass, unless it's the only type
                     try:
                         this_type_list = line_split[1].split("|")
                         this_type_list = list(set(this_type_list))
