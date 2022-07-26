@@ -581,7 +581,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                 for line in inedgefile:
                     line_split = (line.rstrip()).split("\t")
                     # Check for edges representing node types to be remapped
-                    if line_split[4].endswith("hasSTY"):
+                    if line_split[5].endswith("hasSTY"):
                         node_id = line_split[1]
                         type_id = line_split[3]
                         remap_these_nodes[node_id] = type_id
@@ -592,10 +592,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         node_id = line_split[0]
                         # Check if the node id is already a semantic type
                         if node_id in type_map:
-                            if line_split[1] == "biolink:OntologyClass":
-                                line_split[1] = type_map[node_id]
-                            else:
-                                line_split[1] = line_split[1] + "|" + type_map[node_id]
+                            line_split[1] = line_split[1] + "|" + type_map[node_id]
                         # Check if we saw a type assignment among the edges already
                         if node_id in remap_these_nodes:
                             line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
