@@ -369,6 +369,7 @@ OMV	http://omv.ontoware.org/2005/05/ontology	#	True
 ONL-DP	http://neurolog.unice.fr/ontoneurolog/v3.0/ontoneurolog-dataset-processing.owl	#	True
 ONL-TASKS	http://www.semanticweb.org/bakaev/ontologies/2020/3/untitled-ontology-25	#	True
 ONLIRA	http://vavlab.ee.boun.edu.tr/carera/onlira.owl	#	True
+ONSTR	http://onstr.googlecode.com/svn/tags/currentRelease/2014-09-03/ONSTR.owl#ONSTR	_	True
 ONTOAD	http://doe-generated-ontology.com/OntoAD	#	True
 ONTODT	http://ontodm.com/OntoDT	#	True
 ONTODT	http://www.ontodm.com/OntoDT	#	True
@@ -381,7 +382,9 @@ ONTOSINASC	http://www.semanticweb.org/DIASUS/OntoSINASC	#	True
 ONTOTOX	http://OntoTox.owl	#	True
 OOEVV	http://bmkeg.isi.edu/ooevv	/	True
 OOSTT	OOSTT	:	True
+OPB	http://bhi.washington.edu/OPB#	#	True
 OPB	http://bhi.washington.edu/OPB#OPB	_	True
+OPDE	http://www.mudhc.edu.et/template-vocabulary	#	True
 OPE	http://www.semanticweb.org/ontologies/2013/2/OPE.owl	#	True
 OPL	OPL	:	True
 OPTION-ONTOLOGY	http://w3id.org/ontoopt	/	True
@@ -395,11 +398,13 @@ PANET	http://purl.org/pan-science/PaNET	/	True
 PATCT	https://pat.nichd.nih.gov/placentalcelltype	/	True
 PATEL	http://www.semanticweb.org/ambrish/ontologies/2020/10/untitled-ontology-24	#	True
 PATGV	https://pat.nichd.nih.gov/patgeneticvariance	/	True
+PATHLEX	http://www.semanticweb.org/david/ontologies/2013/0/pathLex.owl	#	True
 PATIT	https://pat.nichd.nih.gov/patinvestigativetechniques	/	True
 PATMHC	http://pat.nichd.nih.gov/maternalconditions	/	True
 PATO	PATO	:	True
 PATO	http://purl.obolibrary.org/obo/PATO	_	False
 PAV	pav	:	True
+PCALION	http://www.semanticweb.org/ontologies/Prostate_cancer	#	True
 PCO	PCO	:	True
 PDO	http://purl.jp/bio/11/pdo	/	True
 PDON	http://www.semanticweb.org/ontologies/2011/1/Ontology1296772722296.owl	#	True
