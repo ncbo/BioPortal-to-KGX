@@ -25,6 +25,7 @@ AGROCYMAC	http://www.semanticweb.org/yali/ontologies/2019/0/cultivos	#	True
 AGROMOP	http://www.semanticweb.org/vera/ontologies/2020/1/untitled-ontology-5	#	True
 AHOL	http://opendata.inra.fr/AHOL/AHOL	_	True
 AHSO	https://w3id.org/ahso	#	True
+AIRBUS	http://protege.stanford.edu/thesauri/aero	/	True
 AISM	OBO:AISM	_	True
 AMINO-ACID	http://www.co-ode.org/ontologies/amino-acid/2006/05/18/amino-acid.owl	#	True
 AO	http://childhealthservicemodels.eu/asthma	#	True
@@ -43,6 +44,7 @@ BAO	http://www.bioassayontology.org/bao#BAO	_	True
 BCO	BCO	:	True
 BCTT	http://purl.bioontology.org/ontology/BCTT	#	True
 BFO	BFO	:	True
+BFO	http://www.ifomis.org/bfo/1.1/snap	#	False
 BHN	http://chu-rouen.fr/cismef/BHN	#	True
 BIBFRAME	http://id.loc.gov/ontologies/bibframe	/	True
 BIBLIOTEK-O	http://bibliotek-o.org/1.1/ontology	/	True
@@ -62,6 +64,7 @@ BRIDG	http://www.bridgmodel.org/owl	#	True
 BRO	http://bioontology.org/ontologies/BiomedicalResourceOntology.owl	#	True
 BRSO	http://purl.jp/bio/10/brso	/	True
 BRSO	http://purl.org/brso/BiologicalResourceStatus	#	True
+BRSO	http://purl.org/brso/BiologicalResourceType	#	True
 BSAO	OBO:BSA	_	True
 BSPO	BSPO	:	True
 BT	http://purl.org/biotop/biotop.owl	#	True
@@ -95,8 +98,11 @@ COGAT	file:/srv/ncbo/repository/COGAT/8	/	True
 COGPO	http://www.cogpo.org/ontologies/COGPO	_	True
 COGPO	http://www.cogpo.org/ontologies/CogPOver1.owl	#	True
 COGPO	http://www.cogpo.org/ontologies/CogPOver2010.owl#COGPO	_	True
+COID	https://github.com/sap218/coid/blob/master/coid.owl	#	True
 COKPME	http://www.iiitdwd.ac.in/ACB/COKPME	#	True
 COMODI	http://purl.uni-rostock.de/comodi/comodi	#	True
+CPRO	http://purl.org/cpr	/	True
+CRISP	http://purl.bioontology.org/ontology/CSP	/	True
 CRO	CRO	:	True
 CRYOEM	http://scipion.i2pc.es/ontology/CRYOEM	_	True
 CSSO	http://purl.jp/bio/11/csso/CSSO	_	True
@@ -106,13 +112,16 @@ CVAO	http://www.semanticweb.org/ontologies/2015/11/CVAO	#	True
 CVDO	CVDO	:	True
 CWD	http://www.semanticweb.org/jbagwell/ontologies/2017/9/untitled-ontology-6	#	True
 CYTO	http://www.semanticweb.org/demetrios/ontologies/2014/5	/	True
+DATACITE	http://purl.org/spar/datacite	/	True
 DC	dc	:	True
 DC	dcterms	:	True
 DCM	http://dicom.nema.org/resources/ontology/DCM	/	True
 DDANAT	DDANAT	:	True
 DDPHENO	DDPHENO	:	True
 DEB	http://www.semanticweb.org/osnathakimi/ontologies/deb	#	True
+DERMO	OBO:DERMO	_	True
 DFO	https://w3id.org/dfo	/	True
+DIAB	http://purl.bioontology.org/ontology/DIAB	/	True
 DIDEO	DIDEO	:	True
 DIKB	http://purl.org/net/drug-interaction-knowledge-base/DIKB_evidence_ontology.owl	#	True
 DISDRIV	OBO:DISDRIV	_	True
@@ -121,6 +130,7 @@ DLORO	http://www.semanticweb.org/alan/ontologies/2013/8/untitled-ontology-9	#	Tr
 DOCCC	http://www.semanticweb.org/hll/ontologies/2013/8/untitled-ontology-2	#	True
 DOID	DOID	:	True
 DOREMUS-KEYS	http://data.doremus.org/vocabulary/key	/	True
+DRANPTO	http://www.semanticweb.org/zhenyuzhang/ontologies/2019/8/nonpharmacological-intervention-for-agitation-in-dementia-ontology	/	True
 DRON	DRON	:	True
 DRPSNPTO	http://www.semanticweb.org/zhenyuzhang/ontologies/2020/DRPSNPTO	/	True
 DSEO	http://bigdatau.org/dseo	#	True
@@ -193,8 +203,10 @@ GENO	GENO	:	True
 GEO	GEO	:	True
 GEOSPARQL	http://www.opengis.net/ont/geosparql	#	True
 GEOSPECIES	http://rdf.geospecies.org/ont/geospecies.owl	#	True
+GFFO	https://raw.githubusercontent.com/mpievolbio-scicomp/GenomeFeatureFormatOntology/main/gffo	#	True
 GFO	http://www.onto-med.de/ontologies/gfo-basic.owl	#	True
 GFO	http://www.onto-med.de/ontologies/gfo.owl	#	True
+GFVO	https://www.codamono.com/biointerchange/gfvo	#	True
 GLYCO	http://glycomics.ccrc.uga.edu/ontologies/GlycO	#	True
 GLYCOCOO	http://purl.jp/bio/12/glyco	/	True
 GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
@@ -209,7 +221,7 @@ HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	T
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
 HEIO	http://whistl.uwaterloo.ca/heio.owl	#	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
-HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl	#	True
+HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl#HGNC	_	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
 HMIS033B	http://vocab.vodana.org/hmis033b	/	True
 HNS	http://www.humannervousystem.org/KAnOE/2014/dave86	#	True
@@ -238,6 +250,7 @@ IDO	IDO	:	True
 IDOMAL	IDOMAL	:	True
 IMGT-ONTOLOGY	http://www.imgt.org/download/IMGT-ONTOLOGY/IMGT-ONTOLOGY-v1-0-3.owl	#	True
 INBIODIV	http://www.semanticweb.org/mca/ontologies/2018/8/untitled-ontology-47	#	True
+INCENTIVE	http://purl.org/incentive	/	True
 INCENTIVE-VARS	http://purl.org/incentive/variables	/	True
 INFRARISK	https://www.infrarisk-fp7.eu/vocabs/	#	True
 INSECTH	http://neuromorpho.org/ontologies/insectH.owl	#	True
@@ -256,6 +269,7 @@ ISO19115PR	http://www.geosciml.org/vocabularies/iso-19115-codelists.owl	#	True
 ISO19115PR	http://www.geosciml.org/vocabularies/iso-19115-codes.owl	#	True
 ISSVA	http://purl.bioontology.org/ontology/ISSVA	/	True
 ITO	https://identifiers.org/ito	:	True
+IntAct	http://identifiers.org/intact	/	False
 JERM	http://jermontology.org/ontology/JERMOntology	#	True
 KISAO	http://www.biomodels.net/kisao/KISAO	#	True
 KORO	http://www.knowledgegrid.org/koro/1.0.0/koro.owl	#	True
@@ -295,7 +309,8 @@ MI	MI	:	True
 MIAPA	MIAPA	:	True
 MIM	http://purl.bioontology.org/ontology/MIM	#	True
 MIRO	MIRO	:	True
-MIXS	http://gensc.org/ns/mixs	/	True
+MIXS	https://w3id.org/mixs/terms	/	True
+MIXS	https://w3id.org/mixs/vocab	/	True
 MMO	MMO	:	True
 MOC	http://sweet.jpl.nasa.gov/2.3/matrOrganicCompound.owl	#	True
 MODSCI	https://w3id.org/skgo/modsci	#	True
@@ -311,6 +326,7 @@ MSTDE	http://purl.bioontology.org/ontology/MSTDE	/	True
 MSV	http://purl.jp/bio/11/msv	/	True
 NBO	NBO	:	True
 NCBIGene	OBO:NCBIGene	_	False
+NCBIGene	http://identifiers.org/ncbigene	/	False
 NCBITAXON	OBO:NCBITAXON	_	False
 NCBITAXON	http://purl.bioontology.org/ontology/NCBITAXON	/	True
 NCBITAXON	http://www.ncbi.nlm.nih.gov/taxonomy	/	False
@@ -355,6 +371,7 @@ OGSF	OGSF	:	True
 OHD	OHD	:	True
 OHMI	OHMI	:	True
 OM	http://www.ontology-of-units-of-measure.org/resource	/	True
+OMIM	http://identifiers.org/omim	/	False
 OMIM	http://purl.bioontology.org/ontology/OMIM	/	True
 OMIT	OMIT	:	True
 OMP	OMP	:	True
@@ -363,6 +380,7 @@ OMV	http://omv.ontoware.org/2005/05/ontology	#	True
 ONL-DP	http://neurolog.unice.fr/ontoneurolog/v3.0/ontoneurolog-dataset-processing.owl	#	True
 ONL-TASKS	http://www.semanticweb.org/bakaev/ontologies/2020/3/untitled-ontology-25	#	True
 ONLIRA	http://vavlab.ee.boun.edu.tr/carera/onlira.owl	#	True
+ONSTR	http://onstr.googlecode.com/svn/tags/currentRelease/2014-09-03/ONSTR.owl#ONSTR	_	True
 ONTOAD	http://doe-generated-ontology.com/OntoAD	#	True
 ONTODT	http://ontodm.com/OntoDT	#	True
 ONTODT	http://www.ontodm.com/OntoDT	#	True
@@ -375,7 +393,9 @@ ONTOSINASC	http://www.semanticweb.org/DIASUS/OntoSINASC	#	True
 ONTOTOX	http://OntoTox.owl	#	True
 OOEVV	http://bmkeg.isi.edu/ooevv	/	True
 OOSTT	OOSTT	:	True
+OPB	http://bhi.washington.edu/OPB#	#	True
 OPB	http://bhi.washington.edu/OPB#OPB	_	True
+OPDE	http://www.mudhc.edu.et/template-vocabulary	#	True
 OPE	http://www.semanticweb.org/ontologies/2013/2/OPE.owl	#	True
 OPL	OPL	:	True
 OPTION-ONTOLOGY	http://w3id.org/ontoopt	/	True
@@ -389,14 +409,18 @@ PANET	http://purl.org/pan-science/PaNET	/	True
 PATCT	https://pat.nichd.nih.gov/placentalcelltype	/	True
 PATEL	http://www.semanticweb.org/ambrish/ontologies/2020/10/untitled-ontology-24	#	True
 PATGV	https://pat.nichd.nih.gov/patgeneticvariance	/	True
+PATHLEX	http://www.semanticweb.org/david/ontologies/2013/0/pathLex.owl	#	True
 PATIT	https://pat.nichd.nih.gov/patinvestigativetechniques	/	True
 PATMHC	http://pat.nichd.nih.gov/maternalconditions	/	True
 PATO	PATO	:	True
+PATO	http://purl.obolibrary.org/obo/PATO	_	False
 PAV	pav	:	True
+PCALION	http://www.semanticweb.org/ontologies/Prostate_cancer	#	True
 PCO	PCO	:	True
 PDO	http://purl.jp/bio/11/pdo	/	True
 PDON	http://www.semanticweb.org/ontologies/2011/1/Ontology1296772722296.owl	#	True
 PDQ	http://purl.bioontology.org/ontology/PDQ	/	True
+PDRO	OBO:PDRO/PDRO.owl	#	False
 PDRO	PDRO	:	True
 PDUMDV	OBO:PdumDv	_	True
 PE	http://bmi.utah.edu/ontologies/peontology	/	True
@@ -533,6 +557,7 @@ UNITSONT	http://mimi.case.edu/ontologies/2009/1/UnitsOntology	#	True
 UO	UO	:	True
 UPA	OBO:UPa	_	True
 UPHENO	UPHENO	:	True
+UniProtKB	http://bioonto.de/sbml.owl#UniProt	:	False
 VANDF	http://purl.bioontology.org/ontology/VANDF	/	True
 VARIO	OBO:VariO	_	True
 VDOT	http://www.ifomis.org/vdot/vdot_core.owl#vdot	_	True
