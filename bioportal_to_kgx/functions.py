@@ -600,13 +600,16 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         pass
                     
                     # Before writing, remove any redundant types
-                    # and any remaining OntologyClass, unless it's the only type
+                    # and any remaining OntologyClass.
+                    # If OntologyClass is the only type, modify it to
+                    # biolink:NamedThing
                     try:
                         this_type_list = line_split[1].split("|")
                         this_type_list = list(set(this_type_list))
-                        if "biolink:OntologyClass" in this_type_list and \
-                            len(this_type_list) > 1:
+                        if "biolink:OntologyClass" in this_type_list:
                             this_type_list.remove("biolink:OntologyClass")
+                        if len(this_type_list) == 0: # OntologyClass was the last one 
+                            this_type_list.append("biolink:NamedThing")
                         line_split[1] = "|".join(this_type_list)
                     except KeyError:
                         pass
