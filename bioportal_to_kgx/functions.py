@@ -553,6 +553,7 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
     Requires both node and edgelist.
+    This assumes the nodes are all already CURIEs.
     Updates types to be more specific 
     Biolink Model types.
     New types are *appended* to existing types.
@@ -580,17 +581,16 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                 for line in inedgefile:
                     line_split = (line.rstrip()).split("\t")
                     # Check for edges representing node types to be remapped
-                    if line_split[4].endswith("hasSTY"):
-                        node_id = ":".join(((line_split[1]).rsplit("/",2))[-2:])
-                        type_id = ":".join(((line_split[3]).rsplit("/",2))[-2:])
+                    if line_split[5].endswith("hasSTY"):
+                        node_id = line_split[1]
+                        type_id = line_split[3]
                         remap_these_nodes[node_id] = type_id
                     outedgefile.write("\t".join(line_split) + "\n")
                 for line in innodefile:
                     line_split = (line.rstrip()).split("\t")
                     try:
-                        node_id = ":".join(((line_split[0]).rsplit("/",2))[-2:])
-                        # Check if the node id is a type we recognize
-                        # e.g., the IRI is 'http://purl.bioontology.org/ontology/STY/T120'
+                        node_id = line_split[0]
+                        # Check if the node id is already a semantic type
                         if node_id in type_map:
                             line_split[1] = line_split[1] + "|" + type_map[node_id]
                         # Check if we saw a type assignment among the edges already
@@ -600,13 +600,16 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         pass
                     
                     # Before writing, remove any redundant types
-                    # and OntologyClass, unless it's the only type
+                    # and any remaining OntologyClass.
+                    # If OntologyClass is the only type, modify it to
+                    # biolink:NamedThing
                     try:
                         this_type_list = line_split[1].split("|")
                         this_type_list = list(set(this_type_list))
-                        if "biolink:OntologyClass" in this_type_list and \
-                            len(this_type_list) > 1:
+                        if "biolink:OntologyClass" in this_type_list:
                             this_type_list.remove("biolink:OntologyClass")
+                        if len(this_type_list) == 0: # OntologyClass was the last one 
+                            this_type_list.append("biolink:NamedThing")
                         line_split[1] = "|".join(this_type_list)
                     except KeyError:
                         pass
