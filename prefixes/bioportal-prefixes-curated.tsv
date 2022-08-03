@@ -211,6 +211,7 @@ GLYCO	http://glycomics.ccrc.uga.edu/ontologies/GlycO	#	True
 GLYCOCOO	http://purl.jp/bio/12/glyco	/	True
 GML	http://loki.cae.drexel.edu/~wbs/ontology/2004/09/ogc-gml	#	True
 GML	http://www.opengis.net/ont/gml	#	False
+GNO	OBO:GNO	_	True
 GO	GO	:	True
 GO	http://purl.org/obo/owl/GO#GO	_	False
 GO	http://www.informatics.jax.org/vocab/gene_ontology/GO	:	False
@@ -221,6 +222,7 @@ HCDR	http://www.semanticweb.org/m14067/ontologies/2020/0/untitled-ontology-5	#	T
 HCPCS	http://purl.bioontology.org/ontology/HCPCS	/	True
 HEIO	http://whistl.uwaterloo.ca/heio.owl	#	True
 HFO	http://bmi.utah.edu/ontologies/hfontology	/	True
+HGNC	OBO:HGNC	_	False
 HGNC	http://ncicb.nci.nih.gov/xml/owl/EVS/Hugo.owl#HGNC	_	True
 HL7	http://purl.bioontology.org/ontology/HL7	/	True
 HMIS033B	http://vocab.vodana.org/hmis033b	/	True
@@ -309,6 +311,7 @@ MI	MI	:	True
 MIAPA	MIAPA	:	True
 MIM	http://purl.bioontology.org/ontology/MIM	#	True
 MIRO	MIRO	:	True
+MIRO	OBO:miro	#	False
 MIXS	https://w3id.org/mixs/terms	/	True
 MIXS	https://w3id.org/mixs/vocab	/	True
 MMO	MMO	:	True
@@ -357,6 +360,7 @@ OBCS	OBCS	:	True
 OBI	OBI	:	True
 OBIB	OBIB	:	True
 OBOE	http://ecoinformatics.org/oboe/oboe.1.2	/	True
+OBOREL	OBO:OBO_REL#	_	False
 OBOREL	http://www.obofoundry.org/ro/ro.owl	#	False
 OBS	http://www.semanticweb.org/bito2/ontologies/2021/3/untitled-ontology-11	#	True
 OCIMIDO	https://github.com/sap218/ocimido/blob/master/ontology/ocimido.owl	#	True
@@ -592,3 +596,9 @@ ZONMW-ADMIN-MD	http://www.fair-data-collective.com/zonmw/projectadmin	/	True
 ZONMW-CONTENT	http://purl.org/zonmw/covid19	/	True
 ZONMW-GENERIC	http://purl.org/zonmw/generic	/	True
 ZP	ZP	:	True
+araport	OBO:Araport	_	False
+dictybase	OBO:dictyBase#	_	False
+ensembl.bacteria	OBO:EnsemblBacteria#	_	False
+pombase	OBO:PomBase	_	False
+wormbase	OBO:WormBase	_	False
+zfin	OBO:ZFIN	_	False
