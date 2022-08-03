@@ -451,6 +451,7 @@ PO	PO	:	True
 PORO	PORO	:	True
 PP	https://bitbucket.org/PlantExpAssay/ontology/raw/v0.1/PipelinePatterns.owl	#	True
 PPO	PPO	:	True
+PR	OBO:pr	#	True
 PR	PR	:	True
 PREGONTO	http://www.clininf.eu/pregnancy	#	True
 PREO	http://presence-ontology.org/ontology/	/	True
@@ -597,8 +598,14 @@ ZONMW-CONTENT	http://purl.org/zonmw/covid19	/	True
 ZONMW-GENERIC	http://purl.org/zonmw/generic	/	True
 ZP	ZP	:	True
 araport	OBO:Araport	_	False
+cgnc	OBO:CGNC	_	False
 dictybase	OBO:dictyBase#	_	False
+ecogene	OBO:EcoGene	_	False
 ensembl.bacteria	OBO:EnsemblBacteria#	_	False
+flybase	OBO:FlyBase	_	False
+mgi	OBO:MGI	_	False
 pombase	OBO:PomBase	_	False
+rgd	OBO:RGD	_	False
+sgd	OBO:SGD	_	False
 wormbase	OBO:WormBase	_	False
 zfin	OBO:ZFIN	_	False
