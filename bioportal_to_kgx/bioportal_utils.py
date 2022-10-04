@@ -63,7 +63,8 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     if len(missing_pages) == 0:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
     else:
-        print(f"Tried metadata retrieval for {ontoid}, but failed on {missing_pages}")
+        print(f"Tried metadata retrieval for {ontoid}, "
+              f"but failed on {missing_pages}")
         md["name"] = ""
 
     return md
@@ -117,7 +118,7 @@ def manually_add_md(filepath: str, md: str) -> bool:
                 for line in infile:
                     line_split = (line.rstrip()).split("\t")
                     for heading in MD_HEADINGS:
-                        line_split.append(md[MD_HEADINGS[heading]])  # type: ignore
+                        line_split.append(md[MD_HEADINGS[heading]])
                     outfile.write("\t".join(line_split) + "\n")
         os.replace(out_filepath, filepath)
         success = True

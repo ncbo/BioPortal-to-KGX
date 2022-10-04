@@ -12,17 +12,10 @@ import pandas as pd  # type: ignore
 from sssom.parsers import read_sssom_table  # type: ignore
 
 from bioportal_to_kgx.bioportal_utils import (  # type: ignore
-    bioportal_metadata,
-    check_header_for_md,
-    manually_add_md,
-)
-from bioportal_to_kgx.robot_utils import (  # type: ignore
-    initialize_robot,
-    relax_ontology,
-    robot_measure,
-    robot_remove,
-    robot_report,
-)
+    bioportal_metadata, check_header_for_md, manually_add_md)
+from bioportal_to_kgx.robot_utils import (initialize_robot,  # type: ignore
+                                          relax_ontology, robot_measure,
+                                          robot_remove, robot_report)
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -63,7 +56,8 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
 
     # Find all files, not including lone directory names
     for filepath in glob.iglob(input + "**/**", recursive=True):
-        if len(os.path.basename(filepath)) == 28 and filepath not in data_filepaths:
+        if len(os.path.basename(filepath)) == 28 \
+                and filepath not in data_filepaths:
             if including and os.path.basename(filepath) not in include_only:
                 continue
             if excluding and os.path.basename(filepath) in exclude:
@@ -124,13 +118,13 @@ def do_transforms(
 
     # If planning to do maps, load them first
     if remap_types:
-        # TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
         print(f"Loading type maps from {MAPPING_DIR}/")
         type_map = {}  # type: ignore
         all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
             if filepath.endswith("sssom.tsv"):
-                this_table = read_sssom_table(os.path.join(MAPPING_DIR, filepath))
+                this_table = \
+                    read_sssom_table(os.path.join(MAPPING_DIR, filepath))
                 all_map_paths.append(this_table)
         # Convert the SSSOM maps to a dict of originaltype:newtype
         for msdf in all_map_paths:
@@ -160,17 +154,23 @@ def do_transforms(
                 delim = splitline[2]
                 native = splitline[3]
                 if ontoid in prefix_map:
-                    prefix_map[ontoid]["prefixes"].append([prefix, delim, native])
+                    prefix_map[ontoid]["prefixes"].append([prefix,
+                                                           delim,
+                                                           native])
                 else:
-                    prefix_map[ontoid] = {"prefixes": [[prefix, delim, native]]}
-        with open(os.path.join(PREFIX_DIR, PREF_PREFIX_FILENAME)) as prefix_file:
+                    prefix_map[ontoid] = {"prefixes": [[prefix,
+                                                        delim,
+                                                        native]]}
+        with open(os.path.join(PREFIX_DIR, PREF_PREFIX_FILENAME)) \
+                as prefix_file:
             prefix_file.readline()  # Skip header
             for line in prefix_file:
                 splitline = (line.rstrip()).split("\t")
                 pref_prefix_map[splitline[0]] = splitline[1]
 
         print(f"Loaded prefixes for {len(prefix_map)} ontologies.")
-        print(f"Loaded preferred prefixes for {len(pref_prefix_map)} ontologies.")
+        print("Loaded preferred prefixes for "
+              f"{len(pref_prefix_map)} ontologies.")
 
     print("Transforming all...")
 
@@ -207,7 +207,8 @@ def do_transforms(
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
-                if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
+                if filename.endswith("nodes.tsv") \
+                        or filename.endswith("edges.tsv"):
                     tx_filecount = tx_filecount + 1
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
@@ -229,13 +230,18 @@ def do_transforms(
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
-                print(f"ROBOT reports not found for {outname} - will generate.")
+                print(f"ROBOT reports not found for {outname} "
+                      "- will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
-            if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
-                print(f"KGX validation log not found for {outname} - will validate.")
+            if kgx_validate \
+                    and not have_kgx_validation_log \
+                    and tx_filecount > 0:
+                print(f"KGX validation log not found for {outname} "
+                      "- will validate.")
                 kgx_validate_transform(outdir)
             if get_bioportal_metadata and not have_bioportal_metadata:
-                print(f"BioPortal metadata not found for {outname} - will retrieve.")
+                print(f"BioPortal metadata not found for {outname} "
+                      "- will retrieve.")
                 onto_md = bioportal_metadata(dataname, ncbo_key)
                 # If we fail to retrieve metadata, onto_md['name'] == None
                 # Add metadata to existing transforms - just the edges for now
@@ -246,18 +252,24 @@ def do_transforms(
                     for filename in filelist:
                         if filename.endswith("edges.tsv"):
                             print(f"Adding metadata to {outname}...")
-                            if manually_add_md(os.path.join(outdir, filename), onto_md):
+                            if manually_add_md(os.path.join(outdir, filename),
+                                               onto_md):
                                 print("Complete.")
                             else:
-                                print("Something went wrong during metadata writing.")
+                                print("Something went wrong during "
+                                      "metadata writing.")
             # If writing CURIEs is requested, do it now
             if write_curies and tx_filecount > 0:
                 print(f"Will write new CURIEs for nodes in {outname}.")
-                if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
+                if not update_nodes("curies",
+                                    outdir,
+                                    prefix_map,
+                                    pref_prefix_map):
                     print(f"CURIE writing did not complete for {outname}.")
             # If remapping to Biolink is requested, do it now
             if remap_types and tx_filecount > 0:
-                print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                print(f"Will remap node/edge types in {outname} "
+                      "to Biolink Model.")
                 if not update_nodes("types", outdir, type_map):
                     print(f"Type mapping did not complete for {outname}.")
 
@@ -265,7 +277,8 @@ def do_transforms(
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
             # So we write a placeholder if needed
-            with tempfile.NamedTemporaryFile(mode="w", delete=False) as tempout:
+            with tempfile.NamedTemporaryFile(mode="w", delete=False) \
+                    as tempout:
                 linecount = 0
                 for line in infile:
                     tempout.write(line)
@@ -275,6 +288,7 @@ def do_transforms(
             if linecount == 0:
                 print(f"File for {outname} is empty! Writing placeholder.")
                 with open(outpath, "w") as outfile:
+                    outfile.write("")
                     pass
                 txs_complete[outname] = False
                 continue
@@ -282,23 +296,34 @@ def do_transforms(
             if ok_to_transform:
 
                 print(f"ROBOT: relax {outname}")
-                relaxed_outpath = os.path.join(outdir, outname + "_relaxed.json")
-                if relax_ontology(robot_path, tempname, relaxed_outpath, robot_env):
+                relaxed_outpath = os.path.join(outdir,
+                                               outname + "_relaxed.json")
+                if relax_ontology(robot_path,
+                                  tempname,
+                                  relaxed_outpath,
+                                  robot_env):
                     txs_complete[outname] = True
                 else:
-                    print(f"Encountered error during robot relax of {outname}.")
+                    print("Encountered error during "
+                          f"robot relax of {outname}.")
 
                     # We can try to fix it -
                     # this is usually a null value in a comment.
                     print("Will attempt to repair file and try again.")
-                    repaired_outpath = remove_comments(tempname, robot_path, robot_env)
+                    repaired_outpath = remove_comments(tempname,
+                                                       robot_path,
+                                                       robot_env)
                     if relax_ontology(
-                        robot_path, repaired_outpath, relaxed_outpath, robot_env
+                        robot_path,
+                        repaired_outpath,
+                        relaxed_outpath,
+                        robot_env
                     ):
                         txs_complete[outname] = True
                     else:
                         print(
-                            f"Encountered unresolvable error during robot relax of {outname}."
+                            "Encountered unresolvable error during "
+                            f"robot relax of {outname}."
                         )
                         print("Will skip.")
                         txs_complete[outname] = False
@@ -307,7 +332,10 @@ def do_transforms(
 
                 if robot_validate and txs_complete[outname]:
                     print("Generating ROBOT reports...")
-                    if not get_robot_reports(filepath, outdir, robot_path, robot_env):
+                    if not get_robot_reports(filepath,
+                                             outdir,
+                                             robot_path,
+                                             robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
                 if (
@@ -329,13 +357,16 @@ def do_transforms(
                         output_format="tsv",
                         stream=True,
                         knowledge_sources=[
-                            ("aggregator_knowledge_source", "BioPortal"),
-                            ("primary_knowledge_source", primary_knowledge_source),
+                            ("aggregator_knowledge_source",
+                                "BioPortal"),
+                            ("primary_knowledge_source",
+                                primary_knowledge_source),
                         ],
                     )
                     txs_complete[outname] = True
                 except ValueError as e:
-                    print(f"Encountered error during KGX transform of {outname}: {e}")
+                    print("Encountered error during "
+                          f"KGX transform of {outname}: {e}")
 
                     # We can try to fix it - this is usually a malformed CURIE
                     # (or something that looks like a CURIE)
@@ -349,15 +380,16 @@ def do_transforms(
                             output_format="tsv",
                             stream=True,
                             knowledge_sources=[
-                                ("aggregator_knowledge_source", "BioPortal"),
-                                ("primary_knowledge_source", primary_knowledge_source),
+                                ("aggregator_knowledge_source",
+                                    "BioPortal"),
+                                ("primary_knowledge_source",
+                                    primary_knowledge_source),
                             ],
                         )
                         txs_complete[outname] = True
                     except ValueError as e:
-                        print(
-                            f"Encountered error during KGX transform of {outname}: {e}"
-                        )
+                        print("Encountered error during "
+                              f"KGX transform of {outname}: {e}")
 
                 # Validation
                 if kgx_validate and txs_complete[outname]:
@@ -370,14 +402,18 @@ def do_transforms(
                 # Writing CURIEs
                 if write_curies and txs_complete[outname]:
                     print(f"Will write new CURIEs for nodes in {outname}.")
-                    if not update_nodes("curies", outdir, prefix_map, pref_prefix_map):
+                    if not update_nodes("curies",
+                                        outdir,
+                                        prefix_map,
+                                        pref_prefix_map):
                         print(f"CURIE writing did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
 
                 # Remapping to Biolink
                 if remap_types and txs_complete[outname]:
-                    print(f"Will remap node/edge types in {outname} to Biolink Model.")
+                    print("Will remap node/edge types in "
+                          f" {outname} to Biolink Model.")
                     if not update_nodes("types", outdir, type_map):
                         print(f"Type mapping did not complete for {outname}.")
                         txs_complete[outname] = False
@@ -581,7 +617,8 @@ def update_nodes(
         if operation == "curies":
             ontoid = os.path.basename(in_path)
             if ontoid not in operation_map:
-                print(f"Don't know native prefixes for {ontoid} - will search others.")
+                print(f"Don't know native prefixes for {ontoid} "
+                      "- will search others.")
             if not write_curies(filepaths, ontoid, operation_map, extra_map):
                 success = False
         elif operation == "types":
@@ -617,7 +654,8 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     remap_these_nodes = {}
 
     try:
-        with open(nodepath, "r") as innodefile, open(edgepath, "r") as inedgefile:
+        with open(nodepath, "r") as innodefile, \
+                open(edgepath, "r") as inedgefile:
             with open(outnodepath, "w") as outnodefile, open(
                 outedgepath, "w"
             ) as outedgefile:
@@ -635,8 +673,10 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         node_id = line_split[0]
                         # Check if the node id is already a semantic type
                         if node_id in type_map:
-                            line_split[1] = line_split[1] + "|" + type_map[node_id]
-                        # Check if we saw a type assignment among the edges already
+                            line_split[1] = line_split[1] + \
+                                "|" + type_map[node_id]
+                        # Check if we saw a type assignment
+                        # among the edges already
                         if node_id in remap_these_nodes:
                             line_split[1] = (
                                 line_split[1]
@@ -655,7 +695,8 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         this_type_list = list(set(this_type_list))
                         if "biolink:OntologyClass" in this_type_list:
                             this_type_list.remove("biolink:OntologyClass")
-                        if len(this_type_list) == 0:  # OntologyClass was the last one
+                        if len(this_type_list) == 0:
+                            # OntologyClass was the last one
                             this_type_list.append("biolink:NamedThing")
                         line_split[1] = "|".join(this_type_list)
                     except KeyError:
@@ -667,7 +708,8 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
         os.replace(outedgepath, edgepath)
         success = True
     except (IOError, KeyError) as e:
-        print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
+        print(f"Failed to remap node/edge types for "
+              f"{nodepath} and/or {edgepath}: {e}")
         success = False
 
     return success
@@ -699,7 +741,8 @@ def write_curies(
     update_these_nodes = {}
 
     try:
-        with open(nodepath, "r") as innodefile, open(edgepath, "r") as inedgefile:
+        with open(nodepath, "r") as innodefile, \
+                open(edgepath, "r") as inedgefile:
             with open(outnodepath, "w") as outnodefile, open(
                 outedgepath, "w"
             ) as outedgefile:
@@ -729,9 +772,11 @@ def write_curies(
                                 if node_iri.startswith(prefix[0]):
                                     split_iri = node_iri.rsplit(prefix[1], 1)
                                     if prefix_set in pref_prefix_map:
-                                        prefix_set = pref_prefix_map[prefix_set]
+                                        prefix_set = \
+                                            pref_prefix_map[prefix_set]
                                     if len(split_iri) == 2:
-                                        new_curie = f"{prefix_set}:{split_iri[1]}"
+                                        new_curie = \
+                                            f"{prefix_set}:{split_iri[1]}"
                                     else:
                                         new_curie = f"{prefix_set}:"
                                     line_split[0] = new_curie
