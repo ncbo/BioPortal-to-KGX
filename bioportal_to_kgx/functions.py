@@ -1,19 +1,28 @@
 # functions.py
 
-import os
-import sys
 import glob
-import tempfile
+import os
 import re
+import sys
+import tempfile
 from json import dump as json_dump
 
-import kgx.cli # type: ignore
-import pandas as pd # type: ignore
-from sssom.parsers import read_sssom_table # type: ignore
-from sssom.util import MappingSetDataFrame # type: ignore
+import kgx.cli  # type: ignore
+import pandas as pd  # type: ignore
+from sssom.parsers import read_sssom_table  # type: ignore
 
-from bioportal_to_kgx.robot_utils import initialize_robot, relax_ontology, robot_remove, robot_report, robot_measure  # type: ignore
-from bioportal_to_kgx.bioportal_utils import bioportal_metadata, check_header_for_md, manually_add_md # type: ignore
+from bioportal_to_kgx.bioportal_utils import (  # type: ignore
+    bioportal_metadata,
+    check_header_for_md,
+    manually_add_md,
+)
+from bioportal_to_kgx.robot_utils import (  # type: ignore
+    initialize_robot,
+    relax_ontology,
+    robot_measure,
+    robot_remove,
+    robot_report,
+)
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -22,6 +31,7 @@ MAPPING_DIR = "mappings"
 PREFIX_DIR = "prefixes"
 PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
 PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
+
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
@@ -45,37 +55,39 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     if len(include_only) > 0:
         print(f"Will only include the specified {len(include_only)} file(s).")
         including = True
-    
+
     excluding = False
     if len(exclude) > 0:
         print(f"Will exclude the specified {len(exclude)} file(s).")
         excluding = True
 
     # Find all files, not including lone directory names
-    for filepath in glob.iglob(input + '**/**', recursive=True):
-        if len(os.path.basename(filepath)) == 28 and \
-            filepath not in data_filepaths:
+    for filepath in glob.iglob(input + "**/**", recursive=True):
+        if len(os.path.basename(filepath)) == 28 and filepath not in data_filepaths:
             if including and os.path.basename(filepath) not in include_only:
                 continue
             if excluding and os.path.basename(filepath) in exclude:
                 continue
             data_filepaths.append(filepath)
-    
+
     if len(data_filepaths) > 0:
         print(f"{len(data_filepaths)} files found.")
     else:
         sys.exit("No files found at this path!")
-    
+
     return data_filepaths
 
-def do_transforms(paths: list,
-                    kgx_validate: bool, 
-                    robot_validate: bool,
-                    pandas_validate: bool,
-                    get_bioportal_metadata: bool, 
-                    ncbo_key: str,
-                    remap_types: bool,
-                    write_curies: bool) -> dict:
+
+def do_transforms(
+    paths: list,
+    kgx_validate: bool,
+    robot_validate: bool,
+    pandas_validate: bool,
+    get_bioportal_metadata: bool,
+    ncbo_key: str,
+    remap_types: bool,
+    write_curies: bool,
+) -> dict:
     """
     Given a list of file paths,
     first does pre-processing with ROBOT
@@ -101,7 +113,7 @@ def do_transforms(paths: list,
         os.mkdir(TXDIR)
 
     print("Setting up ROBOT...")
-    robot_path = os.path.join(os.getcwd(),"robot")
+    robot_path = os.path.join(os.getcwd(), "robot")
     robot_params = initialize_robot(robot_path)
     print(f"ROBOT path: {robot_path}")
     robot_env = robot_params[1]
@@ -112,13 +124,13 @@ def do_transforms(paths: list,
 
     # If planning to do maps, load them first
     if remap_types:
-        #TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
+        # TODO: instead of making a dict, merge SSSOMs with sssom.util.merge_msdf
         print(f"Loading type maps from {MAPPING_DIR}/")
-        type_map = {} # type: ignore
+        type_map = {}  # type: ignore
         all_map_paths = []
         for filepath in os.listdir(MAPPING_DIR):
             if filepath.endswith("sssom.tsv"):
-                this_table = read_sssom_table(os.path.join(MAPPING_DIR,filepath))
+                this_table = read_sssom_table(os.path.join(MAPPING_DIR, filepath))
                 all_map_paths.append(this_table)
         # Convert the SSSOM maps to a dict of originaltype:newtype
         for msdf in all_map_paths:
@@ -126,9 +138,9 @@ def do_transforms(paths: list,
                 subj = None
                 obj = None
                 for k, v in row.iteritems():
-                    if k == 'subject_id':
+                    if k == "subject_id":
                         subj = v
-                    if k == 'object_id':
+                    if k == "object_id":
                         obj = v
                     if subj and obj:
                         type_map[subj] = obj
@@ -137,10 +149,10 @@ def do_transforms(paths: list,
     # If planning to write new CURIEs, need to load prefixes first
     if write_curies:
         print(f"Loading prefix maps from {PREFIX_DIR}/")
-        prefix_map = {} # type: ignore
-        pref_prefix_map = {} # type: ignore
-        with open(os.path.join(PREFIX_DIR,PREFIX_FILENAME)) as prefix_file:
-            prefix_file.readline() # Skip header
+        prefix_map = {}  # type: ignore
+        pref_prefix_map = {}  # type: ignore
+        with open(os.path.join(PREFIX_DIR, PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline()  # Skip header
             for line in prefix_file:
                 splitline = (line.rstrip()).split("\t")
                 ontoid = splitline[0]
@@ -150,16 +162,15 @@ def do_transforms(paths: list,
                 if ontoid in prefix_map:
                     prefix_map[ontoid]["prefixes"].append([prefix, delim, native])
                 else:
-                    prefix_map[ontoid] = {"prefixes":[[prefix, delim, native]]}
-        with open(os.path.join(PREFIX_DIR,PREF_PREFIX_FILENAME)) as prefix_file:
-            prefix_file.readline() # Skip header
+                    prefix_map[ontoid] = {"prefixes": [[prefix, delim, native]]}
+        with open(os.path.join(PREFIX_DIR, PREF_PREFIX_FILENAME)) as prefix_file:
+            prefix_file.readline()  # Skip header
             for line in prefix_file:
                 splitline = (line.rstrip()).split("\t")
                 pref_prefix_map[splitline[0]] = splitline[1]
 
         print(f"Loaded prefixes for {len(prefix_map)} ontologies.")
         print(f"Loaded preferred prefixes for {len(pref_prefix_map)} ontologies.")
-        
 
     print("Transforming all...")
 
@@ -167,25 +178,25 @@ def do_transforms(paths: list,
         print(f"Starting on {filepath}")
         with open(filepath) as infile:
             header = (infile.readline()).rstrip()
-            try:    # Throws IndexError if input header is malformed
+            try:  # Throws IndexError if input header is malformed
                 metadata = (header.split(NAMESPACE))[1]
             except IndexError:
                 print(f"Header of {filepath} looks wrong...will skip.")
                 continue
-            metadata = metadata.lstrip('/')
-            metadata_split = (metadata.split("/"))
+            metadata = metadata.lstrip("/")
+            metadata_split = metadata.split("/")
             if metadata_split[0] == TARGET_TYPE:
                 dataname = metadata_split[1]
                 version = metadata_split[3]
                 outname = f"{dataname}_{version}"
-                outdir = os.path.join(TXDIR,"/".join(metadata_split[0:2]))
-                outpath = os.path.join(outdir,outname)
+                outdir = os.path.join(TXDIR, "/".join(metadata_split[0:2]))
+                outpath = os.path.join(outdir, outname)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
                 ok_to_transform = True
             else:
                 continue
-            
+
             # Check if the outdir already contains transforms
             # or if it contains a logfile - if not,
             # and the validate flag is True,
@@ -196,19 +207,19 @@ def do_transforms(paths: list,
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
-                if (filename.endswith("nodes.tsv") or filename.endswith("edges.tsv")):
+                if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
                     tx_filecount = tx_filecount + 1
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
                         ok_to_transform = False
                         txs_complete[outname] = True
                     # Check to see if metadata properties are in the header
-                    if check_header_for_md(os.path.join(outdir,filename)):
-                        print(f"BioPortal metadata present.")
+                    if check_header_for_md(os.path.join(outdir, filename)):
+                        print("BioPortal metadata present.")
                         have_bioportal_metadata = True
                 if filename.endswith(".report"):
                     print(f"ROBOT report(s) present: {filename}")
-                    have_robot_report = True 
+                    have_robot_report = True
                 if filename.endswith(".log"):
                     print(f"KGX validation log present: {filename}")
                     have_kgx_validation_log = True
@@ -229,11 +240,13 @@ def do_transforms(paths: list,
                 # If we fail to retrieve metadata, onto_md['name'] == None
                 # Add metadata to existing transforms - just the edges for now
                 # If we don't have transforms yet, metadata will be added below
-                if onto_md['name'] != '': # This will be empty string if metadata retrieval failed
+                if (
+                    onto_md["name"] != ""
+                ):  # This will be empty string if metadata retrieval failed
                     for filename in filelist:
                         if filename.endswith("edges.tsv"):
                             print(f"Adding metadata to {outname}...")
-                            if manually_add_md(os.path.join(outdir,filename), onto_md):
+                            if manually_add_md(os.path.join(outdir, filename), onto_md):
                                 print("Complete.")
                             else:
                                 print("Something went wrong during metadata writing.")
@@ -252,16 +265,16 @@ def do_transforms(paths: list,
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
             # So we write a placeholder if needed
-            with tempfile.NamedTemporaryFile(mode = "w", delete=False) as tempout:
+            with tempfile.NamedTemporaryFile(mode="w", delete=False) as tempout:
                 linecount = 0
                 for line in infile:
                     tempout.write(line)
-                    linecount = linecount +1
+                    linecount = linecount + 1
                 tempname = tempout.name
 
             if linecount == 0:
                 print(f"File for {outname} is empty! Writing placeholder.")
-                with open(outpath, 'w') as outfile:
+                with open(outpath, "w") as outfile:
                     pass
                 txs_complete[outname] = False
                 continue
@@ -269,52 +282,57 @@ def do_transforms(paths: list,
             if ok_to_transform:
 
                 print(f"ROBOT: relax {outname}")
-                relaxed_outpath = os.path.join(outdir,outname+"_relaxed.json")
-                if relax_ontology(robot_path, 
-                                        tempname,
-                                        relaxed_outpath,
-                                        robot_env):
+                relaxed_outpath = os.path.join(outdir, outname + "_relaxed.json")
+                if relax_ontology(robot_path, tempname, relaxed_outpath, robot_env):
                     txs_complete[outname] = True
                 else:
                     print(f"Encountered error during robot relax of {outname}.")
 
-                    # We can try to fix it - 
+                    # We can try to fix it -
                     # this is usually a null value in a comment.
                     print("Will attempt to repair file and try again.")
                     repaired_outpath = remove_comments(tempname, robot_path, robot_env)
-                    if relax_ontology(robot_path, 
-                                        repaired_outpath,
-                                        relaxed_outpath,
-                                        robot_env):
+                    if relax_ontology(
+                        robot_path, repaired_outpath, relaxed_outpath, robot_env
+                    ):
                         txs_complete[outname] = True
                     else:
-                        print(f"Encountered unresolvable error during robot relax of {outname}.")
+                        print(
+                            f"Encountered unresolvable error during robot relax of {outname}."
+                        )
                         print("Will skip.")
                         txs_complete[outname] = False
                         os.remove(tempout.name)
                         continue
-                
+
                 if robot_validate and txs_complete[outname]:
                     print("Generating ROBOT reports...")
                     if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
-                if get_bioportal_metadata and not have_bioportal_metadata \
-                    and onto_md['name']:
-                    primary_knowledge_source = onto_md['name']
+                if (
+                    get_bioportal_metadata
+                    and not have_bioportal_metadata
+                    and onto_md["name"]
+                ):
+                    primary_knowledge_source = onto_md["name"]
                     have_bioportal_metadata = True
                 else:
-                    primary_knowledge_source = 'False'
+                    primary_knowledge_source = "False"
 
                 print(f"KGX transform {outname}")
                 try:
-                    kgx.cli.transform(inputs=[relaxed_outpath],
-                            input_format='obojson',
-                            output=outpath,
-                            output_format='tsv',
-                            stream=True,
-                            knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", primary_knowledge_source)])
+                    kgx.cli.transform(
+                        inputs=[relaxed_outpath],
+                        input_format="obojson",
+                        output=outpath,
+                        output_format="tsv",
+                        stream=True,
+                        knowledge_sources=[
+                            ("aggregator_knowledge_source", "BioPortal"),
+                            ("primary_knowledge_source", primary_knowledge_source),
+                        ],
+                    )
                     txs_complete[outname] = True
                 except ValueError as e:
                     print(f"Encountered error during KGX transform of {outname}: {e}")
@@ -324,16 +342,22 @@ def do_transforms(paths: list,
                     print("Will attempt to repair file and try again.")
                     repaired_outpath = remove_bad_curie(relaxed_outpath)
                     try:
-                        kgx.cli.transform(inputs=[repaired_outpath],
-                            input_format='obojson',
+                        kgx.cli.transform(
+                            inputs=[repaired_outpath],
+                            input_format="obojson",
                             output=outpath,
-                            output_format='tsv',
+                            output_format="tsv",
                             stream=True,
-                            knowledge_sources=[("aggregator_knowledge_source", "BioPortal"),
-                                                ("primary_knowledge_source", primary_knowledge_source)])
+                            knowledge_sources=[
+                                ("aggregator_knowledge_source", "BioPortal"),
+                                ("primary_knowledge_source", primary_knowledge_source),
+                            ],
+                        )
                         txs_complete[outname] = True
                     except ValueError as e:
-                        print(f"Encountered error during KGX transform of {outname}: {e}")
+                        print(
+                            f"Encountered error during KGX transform of {outname}: {e}"
+                        )
 
                 # Validation
                 if kgx_validate and txs_complete[outname]:
@@ -358,7 +382,7 @@ def do_transforms(paths: list,
                         print(f"Type mapping did not complete for {outname}.")
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
-                
+
                 # One last mandatory validation step - can pandas load it?
                 print("Validating graph files with pandas...")
                 if not pandas_validate_transform(outdir):
@@ -376,6 +400,7 @@ def do_transforms(paths: list,
     # TODO: clean up all remaining placeholders
     return txs_complete
 
+
 def pandas_validate_transform(in_path: str) -> bool:
     """
     Validates transforms by parsing them
@@ -388,8 +413,8 @@ def pandas_validate_transform(in_path: str) -> bool:
 
     tx_filepaths = []
     for filepath in os.listdir(in_path):
-        if filepath.endswith('.tsv'):
-            tx_filepaths.append(os.path.join(in_path,filepath))
+        if filepath.endswith(".tsv"):
+            tx_filepaths.append(os.path.join(in_path, filepath))
 
     if len(tx_filepaths) == 0:
         print(f"Could not find graph files in {in_path}.")
@@ -404,24 +429,27 @@ def pandas_validate_transform(in_path: str) -> bool:
                 keep_default_na=False,
                 quoting=3,
                 lineterminator="\n",
-                delimiter="\t")
+                delimiter="\t",
+            )
             for chunk in file_iter:
-                pass    #Just making sure it loads
+                pass  # Just making sure it loads
         print(f"Graph file {filepath} parses OK.")
         success = True
     except (pd.errors.ParserError, pd.errors.EmptyDataError) as e:
         print(f"Encountered parsing error in {filepath}: {e}")
         success = False
-    
+
     return success
 
 
-def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_env: dict) -> bool:
+def get_robot_reports(
+    filepath: str, outpath_dir: str, robot_path: str, robot_env: dict
+) -> bool:
     """
     Given the path to an obojson file,
     run both the ROBOT 'report' and 'measure'
     commands.
-    Saves both to the same directory as 
+    Saves both to the same directory as
     the input ontology.
     Runs a convert command first to ensure
     ROBOT can parse the input.
@@ -438,29 +466,34 @@ def get_robot_reports(filepath: str, outpath_dir: str, robot_path: str, robot_en
 
     success = True
 
-    report_path = os.path.join(outpath_dir,"robot.report") 
-    measure_path = os.path.join(outpath_dir,"robot.measure")
+    report_path = os.path.join(outpath_dir, "robot.report")
+    measure_path = os.path.join(outpath_dir, "robot.measure")
 
     # Will state 'Report failed!' if any errors present
-    if not robot_report(robot_path=robot_path, 
-                input_path=filepath, 
-                output_path=report_path, 
-                robot_env=robot_env):
-                success = False 
-    
-    if not robot_measure(robot_path=robot_path, 
-                input_path=filepath, 
-                output_path=measure_path, 
-                robot_env=robot_env):
-                success = False
+    if not robot_report(
+        robot_path=robot_path,
+        input_path=filepath,
+        output_path=report_path,
+        robot_env=robot_env,
+    ):
+        success = False
+
+    if not robot_measure(
+        robot_path=robot_path,
+        input_path=filepath,
+        output_path=measure_path,
+        robot_env=robot_env,
+    ):
+        success = False
 
     return success
+
 
 def kgx_validate_transform(in_path: str) -> bool:
     """
     Runs KGX validation on a single set of
     node/edge files, given a input directory
-    containing a transformed ontology. 
+    containing a transformed ontology.
     Writes log to that directory.
     :param in_path: str, path to directory
     :return: True if complete, False otherwise
@@ -471,36 +504,45 @@ def kgx_validate_transform(in_path: str) -> bool:
     # Find node/edgefiles
     # and check if they are empty
     for filepath in os.listdir(in_path):
-        if filepath[-3:] == 'tsv':
-            if not is_file_too_short(os.path.join(in_path,filepath)):
-                tx_filepaths.append(os.path.join(in_path,filepath))
+        if filepath[-3:] == "tsv":
+            if not is_file_too_short(os.path.join(in_path, filepath)):
+                tx_filepaths.append(os.path.join(in_path, filepath))
 
     if len(tx_filepaths) == 0:
         print(f"All transforms in {in_path} are blank or very short.")
         return False
-    
+
     tx_filename = os.path.basename(tx_filepaths[0])
     tx_name = "_".join(tx_filename.split("_", 2)[:2])
-    log_path = os.path.join(in_path,f'kgx_validate_{tx_name}.log')
+    log_path = os.path.join(in_path, f"kgx_validate_{tx_name}.log")
 
     # kgx validate output isn't working for some reason
     # so there are some workarounds here
-    with open(log_path, 'w') as log_file:
+    with open(log_path, "w") as log_file:
         try:
-            json_dump((kgx.cli.validate(inputs=tx_filepaths,
+            json_dump(
+                (
+                    kgx.cli.validate(
+                        inputs=tx_filepaths,
                         input_format="tsv",
                         input_compression=None,
                         stream=True,
-                        output=None)),
-                        log_file,
-                        indent=4)
+                        output=None,
+                    )
+                ),
+                log_file,
+                indent=4,
+            )
             print(f"Wrote validation errors to {log_path}")
             return True
         except TypeError as e:
             print(f"Error while validating {tx_name}: {e}")
             return False
 
-def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: dict={}) -> bool:
+
+def update_nodes(
+    operation: str, in_path: str, operation_map: dict, extra_map: dict = {}
+) -> bool:
     """
     Checks on node and edgefile
     suitability for updating node details.
@@ -517,9 +559,9 @@ def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: d
 
     # Find node/edgefiles
     for filepath in os.listdir(in_path):
-        if filepath[-3:] == 'tsv':
-            if not is_file_too_short(os.path.join(in_path,filepath)):
-                tx_filepaths.append(os.path.join(in_path,filepath))
+        if filepath[-3:] == "tsv":
+            if not is_file_too_short(os.path.join(in_path, filepath)):
+                tx_filepaths.append(os.path.join(in_path, filepath))
 
     if len(tx_filepaths) == 0:
         print(f"No transforms found for {in_path}.")
@@ -534,7 +576,7 @@ def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: d
             filepaths["nodelist"] = filepath
         elif filepath.endswith("_edges.tsv"):
             filepaths["edgelist"] = filepath
-    
+
     if success:
         if operation == "curies":
             ontoid = os.path.basename(in_path)
@@ -548,13 +590,14 @@ def update_nodes(operation: str, in_path: str, operation_map: dict, extra_map: d
 
     return success
 
+
 def append_new_types(filepaths: dict, type_map: dict) -> bool:
     """
     Given a filename for a KGX edge or nodelist,
     update node or edge types.
     Requires both node and edgelist.
     This assumes the nodes are all already CURIEs.
-    Updates types to be more specific 
+    Updates types to be more specific
     Biolink Model types.
     New types are *appended* to existing types.
     :param filepath: str, path to KGX format file
@@ -574,10 +617,10 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
     remap_these_nodes = {}
 
     try:
-        with open(nodepath,'r') as innodefile, \
-            open(edgepath, 'r') as inedgefile:
-            with open(outnodepath,'w') as outnodefile, \
-                open(outedgepath, 'w') as outedgefile:
+        with open(nodepath, "r") as innodefile, open(edgepath, "r") as inedgefile:
+            with open(outnodepath, "w") as outnodefile, open(
+                outedgepath, "w"
+            ) as outedgefile:
                 for line in inedgefile:
                     line_split = (line.rstrip()).split("\t")
                     # Check for edges representing node types to be remapped
@@ -595,10 +638,14 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                             line_split[1] = line_split[1] + "|" + type_map[node_id]
                         # Check if we saw a type assignment among the edges already
                         if node_id in remap_these_nodes:
-                            line_split[1] = line_split[1] + "|" + type_map[remap_these_nodes[node_id]]
+                            line_split[1] = (
+                                line_split[1]
+                                + "|"
+                                + type_map[remap_these_nodes[node_id]]
+                            )
                     except KeyError:
                         pass
-                    
+
                     # Before writing, remove any redundant types
                     # and any remaining OntologyClass.
                     # If OntologyClass is the only type, modify it to
@@ -608,16 +655,16 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                         this_type_list = list(set(this_type_list))
                         if "biolink:OntologyClass" in this_type_list:
                             this_type_list.remove("biolink:OntologyClass")
-                        if len(this_type_list) == 0: # OntologyClass was the last one 
+                        if len(this_type_list) == 0:  # OntologyClass was the last one
                             this_type_list.append("biolink:NamedThing")
                         line_split[1] = "|".join(this_type_list)
                     except KeyError:
                         pass
 
                     outnodefile.write("\t".join(line_split) + "\n")
-                
-        os.replace(outnodepath,nodepath)
-        os.replace(outedgepath,edgepath)
+
+        os.replace(outnodepath, nodepath)
+        os.replace(outedgepath, edgepath)
         success = True
     except (IOError, KeyError) as e:
         print(f"Failed to remap node/edge types for {nodepath} and/or {edgepath}: {e}")
@@ -625,12 +672,15 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
 
     return success
 
-def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map: dict) -> bool:
+
+def write_curies(
+    filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map: dict
+) -> bool:
     """
-    Update node id field in an edgefile 
-    and each corresponding subject/object 
-    node in the corresponding edges 
-    to have a CURIE, where the prefix is 
+    Update node id field in an edgefile
+    and each corresponding subject/object
+    node in the corresponding edges
+    to have a CURIE, where the prefix is
     the ontology ID and the class is
     inferred from the IRI.
     :param in_path: str, path to directory
@@ -649,10 +699,10 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
     update_these_nodes = {}
 
     try:
-        with open(nodepath,'r') as innodefile, \
-            open(edgepath, 'r') as inedgefile:
-            with open(outnodepath,'w') as outnodefile, \
-                open(outedgepath, 'w') as outedgefile:
+        with open(nodepath, "r") as innodefile, open(edgepath, "r") as inedgefile:
+            with open(outnodepath, "w") as outnodefile, open(
+                outedgepath, "w"
+            ) as outedgefile:
                 for line in innodefile:
                     updated_node = False
                     line_split = (line.rstrip()).split("\t")
@@ -660,7 +710,7 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
                     if ontoid in prefix_map:
                         for prefix in prefix_map[ontoid]["prefixes"]:
                             if node_iri.startswith(prefix[0]):
-                                split_iri = node_iri.rsplit(prefix[1],1)
+                                split_iri = node_iri.rsplit(prefix[1], 1)
                                 if ontoid in pref_prefix_map:
                                     ontoid = pref_prefix_map[ontoid]
                                 if len(split_iri) == 2:
@@ -671,13 +721,13 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
                                 update_these_nodes[node_iri] = new_curie
                                 updated_node = True
                                 continue
-                    # If we don't have a native prefix OR this is a foreign prefix
+                    # If we don't have native prefix OR this is foreign prefix
                     # then look at other ontologies
                     if ontoid not in prefix_map or not updated_node:
                         for prefix_set in prefix_map:
                             for prefix in prefix_map[prefix_set]["prefixes"]:
-                                 if node_iri.startswith(prefix[0]):
-                                    split_iri = node_iri.rsplit(prefix[1],1)
+                                if node_iri.startswith(prefix[0]):
+                                    split_iri = node_iri.rsplit(prefix[1], 1)
                                     if prefix_set in pref_prefix_map:
                                         prefix_set = pref_prefix_map[prefix_set]
                                     if len(split_iri) == 2:
@@ -694,11 +744,11 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
                     if line_split[1] in update_these_nodes:
                         line_split[1] = update_these_nodes[line_split[1]]
                     if line_split[3] in update_these_nodes:
-                        line_split[3] = update_these_nodes[line_split[3]]  
+                        line_split[3] = update_these_nodes[line_split[3]]
                     outedgefile.write("\t".join(line_split) + "\n")
-                
-        os.replace(outnodepath,nodepath)
-        os.replace(outedgepath,edgepath)
+
+        os.replace(outnodepath, nodepath)
+        os.replace(outedgepath, edgepath)
         success = True
     except (IOError, KeyError) as e:
         print(f"Failed to write CURIES for {nodepath} and/or {edgepath}: {e}")
@@ -706,24 +756,26 @@ def write_curies(filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map
 
     return success
 
+
 def is_file_too_short(filepath: str) -> bool:
     """
     Checks if a file contains only an empty line
-    or is otherwise very short 
+    or is otherwise very short
     (i.e., it has a non-zero size but is still empty,
     or is only a few lines).
     :param filepath: str, path to file
     :return: bool, True if file is blank or too short
     """
 
-    with open(filepath, 'r') as infile:
+    with open(filepath, "r") as infile:
         for count, line in enumerate(infile):
             pass
-    
+
     if count >= 2:
         return False
     else:
         return True
+
 
 def remove_bad_curie(filepath: str) -> str:
     """
@@ -737,14 +789,15 @@ def remove_bad_curie(filepath: str) -> str:
 
     repaired_filepath = filepath + ".repaired"
 
-    with open(filepath, 'r') as infile:
-        with open(repaired_filepath, 'w') as outfile:
+    with open(filepath, "r") as infile:
+        with open(repaired_filepath, "w") as outfile:
             for line in infile:
-                for pattern in ["file:C:","file:"]:
+                for pattern in ["file:C:", "file:"]:
                     line = re.sub(pattern, "", line)
                 outfile.write(line)
 
     return repaired_filepath
+
 
 def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
     """
@@ -767,10 +820,12 @@ def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
 
     comment_term = "rdfs:comment"
 
-    robot_remove(robot_path=robot_path, 
-                input_path=filepath, 
-                output_path=repaired_filepath, 
-                term=comment_term, 
-                robot_env=robot_env)
+    robot_remove(
+        robot_path=robot_path,
+        input_path=filepath,
+        output_path=repaired_filepath,
+        term=comment_term,
+        robot_env=robot_env,
+    )
 
     return repaired_filepath
