@@ -16,6 +16,7 @@ from bioportal_to_kgx.bioportal_utils import (  # type: ignore
 from bioportal_to_kgx.robot_utils import (initialize_robot,  # type: ignore
                                           relax_ontology, robot_measure,
                                           robot_remove, robot_report)
+from bioportal_to_kgx.stats import make_transform_stats  # type: ignore
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
@@ -67,7 +68,7 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
     if len(data_filepaths) > 0:
         print(f"{len(data_filepaths)} files found.")
     else:
-        sys.exit("No files found at this path!")
+        sys.exit("No files found at this path, or none mapping filters.")
 
     return data_filepaths
 
@@ -115,6 +116,8 @@ def do_transforms(
 
     txs_complete = {}
     txs_invalid = []
+
+    tx_results = []  # A list of dicts
 
     # If planning to do maps, load them first
     if remap_types:
@@ -429,9 +432,22 @@ def do_transforms(
             # Remove the tempfile
             os.remove(tempout.name)
 
+            # Update the results dict
+            if outname not in txs_invalid and txs_complete[outname]:
+                status = "OK"
+            else:
+                status = "FAIL"
+            tx_result = {"id": dataname,
+                         "status": status,
+                         "nodecount": 0,
+                         "edgecount": 0}
+            tx_results.append(tx_result)
+
     # Notify about any invalid transforms (i.e., completed but broken somehow)
     if len(txs_invalid) > 0:
         print(f"The following transforms may have issues:{txs_invalid}")
+
+    make_transform_stats(tx_results, "onto_status.yaml")
 
     # TODO: clean up all remaining placeholders
     return txs_complete
