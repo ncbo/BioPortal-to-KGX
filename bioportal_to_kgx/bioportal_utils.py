@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Functions for interfacing with Bioportal."""
 
 import os
 from typing import List
@@ -16,6 +15,7 @@ MD_HEADINGS = {"primary_knowledge_source": "full_name"}
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     """
     Retrieve metadata for the given ontology.
+
     Note that this requires a NCBO API key,
     to be passed in api_key.
     Returns a dict.
@@ -24,7 +24,6 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     :param outdir: directory to write outfile to
     :param api_key: str, NCBO API key
     """
-
     md = {}
     missing_pages = []  # type: List[str]
 
@@ -72,12 +71,12 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
 
 def check_header_for_md(filepath: str) -> bool:
     """
-    Given a filename for a KGX edge or nodelist,
-    checks for presence of metadata property names.
+    Checks for presence of metadata property names.
+
+    Takes a filename for a KGX edge or nodelist.
     :param filepath: str, path to KGX format file
     :return: bool, True if metadata fields appear present
     """
-
     have_md = False
 
     with open(filepath, "r") as infile:
@@ -92,9 +91,10 @@ def check_header_for_md(filepath: str) -> bool:
 
 def manually_add_md(filepath: str, md: str) -> bool:
     """
-    Given a filename for a KGX edge or nodelist,
-    create a new header slot and add values to
-    each entry.
+    Create a new header slot and add values to node/edgelist.
+
+    Takes a filename for the KGX edge or nodelist,
+    for each entry.
     This only needs to happen if the
     node/edgefile already exists.
     Otherwise the metadata is added at graph
@@ -103,7 +103,6 @@ def manually_add_md(filepath: str, md: str) -> bool:
     :param md: dict, the metadata
     :return: bool, True if successful
     """
-
     success = False
 
     out_filepath = filepath + ".tmp"

@@ -1,4 +1,4 @@
-# functions.py
+"""Main functions for transforming BP to KGX."""
 
 import glob
 import os
@@ -29,14 +29,13 @@ PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
-    Given a path, generates paths for all data files
-    within, recursively.
+    Generates paths for all data files within a path, recursively.
+
     :param input: str for root of data dump
     :param include_only: if non-empty, only return these files
     :param exclude: if non-empty, don't return these files
     :return: list of file paths as strings
     """
-
     data_filepaths = []
 
     # Check if this path exists first.
@@ -84,6 +83,8 @@ def do_transforms(
     write_curies: bool,
 ) -> dict:
     """
+    Do all the transformation operations.
+
     Given a list of file paths,
     first does pre-processing with ROBOT
     (relax only and convert to JSON), then
@@ -103,7 +104,6 @@ def do_transforms(
             with ontology names as keys,
             bools for values with success as True
     """
-
     if not os.path.exists(TXDIR):
         os.mkdir(TXDIR)
 
@@ -458,8 +458,9 @@ def do_transforms(
 
 def pandas_validate_transform(in_path: str) -> tuple:
     """
-    Validates transforms by parsing them
-    with pandas. Will raise a caught error
+    Validate transforms by parsing them with pandas.
+
+    Will raise a caught error
     if there's an issue with format rendering
     the graph files un-parsible.
     Also gets node and edge counts.
@@ -467,7 +468,6 @@ def pandas_validate_transform(in_path: str) -> tuple:
     :return: tuple of (nodecount, edgecount).
     If file is invalid, both values are zero.
     """
-
     tx_filepaths = []
     for filepath in os.listdir(in_path):
         if filepath.endswith(".tsv"):
@@ -511,9 +511,8 @@ def get_robot_reports(
     filepath: str, outpath_dir: str, robot_path: str, robot_env: dict
 ) -> bool:
     """
-    Given the path to an obojson file,
-    run both the ROBOT 'report' and 'measure'
-    commands.
+    Run both the ROBOT 'report' and 'measure' on an obojson.
+
     Saves both to the same directory as
     the input ontology.
     Runs a convert command first to ensure
@@ -528,7 +527,6 @@ def get_robot_reports(
     :param robot_env: ROBOT environment parameters
     :return: True if success
     """
-
     success = True
 
     report_path = os.path.join(outpath_dir, "robot.report")
@@ -556,14 +554,13 @@ def get_robot_reports(
 
 def kgx_validate_transform(in_path: str) -> bool:
     """
-    Runs KGX validation on a single set of
-    node/edge files, given a input directory
-    containing a transformed ontology.
-    Writes log to that directory.
+    Run KGX validation on a single set of node/edge files.
+
+    Takes a input directory containing a transformed
+    ontology. Writes log to that directory.
     :param in_path: str, path to directory
     :return: True if complete, False otherwise
     """
-
     tx_filepaths = []
 
     # Find node/edgefiles
@@ -609,15 +606,14 @@ def update_nodes(
     operation: str, in_path: str, operation_map: dict, extra_map: dict = {}
 ) -> bool:
     """
-    Checks on node and edgefile
-    suitability for updating node details.
+    Check on node and edgefile suitability for updating node details.
+
     :param operation: str, one of "curies" or "types"
     :param in_path: str, path to directory
     :param operation_map: dict of mappings to use
     :param extra_map: additional maps, if needed by further operations
     :return: True if complete, False otherwise
     """
-
     tx_filepaths = []
 
     success = True
@@ -659,8 +655,8 @@ def update_nodes(
 
 def append_new_types(filepaths: dict, type_map: dict) -> bool:
     """
-    Given a filename for a KGX edge or nodelist,
-    update node or edge types.
+    Update node or edge types for a a KGX edge or nodelist.
+
     Requires both node and edgelist.
     This assumes the nodes are all already CURIEs.
     Updates types to be more specific
@@ -671,7 +667,6 @@ def append_new_types(filepaths: dict, type_map: dict) -> bool:
                     and values as type to append
     :return: bool, True if successful
     """
-
     success = False
 
     nodepath = filepaths["nodelist"]
@@ -748,8 +743,10 @@ def write_curies(
     filepaths: dict, ontoid: str, prefix_map: dict, pref_prefix_map: dict
 ) -> bool:
     """
-    Update node id field in an edgefile
-    and each corresponding subject/object
+    Update based on CURIEs.
+
+    Update node id field in an edgefile, and
+    update each corresponding subject/object
     node in the corresponding edges
     to have a CURIE, where the prefix is
     the ontology ID and the class is
@@ -758,7 +755,6 @@ def write_curies(
     :param ontoid: the Bioportal ID of the ontology
     :return: True if complete, False otherwise
     """
-
     success = False
 
     nodepath = filepaths["nodelist"]
@@ -833,14 +829,14 @@ def write_curies(
 
 def is_file_too_short(filepath: str) -> bool:
     """
-    Checks if a file contains only an empty line
-    or is otherwise very short
+    Check if a file contains only an empty line.
+
+    Also check if it's otherwise very short
     (i.e., it has a non-zero size but is still empty,
     or is only a few lines).
     :param filepath: str, path to file
     :return: bool, True if file is blank or too short
     """
-
     with open(filepath, "r") as infile:
         for count, line in enumerate(infile):
             pass
@@ -853,6 +849,8 @@ def is_file_too_short(filepath: str) -> bool:
 
 def remove_bad_curie(filepath: str) -> str:
     """
+    Remove malformed CURIEs.
+
     Given the path to an obojson with a
     CURIE causing KGX to fail transforms,
     remove the offending prefix.
@@ -860,7 +858,6 @@ def remove_bad_curie(filepath: str) -> str:
     :param filepath: str, path to file
     :return: path to repaired file
     """
-
     repaired_filepath = filepath + ".repaired"
 
     with open(filepath, "r") as infile:
@@ -875,6 +872,8 @@ def remove_bad_curie(filepath: str) -> str:
 
 def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
     """
+    Remove comments.
+
     Given the path to an obojson file,
     remove all comment triples.
     They usually have a predicate like
@@ -889,7 +888,6 @@ def remove_comments(filepath: str, robot_path: str, robot_env: dict) -> str:
     :param robot_env: ROBOT environment parameters
     :return: path to repaired file
     """
-
     repaired_filepath = (os.path.splitext(filepath)[0]) + "nocomments.owl"
 
     comment_term = "rdfs:comment"
