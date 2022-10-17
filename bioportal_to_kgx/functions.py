@@ -422,9 +422,12 @@ def do_transforms(
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
 
-                # One last mandatory validation step - can pandas load it?
+            # One last mandatory validation step - can pandas load it?
+            # Also gets node and edge counts in the process.
+            if txs_complete[outname]:
                 print("Validating graph files with pandas...")
-                if not pandas_validate_transform(outdir):
+                nodecount, edgecount = pandas_validate_transform(outdir)
+                if (nodecount, edgecount) == (0, 0):
                     print(f"Validation did not complete for {outname}.")
                     txs_complete[outname] = False
                     txs_invalid.append(outname)
@@ -439,8 +442,8 @@ def do_transforms(
                 status = "FAIL"
             tx_result = {"id": dataname,
                          "status": status,
-                         "nodecount": 0,
-                         "edgecount": 0}
+                         "nodecount": nodecount,
+                         "edgecount": edgecount}
             tx_results.append(tx_result)
 
     # Notify about any invalid transforms (i.e., completed but broken somehow)
@@ -453,14 +456,16 @@ def do_transforms(
     return txs_complete
 
 
-def pandas_validate_transform(in_path: str) -> bool:
+def pandas_validate_transform(in_path: str) -> tuple:
     """
     Validates transforms by parsing them
     with pandas. Will raise a caught error
     if there's an issue with format rendering
     the graph files un-parsible.
+    Also gets node and edge counts.
     :param in_path: str, path to directory
-    :return: True if complete, False otherwise
+    :return: tuple of (nodecount, edgecount).
+    If file is invalid, both values are zero.
     """
 
     tx_filepaths = []
@@ -472,6 +477,7 @@ def pandas_validate_transform(in_path: str) -> bool:
         print(f"Could not find graph files in {in_path}.")
         return False
     try:
+        linecount = 0
         for filepath in tx_filepaths:
             file_iter = pd.read_csv(
                 filepath,
@@ -484,14 +490,21 @@ def pandas_validate_transform(in_path: str) -> bool:
                 delimiter="\t",
             )
             for chunk in file_iter:
-                pass  # Just making sure it loads
-        print(f"Graph file {filepath} parses OK.")
-        success = True
+                linecount = linecount + len(chunk)
+            if filepath.endswith("edges.tsv"):
+                edgecount = linecount
+            if filepath.endswith("nodes.tsv"):
+                nodecount = linecount
+            print(f"Graph file {filepath} parses OK.")
+
     except (pd.errors.ParserError, pd.errors.EmptyDataError) as e:
         print(f"Encountered parsing error in {filepath}: {e}")
-        success = False
+        nodecount = 0
+        edgecount = 0
 
-    return success
+    counts = (nodecount, edgecount)
+
+    return counts
 
 
 def get_robot_reports(
