@@ -12,10 +12,14 @@ import pandas as pd  # type: ignore
 from sssom.parsers import read_sssom_table  # type: ignore
 
 from bioportal_to_kgx.bioportal_utils import (  # type: ignore
-    bioportal_metadata, check_header_for_md, manually_add_md)
+    bioportal_metadata,  # type: ignore
+    check_header_for_md,  # type: ignore
+    manually_add_md)  # type: ignore
 from bioportal_to_kgx.robot_utils import (initialize_robot,  # type: ignore
-                                          relax_ontology, robot_measure,
-                                          robot_remove, robot_report)
+                                          relax_ontology,  # type: ignore
+                                          robot_measure,   # type: ignore
+                                          robot_remove,  # type: ignore
+                                          robot_report)   # type: ignore
 from bioportal_to_kgx.stats import make_transform_stats  # type: ignore
 
 TXDIR = "transformed"
@@ -29,7 +33,7 @@ PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
-    Generates paths for all data files within a path, recursively.
+    Generate paths for all data files within a path, recursively.
 
     :param input: str for root of data dump
     :param include_only: if non-empty, only return these files
@@ -131,7 +135,7 @@ def do_transforms(
                 all_map_paths.append(this_table)
         # Convert the SSSOM maps to a dict of originaltype:newtype
         for msdf in all_map_paths:
-            for i, row in msdf.df.iterrows():
+            for _, row in msdf.df.iterrows():
                 subj = None
                 obj = None
                 for k, v in row.iteritems():
@@ -603,7 +607,7 @@ def kgx_validate_transform(in_path: str) -> bool:
 
 
 def update_nodes(
-    operation: str, in_path: str, operation_map: dict, extra_map: dict = {}
+    operation: str, in_path: str, operation_map: dict, extra_map: dict
 ) -> bool:
     """
     Check on node and edgefile suitability for updating node details.
@@ -615,6 +619,9 @@ def update_nodes(
     :return: True if complete, False otherwise
     """
     tx_filepaths = []
+
+    if not extra_map:
+        extra_map = {}
 
     success = True
 
@@ -838,8 +845,8 @@ def is_file_too_short(filepath: str) -> bool:
     :return: bool, True if file is blank or too short
     """
     with open(filepath, "r") as infile:
-        for count, line in enumerate(infile):
-            pass
+        for count, _ in enumerate(infile):
+            count = count + 1
 
     if count >= 2:
         return False

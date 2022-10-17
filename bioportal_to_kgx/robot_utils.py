@@ -14,10 +14,10 @@ from post_setup.post_setup import robot_setup
 def initialize_robot(robot_path: str) -> list:
     """
     Initialize ROBOT with necessary configuration.
+
     During install, ROBOT is downloaded to the root project directory,
     and the path variable used here is only necessary if it varies from
     the project location.
-
     :param path: Path to ROBOT files.
     :return: A list consisting an instance of Command and
     dict of all environment variables.

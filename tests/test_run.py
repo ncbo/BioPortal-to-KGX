@@ -8,10 +8,10 @@ from run import run
 
 
 class TestRun(TestCase):
-    """Tests the run.py script."""
+    """Test the run.py script."""
 
     def setUp(self) -> None:
-        """Setup for tests."""
+        """Set up for tests."""
         self.runner = CliRunner()
 
     def test_run_transform(self):

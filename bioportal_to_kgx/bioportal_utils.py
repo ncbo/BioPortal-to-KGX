@@ -71,7 +71,7 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
 
 def check_header_for_md(filepath: str) -> bool:
     """
-    Checks for presence of metadata property names.
+    Check for presence of metadata property names.
 
     Takes a filename for a KGX edge or nodelist.
     :param filepath: str, path to KGX format file
