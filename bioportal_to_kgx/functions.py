@@ -11,16 +11,15 @@ import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
 from sssom.parsers import read_sssom_table  # type: ignore
 
-from bioportal_to_kgx.bioportal_utils import (  # type: ignore
-    bioportal_metadata,  # type: ignore
-    check_header_for_md,  # type: ignore
-    manually_add_md)  # type: ignore
-from bioportal_to_kgx.robot_utils import (initialize_robot,  # type: ignore
-                                          relax_ontology,  # type: ignore
-                                          robot_measure,   # type: ignore
-                                          robot_remove,  # type: ignore
-                                          robot_report)   # type: ignore
-from bioportal_to_kgx.stats import make_transform_stats  # type: ignore
+from bioportal_to_kgx.bioportal_utils import (bioportal_metadata,
+                                              check_header_for_md,
+                                              manually_add_md)
+from bioportal_to_kgx.robot_utils import (initialize_robot,
+                                          relax_ontology,
+                                          robot_measure,
+                                          robot_remove,
+                                          robot_report)
+from bioportal_to_kgx.stats import make_transform_stats
 
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
