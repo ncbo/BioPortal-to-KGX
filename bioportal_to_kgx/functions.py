@@ -400,7 +400,8 @@ def pandas_validate_transform(in_path: str) -> tuple:
     """
     tx_filepaths = []
     for filepath in os.listdir(in_path):
-        if filepath.endswith(".tsv"):
+        if filepath.endswith("nodes.tsv") or \
+                filepath.endswith("edges.tsv"):
             tx_filepaths.append(os.path.join(in_path, filepath))
 
     if len(tx_filepaths) == 0:
