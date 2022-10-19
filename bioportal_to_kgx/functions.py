@@ -10,6 +10,8 @@ from json import dump as json_dump
 import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
 
+from universalizer.norm import clean_and_normalize_graph
+
 from bioportal_to_kgx.bioportal_utils import (bioportal_metadata,
                                               check_header_for_md,
                                               manually_add_md)
@@ -332,9 +334,23 @@ def do_transforms(
                         txs_complete[outname] = False
                         txs_invalid.append(outname)
 
-            # Wrapped normalization steps should all go here.
+            # Wrapped normalization steps all go here.
             # Take the 'remap' and 'write_curies' params
             # and pass the SSSOM map directory in the former case
+            print("Normalizing graph...")
+
+            maps = []
+            if remap:
+                maps = [os.join(MAPPING_DIR, fn) for fn in
+                        os.listdir(MAPPING_DIR) if
+                        os.isfile(os.join(MAPPING_DIR, fn))]
+
+            if not clean_and_normalize_graph(filepath=outdir,
+                                             compressed=False,
+                                             maps=maps,
+                                             update_categories=write_curies,
+                                             oak_lookup=False):
+                print(f"Normalization did not complete for {outname}.")
 
             # One last mandatory validation step - can pandas load it?
             # Also gets node and edge counts in the process.
