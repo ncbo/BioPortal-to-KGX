@@ -9,7 +9,6 @@ from json import dump as json_dump
 
 import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
-
 from universalizer.norm import clean_and_normalize_graph
 
 from bioportal_to_kgx.bioportal_utils import (bioportal_metadata,
