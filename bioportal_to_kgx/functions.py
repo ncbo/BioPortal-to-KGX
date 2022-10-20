@@ -302,12 +302,13 @@ def do_transforms(
                         do_kgx_tx = False
                     except ValueError as e:
                         print("Encountered error during "
-                            f"KGX transform of {outname}: {e}")
+                              f"KGX transform of {outname}: {e}")
 
-                        # We can try to fix it - this is usually a malformed CURIE
+                        # We can try to fix it
+                        # this is usually a malformed CURIE
                         # (or something that looks like a CURIE)
                         if not did_repair:
-                            print("Will attempt to repair file and try again.")
+                            print("Will attempt to repair and try again.")
                             repaired_outpath = repair_bad_curie(relaxed_outpath)
                             os.replace(repaired_outpath, relaxed_outpath)
                             did_repair = True
