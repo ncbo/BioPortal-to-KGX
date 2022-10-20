@@ -303,7 +303,7 @@ def do_transforms(
                     # We can try to fix it - this is usually a malformed CURIE
                     # (or something that looks like a CURIE)
                     print("Will attempt to repair file and try again.")
-                    repaired_outpath = remove_bad_curie(relaxed_outpath)
+                    repaired_outpath = repair_bad_curie(relaxed_outpath)
                     try:
                         kgx.cli.transform(
                             inputs=[repaired_outpath],
@@ -550,9 +550,9 @@ def is_file_too_short(filepath: str) -> bool:
         return True
 
 
-def remove_bad_curie(filepath: str) -> str:
+def repair_bad_curie(filepath: str) -> str:
     """
-    Remove malformed CURIEs.
+    Remove malformed CURIE prefixes.
 
     Given the path to an obojson with a
     CURIE causing KGX to fail transforms,
@@ -567,7 +567,7 @@ def remove_bad_curie(filepath: str) -> str:
         with open(repaired_filepath, "w") as outfile:
             for line in infile:
                 for pattern in ["file:C:", "file:"]:
-                    line = re.sub(pattern, "", line)
+                    line = re.sub(pattern, "OBO:", line)
                 outfile.write(line)
 
     return repaired_filepath
