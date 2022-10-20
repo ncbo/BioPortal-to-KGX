@@ -15,7 +15,7 @@ MD_HEADINGS = {"primary_knowledge_source": "full_name"}
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     """
     Retrieve metadata for the given ontology.
-    
+
     Note that this requires a NCBO API key,
     to be passed in api_key.
     Returns a dict.

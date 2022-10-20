@@ -309,7 +309,8 @@ def do_transforms(
                         # (or something that looks like a CURIE)
                         if not did_repair:
                             print("Will attempt to repair and try again.")
-                            repaired_outpath = repair_bad_curie(relaxed_outpath)
+                            repaired_outpath = repair_bad_curie(
+                                               relaxed_outpath)
                             os.replace(repaired_outpath, relaxed_outpath)
                             did_repair = True
                         else:
