@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "bioportal-to-kgx"
+version = "0.1.0"
+description = "Assembles a BioPortal database dump into nodes and edges for assembly into KG-Bioportal."
+authors = ["caufieldjh <j.harry.caufield@gmail.com>"]
+license = "BSD-3"
+repository = "https://github.com/ncbo/BioPortal-to-KGX"
+readme = "README.md"
+include = [
+    "LICENSE",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.3"
+kgx = "^1.7.2"
+requests = "^2.28.1"
+sh = "^1.14.3"
+universalizer = "^0.0.1"
+parameterized = "^0.8.1"
+PyYAML = "^6.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
