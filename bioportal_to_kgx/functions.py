@@ -340,6 +340,9 @@ def do_transforms(
                                              compressed=False,
                                              maps=maps,
                                              update_categories=write_curies,
+                                             contexts=["obo",
+                                                       "bioregistry.upper",
+                                                       "bioportal"],
                                              oak_lookup=False):
                 print(f"Normalization did not complete for {outname}.")
 
