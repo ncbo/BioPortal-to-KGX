@@ -6,7 +6,6 @@ import re
 import sys
 import tempfile
 from json import dump as json_dump
-from typing import Union
 
 import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
@@ -173,7 +172,7 @@ def do_transforms(
                     have_kgx_validation_log = True
             if pandas_validate and tx_filecount > 0:
                 print("Validating graph files can be parsed...")
-                if pandas_validate_transform(outdir) == (0,0):
+                if pandas_validate_transform(outdir) == (0, 0):
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
@@ -403,7 +402,7 @@ def pandas_validate_transform(in_path: str) -> tuple:
 
     if len(tx_filepaths) == 0:
         print(f"Could not find graph files in {in_path}.")
-        return (0,0)
+        return (0, 0)
     try:
         linecount = 0
         for filepath in tx_filepaths:
