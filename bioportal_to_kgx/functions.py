@@ -173,7 +173,7 @@ def do_transforms(
                     have_kgx_validation_log = True
             if pandas_validate and tx_filecount > 0:
                 print("Validating graph files can be parsed...")
-                if not pandas_validate_transform(outdir):
+                if pandas_validate_transform(outdir) == (0,0):
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
@@ -351,11 +351,13 @@ def do_transforms(
             # Also gets node and edge counts in the process.
             if txs_complete[outname]:
                 print("Validating graph files with pandas...")
-                nodecount, edgecount = pandas_validate_transform(outdir)
-                if (nodecount, edgecount) == (0, 0):
+                counts = pandas_validate_transform(outdir)
+                if counts == (0, 0):
                     print(f"Validation did not complete for {outname}.")
                     txs_complete[outname] = False
                     txs_invalid.append(outname)
+                else:
+                    nodecount, edgecount = counts
 
             # Remove the tempfile
             os.remove(tempout.name)
@@ -381,7 +383,7 @@ def do_transforms(
     return txs_complete
 
 
-def pandas_validate_transform(in_path: str) -> Union[tuple, bool]:
+def pandas_validate_transform(in_path: str) -> tuple:
     """
     Validate transforms by parsing them with pandas.
 
@@ -401,7 +403,7 @@ def pandas_validate_transform(in_path: str) -> Union[tuple, bool]:
 
     if len(tx_filepaths) == 0:
         print(f"Could not find graph files in {in_path}.")
-        return False
+        return (0,0)
     try:
         linecount = 0
         for filepath in tx_filepaths:
