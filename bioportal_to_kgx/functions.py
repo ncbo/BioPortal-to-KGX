@@ -6,6 +6,7 @@ import re
 import sys
 import tempfile
 from json import dump as json_dump
+from typing import Union
 
 import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
@@ -332,9 +333,9 @@ def do_transforms(
 
             maps = []
             if remap:
-                maps = [os.join(MAPPING_DIR, fn) for fn in
+                maps = [os.path.join(MAPPING_DIR, fn) for fn in
                         os.listdir(MAPPING_DIR) if
-                        os.isfile(os.join(MAPPING_DIR, fn))]
+                        os.path.isfile(os.path.join(MAPPING_DIR, fn))]
 
             if not clean_and_normalize_graph(filepath=outdir,
                                              compressed=False,
@@ -380,7 +381,7 @@ def do_transforms(
     return txs_complete
 
 
-def pandas_validate_transform(in_path: str) -> tuple:
+def pandas_validate_transform(in_path: str) -> Union[tuple, bool]:
     """
     Validate transforms by parsing them with pandas.
 
