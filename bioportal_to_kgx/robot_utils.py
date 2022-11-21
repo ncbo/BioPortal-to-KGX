@@ -77,6 +77,9 @@ def relax_ontology(
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
         success = False
+    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+        print(f"ROBOT crashed! {e}")
+        success = False
 
     return success
 
@@ -113,6 +116,9 @@ def robot_convert(
         success = True
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
+        success = False
+    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+        print(f"ROBOT crashed! {e}")
         success = False
 
     return success
@@ -153,6 +159,9 @@ def merge_and_convert_ontology(
         success = True
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
+        success = False
+    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+        print(f"ROBOT crashed! {e}")
         success = False
 
     return success
