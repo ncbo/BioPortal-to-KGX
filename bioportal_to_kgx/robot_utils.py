@@ -209,7 +209,11 @@ def measure_ontology(
 
 
 def robot_remove(
-    robot_path: str, input_path: str, output_path: str, term: str, robot_env: dict
+    robot_path: str,
+    input_path: str,
+    output_path: str,
+    term: str,
+    robot_env: dict
 ) -> bool:
     """
     Run the ROBOT remove command on a single ontology.
