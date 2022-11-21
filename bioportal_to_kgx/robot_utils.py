@@ -77,7 +77,7 @@ def relax_ontology(
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
         success = False
-    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
         print(f"ROBOT crashed! {e}")
         success = False
 
@@ -117,7 +117,7 @@ def robot_convert(
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
         success = False
-    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
         print(f"ROBOT crashed! {e}")
         success = False
 
@@ -160,7 +160,7 @@ def merge_and_convert_ontology(
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
         success = False
-    except sh.SignalException_SIGKILL as e: # If ROBOT encounters a severe error
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
         print(f"ROBOT crashed! {e}")
         success = False
 
@@ -209,11 +209,7 @@ def measure_ontology(
 
 
 def robot_remove(
-    robot_path: str,
-    input_path: str,
-    output_path: str,
-    term: str,
-    robot_env: dict
+    robot_path: str, input_path: str, output_path: str, term: str, robot_env: dict
 ) -> bool:
     """
     Run the ROBOT remove command on a single ontology.
