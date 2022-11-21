@@ -68,7 +68,7 @@ def relax_ontology(
             input_path,
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
             _timeout=10800,
         )
@@ -106,7 +106,7 @@ def robot_convert(
             input_path,
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
         )
         print("Complete.")
@@ -145,7 +145,7 @@ def merge_and_convert_ontology(
             "convert",
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
             _timeout=10800,
         )
