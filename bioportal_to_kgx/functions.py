@@ -395,6 +395,9 @@ def pandas_validate_transform(in_path: str) -> tuple:
     If file is invalid, both values are zero.
     """
     tx_filepaths = []
+    nodecount = 0
+    edgecount = 0
+
     for filepath in os.listdir(in_path):
         if filepath.endswith("nodes.tsv") or \
                 filepath.endswith("edges.tsv"):
@@ -426,8 +429,6 @@ def pandas_validate_transform(in_path: str) -> tuple:
 
     except (pd.errors.ParserError, pd.errors.EmptyDataError) as e:
         print(f"Encountered parsing error in {filepath}: {e}")
-        nodecount = 0
-        edgecount = 0
 
     counts = (nodecount, edgecount)
 
