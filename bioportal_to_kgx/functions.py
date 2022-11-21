@@ -515,7 +515,6 @@ def kgx_validate_transform(in_path: str) -> bool:
                         inputs=tx_filepaths,
                         input_format="tsv",
                         input_compression=None,
-                        stream=True,
                         output=None,
                     )
                 ),
