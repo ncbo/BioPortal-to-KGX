@@ -172,7 +172,7 @@ def do_transforms(
                     have_kgx_validation_log = True
             if pandas_validate and tx_filecount > 0:
                 print("Validating graph files can be parsed...")
-                if not pandas_validate_transform(outdir):
+                if pandas_validate_transform(outdir) == (0, 0):
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
@@ -332,14 +332,17 @@ def do_transforms(
 
             maps = []
             if remap:
-                maps = [os.join(MAPPING_DIR, fn) for fn in
+                maps = [os.path.join(MAPPING_DIR, fn) for fn in
                         os.listdir(MAPPING_DIR) if
-                        os.isfile(os.join(MAPPING_DIR, fn))]
+                        os.path.isfile(os.path.join(MAPPING_DIR, fn))]
 
             if not clean_and_normalize_graph(filepath=outdir,
                                              compressed=False,
                                              maps=maps,
                                              update_categories=write_curies,
+                                             contexts=["obo",
+                                                       "bioregistry.upper",
+                                                       "bioportal"],
                                              oak_lookup=False):
                 print(f"Normalization did not complete for {outname}.")
 
@@ -347,11 +350,13 @@ def do_transforms(
             # Also gets node and edge counts in the process.
             if txs_complete[outname]:
                 print("Validating graph files with pandas...")
-                nodecount, edgecount = pandas_validate_transform(outdir)
-                if (nodecount, edgecount) == (0, 0):
+                counts = pandas_validate_transform(outdir)
+                if counts == (0, 0):
                     print(f"Validation did not complete for {outname}.")
                     txs_complete[outname] = False
                     txs_invalid.append(outname)
+                else:
+                    nodecount, edgecount = counts
 
             # Remove the tempfile
             os.remove(tempout.name)
@@ -397,7 +402,7 @@ def pandas_validate_transform(in_path: str) -> tuple:
 
     if len(tx_filepaths) == 0:
         print(f"Could not find graph files in {in_path}.")
-        return False
+        return (0, 0)
     try:
         linecount = 0
         for filepath in tx_filepaths:

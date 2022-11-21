@@ -89,7 +89,7 @@ def check_header_for_md(filepath: str) -> bool:
     return have_md
 
 
-def manually_add_md(filepath: str, md: str) -> bool:
+def manually_add_md(filepath: str, md: dict) -> bool:
     """
     Create a new header slot and add values to node/edgelist.
 
