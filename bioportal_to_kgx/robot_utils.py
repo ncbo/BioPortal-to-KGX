@@ -68,7 +68,7 @@ def relax_ontology(
             input_path,
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
             _timeout=10800,
         )
@@ -76,6 +76,9 @@ def relax_ontology(
         success = True
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
+        success = False
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
+        print(f"ROBOT crashed! {e}")
         success = False
 
     return success
@@ -106,13 +109,16 @@ def robot_convert(
             input_path,
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
         )
         print("Complete.")
         success = True
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
+        success = False
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
+        print(f"ROBOT crashed! {e}")
         success = False
 
     return success
@@ -145,7 +151,7 @@ def merge_and_convert_ontology(
             "convert",
             "--output",
             output_path,
-            "--vvv",
+            "-vvv",
             _env=robot_env,
             _timeout=10800,
         )
@@ -153,6 +159,9 @@ def merge_and_convert_ontology(
         success = True
     except sh.ErrorReturnCode_1 as e:  # If ROBOT runs but returns an error
         print(f"ROBOT encountered an error: {e}")
+        success = False
+    except sh.SignalException_SIGKILL as e:  # If ROBOT encounters severe error
+        print(f"ROBOT crashed! {e}")
         success = False
 
     return success
