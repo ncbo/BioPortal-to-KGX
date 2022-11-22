@@ -329,7 +329,6 @@ def do_transforms(
 
             if not clean_and_normalize_graph(filepath=outdir,
                                              compressed=False,
-                                             maps=maps,
                                              update_categories=write_curies,
                                              contexts=["obo",
                                                        "bioregistry.upper",
