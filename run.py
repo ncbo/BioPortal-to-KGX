@@ -63,13 +63,6 @@ from bioportal_to_kgx.functions import (  # type: ignore
 )
 @click.option("--ncbo_key", help="""Key for the NCBO API.""")
 @click.option(
-    "--remap",
-    is_flag=True,
-    help="""If used, will use the SSSOM maps in the mappings/ directory
-                        to append more specific Biolink types to
-                        existing types and remap any IDs.""",
-)
-@click.option(
     "--write_curies",
     is_flag=True,
     help="""If used, will convert node IDs to CURIEs, with the ontology
@@ -96,7 +89,6 @@ def run(
     robot_validate: bool,
     pandas_validate: bool,
     get_bioportal_metadata: bool,
-    remap: bool,
     write_curies: bool,
     ncbo_key=None,
     include_only=[],
@@ -117,7 +109,6 @@ def run(
         pandas_validate,
         get_bioportal_metadata,
         ncbo_key,
-        remap,
         write_curies,
     )
 

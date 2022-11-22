@@ -1,4 +1,4 @@
-"""Tests for BioPortal-to-KGX."""
+"""Integration tests for BioPortal-to-KGX."""
 
 from unittest import TestCase
 

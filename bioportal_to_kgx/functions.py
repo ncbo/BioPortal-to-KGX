@@ -22,7 +22,6 @@ from bioportal_to_kgx.stats import make_transform_stats
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
-MAPPING_DIR = "mappings"
 PREFIX_DIR = "prefixes"
 PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
 PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
@@ -79,7 +78,6 @@ def do_transforms(
     pandas_validate: bool,
     get_bioportal_metadata: bool,
     ncbo_key: str,
-    remap: bool,
     write_curies: bool,
 ) -> dict:
     """
@@ -98,7 +96,6 @@ def do_transforms(
     :param pandas_validate: bool
     :param get_bioportal_metadata: bool
     :param ncbo_key: str
-    :param remap: bool
     :param write_curies: bool
     :return: dict of transform success/failure,
             with ontology names as keys,
@@ -326,15 +323,9 @@ def do_transforms(
                         txs_invalid.append(outname)
 
             # Wrapped normalization steps all go here.
-            # Take the 'remap' and 'write_curies' params
+            # Take the 'write_curies' param
             # and pass the SSSOM map directory in the former case
             print("Normalizing graph...")
-
-            maps = []
-            if remap:
-                maps = [os.path.join(MAPPING_DIR, fn) for fn in
-                        os.listdir(MAPPING_DIR) if
-                        os.path.isfile(os.path.join(MAPPING_DIR, fn))]
 
             if not clean_and_normalize_graph(filepath=outdir,
                                              compressed=False,
