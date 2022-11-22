@@ -2350,7 +2350,7 @@ sssom = "^0.3.16"
 type = "git"
 url = "https://github.com/Knowledge-Graph-Hub/universalizer.git"
 reference = "main"
-resolved_reference = "170941f505588289cfddb3bb6ad27c3a92c864b4"
+resolved_reference = "5dc80435d71e05176172b5d0e533e30d089dae48"
 
 [[package]]
 name = "uri-template"
