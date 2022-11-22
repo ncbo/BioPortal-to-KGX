@@ -733,7 +733,7 @@ PCAO	biolink:NamedThing
 PCL	biolink:NamedThing
 PCMO	biolink:NamedThing
 PCO	biolink:NamedThing
-PDO	biolink:NamedThing
+PDO	biolink:DiseaseOrPhenotypicFeature
 PDON	biolink:NamedThing
 PDO_CAS	biolink:NamedThing
 PDQ	biolink:NamedThing
@@ -750,9 +750,9 @@ PGXO	biolink:NamedThing
 PHAGE	biolink:NamedThing
 PHARE	biolink:NamedThing
 PHENX	biolink:NamedThing
-PHFUMIADO	biolink:NamedThing
+PHFUMIADO	biolink:AnatomicalEntity
 PHIPO	biolink:NamedThing
-PHMAMMADO	biolink:NamedThing
+PHMAMMADO	biolink:AnatomicalEntity
 PHYLONT	biolink:NamedThing
 PIERO	biolink:NamedThing
 PINO	biolink:NamedThing
@@ -769,8 +769,8 @@ PMO	biolink:NamedThing
 PMO-SPEED	biolink:NamedThing
 PMR	biolink:NamedThing
 PNADO	biolink:NamedThing
-PO	biolink:NamedThing
-PORO	biolink:NamedThing
+PO	biolink:AnatomicalEntity
+PORO	biolink:AnatomicalEntity
 PP	biolink:NamedThing
 PPLC	biolink:NamedThing
 PPO	biolink:NamedThing
@@ -785,7 +785,7 @@ PROPREO	biolink:NamedThing
 PROVO	biolink:NamedThing
 PSDO	biolink:NamedThing
 PSDS	biolink:NamedThing
-PSIMOD	biolink:NamedThing
+MOD	biolink:PosttranslationalModification
 PSO	biolink:NamedThing
 PSO_2	biolink:NamedThing
 PTO	biolink:NamedThing
@@ -812,7 +812,7 @@ RDO	biolink:NamedThing
 REPO	biolink:NamedThing
 REPRODUCE-ME	biolink:NamedThing
 RETO	biolink:NamedThing
-REX	biolink:NamedThing
+REX	biolink:BiologicalProcess
 REXO	biolink:NamedThing
 RH-MESH	biolink:NamedThing
 RNAO	biolink:NamedThing
@@ -820,11 +820,11 @@ RNPRIO	biolink:NamedThing
 RNRMU	biolink:NamedThing
 RO	biolink:NamedThing
 ROCKNROLLTEST	biolink:NamedThing
-ROLEO	biolink:NamedThing
+ROLEO	biolink:PopulationOfIndividualOrganisms
 ROO	biolink:NamedThing
 ROS	biolink:NamedThing
-RPO	biolink:NamedThing
-RS	biolink:NamedThing
+RPO	biolink:DiseaseOrPhenotypicFeature
+RS	biolink:Genotype
 RSA	biolink:NamedThing
 RVO	biolink:NamedThing
 RXNO	biolink:NamedThing
@@ -862,7 +862,7 @@ SOPHARM	biolink:NamedThing
 SOS	biolink:NamedThing
 SOY	biolink:NamedThing
 SP	biolink:NamedThing
-SPD	biolink:NamedThing
+SPD	biolink:AnatomicalEntity
 SPO	biolink:NamedThing
 SPTO	biolink:NamedThing
 SSE	biolink:NamedThing
@@ -875,10 +875,10 @@ STY	biolink:NamedThing
 SURGICAL	biolink:NamedThing
 SWEET	biolink:NamedThing
 SWO	biolink:NamedThing
-SYMP	biolink:NamedThing
+SYMP	biolink:ClinicalFinding
 SYN	biolink:NamedThing
 TADS	biolink:NamedThing
-TAO	biolink:NamedThing
+TAO	biolink:AnatomicalEntity
 TAXRANK	biolink:NamedThing
 TCDO	biolink:NamedThing
 TCO	biolink:NamedThing
@@ -893,7 +893,7 @@ TESTEX	biolink:NamedThing
 TEST_A	biolink:NamedThing
 TEST_CBI	biolink:NamedThing
 TEST_IDKWHATIMDO	biolink:NamedThing
-TGMA	biolink:NamedThing
+TGMA	biolink:AnatomicalEntity
 TIM	biolink:NamedThing
 TIME	biolink:NamedThing
 TIMEBANK	biolink:NamedThing
@@ -909,7 +909,7 @@ TOP-MENELAS	biolink:NamedThing
 TRAK	biolink:NamedThing
 TRANS	biolink:NamedThing
 TRIAGE	biolink:NamedThing
-TRON	biolink:NamedThing
+TRON	biolink:AnatomicalEntity
 TTO	biolink:OrganismTaxon
 TXPO	biolink:NamedThing
 TYPON	biolink:NamedThing
@@ -973,3 +973,5 @@ ZONMW-GENERIC	biolink:NamedThing
 ZP	biolink:NamedThing
 pseudo	biolink:NamedThing
 suicideo	biolink:NamedThing
+UniProtKB	biolink:Protein
+NCBIGene	biolink:Gene
