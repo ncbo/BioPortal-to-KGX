@@ -22,7 +22,6 @@ from bioportal_to_kgx.stats import make_transform_stats
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
-MAPPING_DIR = "mappings"
 PREFIX_DIR = "prefixes"
 PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
 PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
@@ -56,8 +55,7 @@ def examine_data_directory(input: str, include_only: list, exclude: list):
 
     # Find all files, not including lone directory names
     for filepath in glob.iglob(input + "**/**", recursive=True):
-        if len(os.path.basename(filepath)) == 28 \
-                and filepath not in data_filepaths:
+        if len(os.path.basename(filepath)) == 28 and filepath not in data_filepaths:
             if including and os.path.basename(filepath) not in include_only:
                 continue
             if excluding and os.path.basename(filepath) in exclude:
@@ -79,7 +77,6 @@ def do_transforms(
     pandas_validate: bool,
     get_bioportal_metadata: bool,
     ncbo_key: str,
-    remap: bool,
     write_curies: bool,
 ) -> dict:
     """
@@ -98,7 +95,6 @@ def do_transforms(
     :param pandas_validate: bool
     :param get_bioportal_metadata: bool
     :param ncbo_key: str
-    :param remap: bool
     :param write_curies: bool
     :return: dict of transform success/failure,
             with ontology names as keys,
@@ -153,8 +149,7 @@ def do_transforms(
             tx_filecount = 0
             filelist = os.listdir(outdir)
             for filename in filelist:
-                if filename.endswith("nodes.tsv") \
-                        or filename.endswith("edges.tsv"):
+                if filename.endswith("nodes.tsv") or filename.endswith("edges.tsv"):
                     tx_filecount = tx_filecount + 1
                     if ok_to_transform:
                         print(f"Transform already present for {outname}")
@@ -176,18 +171,13 @@ def do_transforms(
                     print(f"Validation did not complete for {outname}.")
                     txs_invalid.append(outname)
             if robot_validate and not have_robot_report and tx_filecount > 0:
-                print(f"ROBOT reports not found for {outname} "
-                      "- will generate.")
+                print(f"ROBOT reports not found for {outname} " "- will generate.")
                 get_robot_reports(filepath, outdir, robot_path, robot_env)
-            if kgx_validate \
-                    and not have_kgx_validation_log \
-                    and tx_filecount > 0:
-                print(f"KGX validation log not found for {outname} "
-                      "- will validate.")
+            if kgx_validate and not have_kgx_validation_log and tx_filecount > 0:
+                print(f"KGX validation log not found for {outname} " "- will validate.")
                 kgx_validate_transform(outdir)
             if get_bioportal_metadata and not have_bioportal_metadata:
-                print(f"BioPortal metadata not found for {outname} "
-                      "- will retrieve.")
+                print(f"BioPortal metadata not found for {outname} " "- will retrieve.")
                 onto_md = bioportal_metadata(dataname, ncbo_key)
                 # If we fail to retrieve metadata, onto_md['name'] == None
                 # Add metadata to existing transforms - just the edges for now
@@ -198,19 +188,18 @@ def do_transforms(
                     for filename in filelist:
                         if filename.endswith("edges.tsv"):
                             print(f"Adding metadata to {outname}...")
-                            if manually_add_md(os.path.join(outdir, filename),
-                                               onto_md):
+                            if manually_add_md(os.path.join(outdir, filename), onto_md):
                                 print("Complete.")
                             else:
-                                print("Something went wrong during "
-                                      "metadata writing.")
+                                print(
+                                    "Something went wrong during " "metadata writing."
+                                )
 
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
             # relevant contents aren't somewhere in the data dump
             # So we write a placeholder if needed
-            with tempfile.NamedTemporaryFile(mode="w", delete=False) \
-                    as tempout:
+            with tempfile.NamedTemporaryFile(mode="w", delete=False) as tempout:
                 linecount = 0
                 for line in infile:
                     tempout.write(line)
@@ -228,28 +217,18 @@ def do_transforms(
             if ok_to_transform:
 
                 print(f"ROBOT: relax {outname}")
-                relaxed_outpath = os.path.join(outdir,
-                                               outname + "_relaxed.json")
-                if relax_ontology(robot_path,
-                                  tempname,
-                                  relaxed_outpath,
-                                  robot_env):
+                relaxed_outpath = os.path.join(outdir, outname + "_relaxed.json")
+                if relax_ontology(robot_path, tempname, relaxed_outpath, robot_env):
                     txs_complete[outname] = True
                 else:
-                    print("Encountered error during "
-                          f"robot relax of {outname}.")
+                    print("Encountered error during " f"robot relax of {outname}.")
 
                     # We can try to fix it -
                     # this is usually a null value in a comment.
                     print("Will attempt to repair file and try again.")
-                    repaired_outpath = remove_comments(tempname,
-                                                       robot_path,
-                                                       robot_env)
+                    repaired_outpath = remove_comments(tempname, robot_path, robot_env)
                     if relax_ontology(
-                        robot_path,
-                        repaired_outpath,
-                        relaxed_outpath,
-                        robot_env
+                        robot_path, repaired_outpath, relaxed_outpath, robot_env
                     ):
                         txs_complete[outname] = True
                     else:
@@ -264,10 +243,7 @@ def do_transforms(
 
                 if robot_validate and txs_complete[outname]:
                     print("Generating ROBOT reports...")
-                    if not get_robot_reports(filepath,
-                                             outdir,
-                                             robot_path,
-                                             robot_env):
+                    if not get_robot_reports(filepath, outdir, robot_path, robot_env):
                         print(f"Could not get ROBOT reports for {outname}.")
 
                 if (
@@ -292,25 +268,24 @@ def do_transforms(
                             output_format="tsv",
                             stream=True,
                             knowledge_sources=[
-                                ("aggregator_knowledge_source",
-                                    "BioPortal"),
-                                ("primary_knowledge_source",
-                                    primary_knowledge_source),
+                                ("aggregator_knowledge_source", "BioPortal"),
+                                ("primary_knowledge_source", primary_knowledge_source),
                             ],
                         )
                         txs_complete[outname] = True
                         do_kgx_tx = False
                     except ValueError as e:
-                        print("Encountered error during "
-                              f"KGX transform of {outname}: {e}")
+                        print(
+                            "Encountered error during "
+                            f"KGX transform of {outname}: {e}"
+                        )
 
                         # We can try to fix it
                         # this is usually a malformed CURIE
                         # (or something that looks like a CURIE)
                         if not did_repair:
                             print("Will attempt to repair and try again.")
-                            repaired_outpath = repair_bad_curie(
-                                relaxed_outpath)
+                            repaired_outpath = repair_bad_curie(relaxed_outpath)
                             os.replace(repaired_outpath, relaxed_outpath)
                             did_repair = True
                         else:
@@ -326,24 +301,19 @@ def do_transforms(
                         txs_invalid.append(outname)
 
             # Wrapped normalization steps all go here.
-            # Take the 'remap' and 'write_curies' params
+            # Take the 'write_curies' param
             # and pass the SSSOM map directory in the former case
             print("Normalizing graph...")
 
-            maps = []
-            if remap:
-                maps = [os.path.join(MAPPING_DIR, fn) for fn in
-                        os.listdir(MAPPING_DIR) if
-                        os.path.isfile(os.path.join(MAPPING_DIR, fn))]
-
-            if not clean_and_normalize_graph(filepath=outdir,
-                                             compressed=False,
-                                             maps=maps,
-                                             update_categories=write_curies,
-                                             contexts=["obo",
-                                                       "bioregistry.upper",
-                                                       "bioportal"],
-                                             oak_lookup=False):
+            if not clean_and_normalize_graph(
+                filepath=outdir,
+                compressed=False,
+                maps=[],
+                update_categories=write_curies,
+                contexts=["obo", "bioregistry.upper", "bioportal"],
+                namespace_cat_map="namespace_maps.tsv",
+                oak_lookup=False,
+            ):
                 print(f"Normalization did not complete for {outname}.")
 
             # One last mandatory validation step - can pandas load it?
@@ -366,10 +336,12 @@ def do_transforms(
                 status = "OK"
             else:
                 status = "FAIL"
-            tx_result = {"id": dataname,
-                         "status": status,
-                         "nodecount": nodecount,
-                         "edgecount": edgecount}
+            tx_result = {
+                "id": dataname,
+                "status": status,
+                "nodecount": nodecount,
+                "edgecount": edgecount,
+            }
             tx_results.append(tx_result)
 
     # Notify about any invalid transforms (i.e., completed but broken somehow)
@@ -399,8 +371,7 @@ def pandas_validate_transform(in_path: str) -> tuple:
     edgecount = 0
 
     for filepath in os.listdir(in_path):
-        if filepath.endswith("nodes.tsv") or \
-                filepath.endswith("edges.tsv"):
+        if filepath.endswith("nodes.tsv") or filepath.endswith("edges.tsv"):
             tx_filepaths.append(os.path.join(in_path, filepath))
 
     if len(tx_filepaths) == 0:
