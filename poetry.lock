@@ -740,7 +740,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
 optional = false
@@ -1148,7 +1148,7 @@ viz = ["pygraphviz"]
 
 [[package]]
 name = "oaklib"
-version = "0.1.54"
+version = "0.1.55"
 description = "Ontology Access Kit: Python library for common ontology operations over a variety of backends"
 category = "main"
 optional = false
@@ -2350,7 +2350,7 @@ sssom = "^0.3.16"
 type = "git"
 url = "https://github.com/Knowledge-Graph-Hub/universalizer.git"
 reference = "main"
-resolved_reference = "5dc80435d71e05176172b5d0e533e30d089dae48"
+resolved_reference = "0d59bdad3c57a13ae15909454760eb09877868a5"
 
 [[package]]
 name = "uri-template"
@@ -3103,8 +3103,8 @@ jsonpointer = [
     {file = "jsonpointer-2.3.tar.gz", hash = "sha256:97cba51526c829282218feb99dab1b1e6bdf8efd1c43dc9d57be093c0d69c99a"},
 ]
 jsonschema = [
-    {file = "jsonschema-4.17.0-py3-none-any.whl", hash = "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248"},
-    {file = "jsonschema-4.17.0.tar.gz", hash = "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d"},
+    {file = "jsonschema-4.17.1-py3-none-any.whl", hash = "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7"},
+    {file = "jsonschema-4.17.1.tar.gz", hash = "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3"},
 ]
 jsonstreams = [
     {file = "jsonstreams-0.6.0-py2.py3-none-any.whl", hash = "sha256:b2e609c2bc17eec77fe26dae4d32556ba59dafbbff30c9a4909f2e19fa5bb000"},
@@ -3351,8 +3351,8 @@ nxontology = [
     {file = "nxontology-0.4.1.tar.gz", hash = "sha256:8f1e5d6d7787542e9414be4ae34bb09e369dbaf2d6c646bba2d18b122c083d44"},
 ]
 oaklib = [
-    {file = "oaklib-0.1.54-py3-none-any.whl", hash = "sha256:a64c971f8af896dc1e759179d32061262f5bcf785d7f2b3207882b1a7bdc2c85"},
-    {file = "oaklib-0.1.54.tar.gz", hash = "sha256:f7fdc2e6a9eb610c3dcc3fb32005dc4262e1ddf6ee51a8402eeb4e8c0ede0747"},
+    {file = "oaklib-0.1.55-py3-none-any.whl", hash = "sha256:e210e50898a3644e7a2ef3fe335e7624daa928a702f4feed861e1bfdacf723bc"},
+    {file = "oaklib-0.1.55.tar.gz", hash = "sha256:7a16ebabc85e2140f7c491c8ada69a9b459a51f4334aaf229ce495ccd2ba6208"},
 ]
 ols-client = [
     {file = "ols_client-0.1.2-py3-none-any.whl", hash = "sha256:880a41aa99fd1dbcda95f408356e1c4307ad7c34dfa75c959b54973c85d9fa6e"},
