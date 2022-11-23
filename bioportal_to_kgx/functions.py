@@ -308,6 +308,7 @@ def do_transforms(
             if not clean_and_normalize_graph(
                 filepath=outdir,
                 compressed=False,
+                maps=[],
                 update_categories=write_curies,
                 contexts=["obo", "bioregistry.upper", "bioportal"],
                 namespace_cat_map="namespace_maps.tsv",
