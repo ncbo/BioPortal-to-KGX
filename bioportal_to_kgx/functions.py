@@ -19,6 +19,7 @@ from bioportal_to_kgx.robot_utils import (initialize_robot, relax_ontology,
                                           robot_report)
 from bioportal_to_kgx.stats import make_transform_stats
 
+BIOPORTAL_SOURCE = "BioPortal 2022-07-20"
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
@@ -264,7 +265,7 @@ def do_transforms(
                             output_format="tsv",
                             stream=True,
                             knowledge_sources=[
-                                ("aggregator_knowledge_source", "BioPortal"),
+                                ("aggregator_knowledge_source", BIOPORTAL_SOURCE),
                                 ("primary_knowledge_source", primary_knowledge_source),
                             ],
                         )
