@@ -189,9 +189,7 @@ def do_transforms(
                             if manually_add_md(os.path.join(outdir, filename), onto_md):
                                 print("Complete.")
                             else:
-                                print(
-                                    "Something went wrong during " "metadata writing."
-                                )
+                                print("Something went wrong during metadata writing.")
 
             # Need version of file w/o first line or KGX will choke
             # The file may be empty, but that doesn't mean the
@@ -253,11 +251,15 @@ def do_transforms(
                 else:
                     primary_knowledge_source = "False"
 
-                print(f"KGX transform {outname}")
+                print(f"KGX transforming {outname}...")
                 do_kgx_tx = True
                 did_repair = False
                 while do_kgx_tx:
                     try:
+                        # For unknown reasons, this doesn't always
+                        # add knowledge sources.
+                        # So we try to add them afterward, too,
+                        # before validating the KGX output.
                         kgx.cli.transform(
                             inputs=[relaxed_outpath],
                             input_format="obojson",
@@ -288,6 +290,17 @@ def do_transforms(
                         else:
                             print("Could not repair.")
                             break
+
+                if have_bioportal_metadata:
+                    print(f"Adding metadata to {outname}...")
+                    if manually_add_md(
+                        os.path.join(outdir, outname+"_edges.tsv"), onto_md
+                    ):
+                        print("Complete.")
+                    else:
+                        print(
+                            "Something went wrong during metadata writing."
+                        )
 
                 # Validation
                 if kgx_validate and txs_complete[outname]:
