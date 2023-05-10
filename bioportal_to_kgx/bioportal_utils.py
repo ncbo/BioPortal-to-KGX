@@ -35,7 +35,7 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
         params = dict(apikey=api_key, display_context="False", include="all")
         print(f"Accessing {req_url}...")
 
-        response = requests.get(req_url, params=params)
+        response = requests.get(req_url, params=params, timeout=20)
         print(response)
 
         if response.status_code != 200:

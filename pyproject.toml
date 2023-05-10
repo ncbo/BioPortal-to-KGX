@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bioportal-to-kgx"
-version = "0.1.0"
+version = "0.1.1"
 description = "Assembles a BioPortal database dump into nodes and edges for assembly into KG-Bioportal."
 authors = ["caufieldjh <j.harry.caufield@gmail.com>"]
 license = "BSD-3"
