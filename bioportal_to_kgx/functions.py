@@ -22,9 +22,6 @@ from bioportal_to_kgx.stats import make_transform_stats
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
-PREFIX_DIR = "prefixes"
-PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
-PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
 
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
@@ -215,7 +212,6 @@ def do_transforms(
                 continue
 
             if ok_to_transform:
-
                 print(f"ROBOT: relax {outname}")
                 relaxed_outpath = os.path.join(outdir, outname + "_relaxed.json")
                 if relax_ontology(robot_path, tempname, relaxed_outpath, robot_env):
