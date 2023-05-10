@@ -11,7 +11,8 @@ import kgx.cli  # type: ignore
 import pandas as pd  # type: ignore
 from universalizer.norm import clean_and_normalize_graph
 
-from bioportal_to_kgx.bioportal_utils import (bioportal_metadata,
+from bioportal_to_kgx.bioportal_utils import (BIOPORTAL_SOURCE,
+                                              bioportal_metadata,
                                               check_header_for_md,
                                               manually_add_md)
 from bioportal_to_kgx.robot_utils import (initialize_robot, relax_ontology,
@@ -19,7 +20,6 @@ from bioportal_to_kgx.robot_utils import (initialize_robot, relax_ontology,
                                           robot_report)
 from bioportal_to_kgx.stats import make_transform_stats
 
-BIOPORTAL_SOURCE = "BioPortal 2022-07-20"
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
@@ -294,13 +294,11 @@ def do_transforms(
                 if have_bioportal_metadata:
                     print(f"Adding metadata to {outname}...")
                     if manually_add_md(
-                        os.path.join(outdir, outname+"_edges.tsv"), onto_md
+                        os.path.join(outdir, outname + "_edges.tsv"), onto_md
                     ):
                         print("Complete.")
                     else:
-                        print(
-                            "Something went wrong during metadata writing."
-                        )
+                        print("Something went wrong during metadata writing.")
 
                 # Validation
                 if kgx_validate and txs_complete[outname]:

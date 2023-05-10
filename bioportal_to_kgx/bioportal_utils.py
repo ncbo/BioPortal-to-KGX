@@ -5,11 +5,15 @@ from typing import List
 
 import requests  # type: ignore
 
+BIOPORTAL_SOURCE = "BioPortal 2022-07-20"
 BASE_ONTO_URL = "https://data.bioontology.org/ontologies/"
 
 # Mapping from Biolink slots (keys) to a custom value
 # assembled from metadata
-MD_HEADINGS = {"primary_knowledge_source": "full_name"}
+MD_HEADINGS = {
+    "primary_knowledge_source": "full_name",
+    "aggregator_knowledge_source": "bp_version",
+}
 
 
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
@@ -62,9 +66,12 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     if len(missing_pages) == 0:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
     else:
-        print(f"Tried metadata retrieval for {ontoid}, "
-              f"but failed on {missing_pages}")
+        print(
+            f"Tried metadata retrieval for {ontoid}, " f"but failed on {missing_pages}"
+        )
         md["name"] = ""
+    
+    md["bp_version"] = BIOPORTAL_SOURCE
 
     return md
 
@@ -95,10 +102,6 @@ def manually_add_md(filepath: str, md: dict) -> bool:
 
     Takes a filename for the KGX edge or nodelist,
     for each entry.
-    This only needs to happen if the
-    node/edgefile already exists.
-    Otherwise the metadata is added at graph
-    file creation.
     :param filepath: str, path to KGX format file
     :param md: dict, the metadata
     :return: bool, True if successful
