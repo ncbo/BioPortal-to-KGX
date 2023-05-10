@@ -5,11 +5,15 @@ from typing import List
 
 import requests  # type: ignore
 
+BIOPORTAL_SOURCE = "BioPortal 2022-07-20"
 BASE_ONTO_URL = "https://data.bioontology.org/ontologies/"
 
 # Mapping from Biolink slots (keys) to a custom value
 # assembled from metadata
-MD_HEADINGS = {"primary_knowledge_source": "full_name"}
+MD_HEADINGS = {
+    "primary_knowledge_source": "full_name",
+    "aggregator_knowledge_source": "bp_version",
+}
 
 
 def bioportal_metadata(ontoid: str, api_key: str) -> dict:
@@ -62,9 +66,12 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
     if len(missing_pages) == 0:
         print(f"Retrieved metadata for {ontoid} ({md['name']})")
     else:
-        print(f"Tried metadata retrieval for {ontoid}, "
-              f"but failed on {missing_pages}")
+        print(
+            f"Tried metadata retrieval for {ontoid}, " f"but failed on {missing_pages}"
+        )
         md["name"] = ""
+
+    md["bp_version"] = BIOPORTAL_SOURCE
 
     return md
 
@@ -91,25 +98,25 @@ def check_header_for_md(filepath: str) -> bool:
 
 def manually_add_md(filepath: str, md: dict) -> bool:
     """
-    Create a new header slot and add values to node/edgelist.
+    Create new column headings and add values to node/edgelist.
 
     Takes a filename for the KGX edge or nodelist,
-    for each entry.
-    This only needs to happen if the
-    node/edgefile already exists.
-    Otherwise the metadata is added at graph
-    file creation.
+    for each entry. Removes "knowledge_source" if present.
     :param filepath: str, path to KGX format file
     :param md: dict, the metadata
     :return: bool, True if successful
     """
     success = False
 
+    ks_heading = "knowledge_source"
+
     out_filepath = filepath + ".tmp"
 
     try:
         with open(filepath, "r") as infile:
-            out_header_split = ((infile.readline()).rstrip()).split("/t")
+            out_header_split = ((infile.readline()).rstrip()).split("\t")
+            if ks_heading in out_header_split:
+                out_header_split.remove(ks_heading)
             with open(out_filepath, "w") as outfile:
                 for heading in MD_HEADINGS:
                     out_header_split.append(heading)
