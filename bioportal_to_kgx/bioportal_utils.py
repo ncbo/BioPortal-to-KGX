@@ -70,7 +70,7 @@ def bioportal_metadata(ontoid: str, api_key: str) -> dict:
             f"Tried metadata retrieval for {ontoid}, " f"but failed on {missing_pages}"
         )
         md["name"] = ""
-    
+
     md["bp_version"] = BIOPORTAL_SOURCE
 
     return md
