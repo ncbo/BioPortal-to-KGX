@@ -22,8 +22,6 @@ from bioportal_to_kgx.stats import make_transform_stats
 TXDIR = "transformed"
 NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
-PREFIX_DIR = "prefixes"
-PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
