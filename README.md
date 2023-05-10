@@ -28,7 +28,10 @@ python run.py --input ../path/to/your/data/ --include_only dabd4d902360003975fb2
 
 Output will be written to the `/bioportal_to_kgx` directory within `/transformed`, with subdirectories named for the 4store graph and each subgraph.
 
-Each subgraph will contain node and edge files ({subgraph_name}_nodes.tsv and {subgraph_name}_edges.tsv, respectively) along with logs containing any validation messages about the transforms.
+Each subgraph will contain:
+* node and edge files ({subgraph_name}_nodes.tsv and {subgraph_name}_edges.tsv, respectively) 
+* A JSON version of the ontology ({subgraph_name}_relaxed.json)
+* logs containing any validation messages about the transforms
 
 ## Troubleshooting
 
