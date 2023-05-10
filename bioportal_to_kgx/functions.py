@@ -24,8 +24,6 @@ NAMESPACE = "data.bioontology.org"
 TARGET_TYPE = "ontologies"
 PREFIX_DIR = "prefixes"
 PREFIX_FILENAME = "bioportal-prefixes-curated.tsv"
-PREF_PREFIX_FILENAME = "bioportal-preferred-prefixes.tsv"
-
 
 def examine_data_directory(input: str, include_only: list, exclude: list):
     """
