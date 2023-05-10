@@ -16,7 +16,7 @@ The dump will be in the form of n-triples, with individual sets of records in ne
 Run BioPortal-to-KGX with all validation and metadata retrieval options as:
 
 ```
-python run.py --input ../path/to/your/data/ --kgx_validate --robot_validate --pandas_validate --write_curies --remap_types --get_bioportal_metadata --ncbo_key YOUR_NCBO_API_KEY_HERE 
+python run.py --input ../path/to/your/data/ --kgx_validate --robot_validate --pandas_validate --write_curies --get_bioportal_metadata --ncbo_key YOUR_NCBO_API_KEY_HERE 
 ```
 
 Specify individual ontologies to include or exclude with the --include_only and --exclude options, respectively, each followed by a comma-delimited list of the original hashed file ID from the 4store dump.
